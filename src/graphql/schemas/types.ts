@@ -1,62 +1,157 @@
 export const types = `
-  type Documento {
+  type Document {
     _id: ID!
-    titulo: String!
+    title: String!
     path: String!
-    Categoria: ID!
-    docente: ID!
+    category: ID!
+    owner: ID!
     createdAt: Number!
-    UpdatedAt: Number
+    updatedAt: Number
   }
   
-  input TypeInput {
-    
+  input  InputDocument {
+    title: String!
+    path: String!
+    category: ID!
+    owner: ID!
   }
 
-  type Facultad {
+  input UpdateDocument{
+    title: String
+    path: String
+    category: ID
+  }
+  """
+  type Campus {
     _id: ID!
-    nombre: String!
-    numbero: String!
+    name: String!
+    phone: String!
   }
 
-  type Permiso {
-    _id: ID!
-    nombre: String!
+  input InputCampus {
+    name: String!
+    phone: String!
   }
 
-  type Aviso {
+  input UpdateCampus{
+    name: String
+    phone: String
+  }
+  """
+  type Permission {
     _id: ID!
-    titulo: String!
-    cuerpo: String!
+    name: String!
+  }
+
+  input InputPermission {
+    name: String!
+  }
+
+  input UpdatePermission {
+    name: String
+  }
+
+  input TypeInputPermiso {
+    _id: ID!
+    name: String!
+  }
+
+  type Notice {
+    _id: ID!
+    title: String!
+    body: String!
     status: String!
     link: String!
     imgLnk: String!
     createdBy: ID!
+    fromDate: Number!
+    toDate: Number!
     createdAt: Number!
     UpdatedAt: Number
   }
 
-  type Docente {
+  input InputNotice {
+    title: String!
+    body: String!
+    status: String!
+    link: String!
+    imgLnk: String!
+    fromDate: Number!
+    toDate: Number!
+  }
+
+  input UpdateNotice {
+    title: String
+    body: String
+    status: String
+    link: String
+    imgLnk: String
+    fromDate: Number
+    toDate: Number
+  }
+
+  type User {
     _id: ID!
     clave: String!
     status: String!
-    nombre: String!
-    adscripcion: ID!
-    permisos: [Permiso!]!
+    name: String!
+    adscription: ID!
+    permissions: [Permission!]!
   }
 
-  type Rubo {
+  input InputUser {
+    clave: String!
+    status: String!
+    name: String!
+    adscription: ID!
+    permissions: [TypeInputPermiso!]!
+  }
+
+  input UpdateUser {
+    status: String
+    permissions: [TypeInputPermiso!]
+  }
+
+  type Rubro {
     _id: ID!
     clave: String!
-    titulo: String!
+    title: String!
     categorias: [ID!]!
   }
 
-  type Categoria {
+  input InputRubro {
+    clave: string!
+    title: string!
+    categorias: [ID!]!
+  }
+
+  input UpdateRubro {
+    clave: string
+    title: string
+    categorias: [ID!]
+  }
+
+  type Category {
     _id: ID!
     parent: ID!
     clave: String!
-    titulo: String!
+    title: String!
+    puntos: Number
+    children: [ID!]
+  }
+
+  input InputCategory {
+    parent: ID!
+    clave: String!
+    title: String!
+    puntos: Number
+    children: [ID!]
+  }
+
+  input UpdateCategory {
+    parent: ID
+    clave: String
+    title: String
     puntos: Number
     children: [ID!]
   }
@@ -66,5 +161,10 @@ export const types = `
     descripcion: String!
     cuaser: ID!
     createdAt: Number!
+  }
+  
+  input InputSystemLog {
+    descripcion: String!
+    cuaser: ID!
   }
 `;

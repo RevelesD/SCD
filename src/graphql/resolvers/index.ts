@@ -1,11 +1,33 @@
-import { documentsQueries, documentMutation } from './document.resolver';
+import { documentQueries, documentMutations } from './document.resolver';
+import { campusQueries, campusMutations } from './campus.resolver';
+import { categoryQueries, categoryMutations } from './category.resolver';
+import { noticeQueries, noticeMutations } from './notice.resolver';
+import { PermissionQueries, PermissionMutations } from './permission.resolver';
+import { rubroQueries, rubroMutations } from './rubro.resolver';
+import { systemLogQueries, systemLogMutations } from './systemLog.resolver';
+import { userQueries, userMutations } from './user.resolver';
+
 
 const resolvers = {
   Query: {
-    ...documentsQueries
+    ...documentQueries,
+    ...campusQueries,
+    ...categoryQueries,
+    ...noticeQueries,
+    ...PermissionQueries,
+    ...rubroQueries,
+    ...systemLogQueries,
+    ...userQueries
   },
   Mutation: {
-    ...documentMutation
+    ...documentMutations,
+    ...campusMutations,
+    ...categoryMutations,
+    ...noticeMutations,
+    ...PermissionMutations,
+    ...rubroMutations,
+    ...systemLogMutations,
+    ...userMutations
   }
 };
 

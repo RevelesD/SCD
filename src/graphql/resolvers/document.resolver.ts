@@ -1,16 +1,22 @@
-const documentsQueries = {
-  getDocument: async(_, args, context, info) => {
+const documentQueries = {
+  document: async(_, args, context, info) => {
     return
   },
-  getDocuments: async(_, args, context, info) => {
+  documents: async(_, args, context, info) => {
     return
   }
 };
 
-const documentMutation = {
+const documentMutations = {
   createDocument: async(_, args, context, info) => {
     return
+  },
+  updateDocument: async(_, args, context, info) => {
+    return
+  },
+  deleteDocument: async(_, args, context, info) => {
+    return
   }
 };
 
-export { documentsQueries, documentMutation };
+export { documentQueries, documentMutations };
