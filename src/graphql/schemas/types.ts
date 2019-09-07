@@ -5,8 +5,8 @@ export const types = `
     path: String!
     category: ID!
     owner: ID!
-    createdAt: Number!
-    updatedAt: Number
+    createdAt: Int!
+    updatedAt: Int
   }
   
   input  InputDocument {
@@ -21,7 +21,7 @@ export const types = `
     path: String
     category: ID
   }
-  """
+  
   type Campus {
     _id: ID!
     name: String!
@@ -37,8 +37,13 @@ export const types = `
     name: String
     phone: String
   }
-  """
+  
   type Permission {
+    _id: ID!
+    name: String!
+  }
+
+  input TypeInputPermission {
     _id: ID!
     name: String!
   }
@@ -51,9 +56,8 @@ export const types = `
     name: String
   }
 
-  input TypeInputPermiso {
+  input DeletePermission {
     _id: ID!
-    name: String!
   }
 
   type Notice {
@@ -64,10 +68,10 @@ export const types = `
     link: String!
     imgLnk: String!
     createdBy: ID!
-    fromDate: Number!
-    toDate: Number!
-    createdAt: Number!
-    UpdatedAt: Number
+    fromDate: Int!
+    toDate: Int!
+    createdAt: Int!
+    UpdatedAt: Int
   }
 
   input InputNotice {
@@ -76,8 +80,8 @@ export const types = `
     status: String!
     link: String!
     imgLnk: String!
-    fromDate: Number!
-    toDate: Number!
+    fromDate: Int!
+    toDate: Int!
   }
 
   input UpdateNotice {
@@ -86,8 +90,8 @@ export const types = `
     status: String
     link: String
     imgLnk: String
-    fromDate: Number
-    toDate: Number
+    fromDate: Int
+    toDate: Int
   }
 
   type User {
@@ -104,12 +108,12 @@ export const types = `
     status: String!
     name: String!
     adscription: ID!
-    permissions: [TypeInputPermiso!]!
+    permissions: [TypeInputPermission!]!
   }
 
   input UpdateUser {
     status: String
-    permissions: [TypeInputPermiso!]
+    permissions: [TypeInputPermission!]
   }
 
   type Rubro {
@@ -120,14 +124,14 @@ export const types = `
   }
 
   input InputRubro {
-    clave: string!
-    title: string!
+    clave: String!
+    title: String!
     categorias: [ID!]!
   }
 
   input UpdateRubro {
-    clave: string
-    title: string
+    clave: String
+    title: String
     categorias: [ID!]
   }
 
@@ -136,7 +140,7 @@ export const types = `
     parent: ID!
     clave: String!
     title: String!
-    puntos: Number
+    puntos: Int
     children: [ID!]
   }
 
@@ -144,7 +148,7 @@ export const types = `
     parent: ID!
     clave: String!
     title: String!
-    puntos: Number
+    puntos: Int
     children: [ID!]
   }
 
@@ -152,7 +156,7 @@ export const types = `
     parent: ID
     clave: String
     title: String
-    puntos: Number
+    puntos: Int
     children: [ID!]
   }
 
@@ -160,7 +164,7 @@ export const types = `
     _id: ID!
     descripcion: String!
     cuaser: ID!
-    createdAt: Number!
+    createdAt: Int!
   }
   
   input InputSystemLog {

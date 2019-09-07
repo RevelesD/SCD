@@ -2,7 +2,7 @@ import { documentQueries, documentMutations } from './document.resolver';
 import { campusQueries, campusMutations } from './campus.resolver';
 import { categoryQueries, categoryMutations } from './category.resolver';
 import { noticeQueries, noticeMutations } from './notice.resolver';
-import { PermissionQueries, PermissionMutations } from './permission.resolver';
+import { permissionQueries, permissionMutations } from './permission.resolver';
 import { rubroQueries, rubroMutations } from './rubro.resolver';
 import { systemLogQueries, systemLogMutations } from './systemLog.resolver';
 import { userQueries, userMutations } from './user.resolver';
@@ -14,7 +14,7 @@ const resolvers = {
     ...campusQueries,
     ...categoryQueries,
     ...noticeQueries,
-    ...PermissionQueries,
+    ...permissionQueries,
     ...rubroQueries,
     ...systemLogQueries,
     ...userQueries
@@ -24,7 +24,7 @@ const resolvers = {
     ...campusMutations,
     ...categoryMutations,
     ...noticeMutations,
-    ...PermissionMutations,
+    ...permissionMutations,
     ...rubroMutations,
     ...systemLogMutations,
     ...userMutations

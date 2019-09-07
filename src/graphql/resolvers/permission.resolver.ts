@@ -1,10 +1,10 @@
-const PermissionQueries = {
-  Permission: async(_, args, context, info) => {
+const permissionQueries = {
+  permission: async(_, args, context, info) => {
         return
   }
 };
 
-const PermissionMutations = {
+const permissionMutations = {
   createPermission: async(_, args, context, info) => {
         return
     },
@@ -16,4 +16,4 @@ const PermissionMutations = {
     }
 };
 
-export { PermissionQueries, PermissionMutations };
+export { permissionQueries, permissionMutations };
