@@ -17,7 +17,14 @@ const uploadsMutations = {
     console.log('encoding',encoding);
 
     // 2. Stream file contents into cloud storage:
-
+    let db;
+    MongoClient.connect('mongodb://localhost/scd', (err, database) => {
+      if (err) {
+        console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+        process.exit(1);
+      }
+      db = database;
+    })
 
 
     // 3. Record the file upload in your DB.
