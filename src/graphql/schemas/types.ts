@@ -171,4 +171,12 @@ export const types = `
     descripcion: String!
     cuaser: ID!
   }
+  
+  type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
+  
+  
 `;

@@ -10,8 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/mongoose": "^5.5.17",
     "apollo-server": "^2.8.2",
     "graphql": "^14.4.2",
-    "nodemon": "^1.19.1"
+    "mongoose": "^5.6.13"
   }
 }

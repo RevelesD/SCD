@@ -13,4 +13,6 @@ export const queries = `
   categories(offset: Int!, limit: Int!): [Category!]!
   systemLog(id: ID!): SystemLog!
   systemLogs(from: Int!, to: Int!): [SystemLog!]!
+  
+  uploads: [File]
 `;
