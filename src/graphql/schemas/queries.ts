@@ -15,4 +15,5 @@ export const queries = `
   systemLogs(from: Int!, to: Int!): [SystemLog!]!
   
   uploads: [File]
+  upload(id: ID!): File!
 `;
