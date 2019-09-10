@@ -6,6 +6,7 @@ import { permissionQueries, permissionMutations } from './permission.resolver';
 import { rubroQueries, rubroMutations } from './rubro.resolver';
 import { systemLogQueries, systemLogMutations } from './systemLog.resolver';
 import { userQueries, userMutations } from './user.resolver';
+import { uploadsMutations, uploadsQueries } from './uploads.resolver';
 
 
 const resolvers = {
@@ -17,7 +18,8 @@ const resolvers = {
     ...permissionQueries,
     ...rubroQueries,
     ...systemLogQueries,
-    ...userQueries
+    ...userQueries,
+    ...uploadsQueries
   },
   Mutation: {
     ...documentMutations,
@@ -27,7 +29,8 @@ const resolvers = {
     ...permissionMutations,
     ...rubroMutations,
     ...systemLogMutations,
-    ...userMutations
+    ...userMutations,
+    ...uploadsMutations
   }
 };
 

@@ -173,6 +173,7 @@ export const types = `
   }
   
   type File {
+    _id: ID!
     filename: String!
     mimetype: String!
     encoding: String!
