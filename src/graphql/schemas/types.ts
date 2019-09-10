@@ -68,10 +68,10 @@ export const types = `
     link: String!
     imgLnk: String!
     createdBy: ID!
-    fromDate: Int!
-    toDate: Int!
-    createdAt: Int!
-    UpdatedAt: Int
+    fromDate: Float!
+    toDate: Float!
+    createdAt: Float!
+    UpdatedAt: Float
   }
 
   input InputNotice {
@@ -80,8 +80,8 @@ export const types = `
     status: String!
     link: String!
     imgLnk: String!
-    fromDate: Int!
-    toDate: Int!
+    fromDate: Float!
+    toDate: Float!
   }
 
   input UpdateNotice {
@@ -156,13 +156,13 @@ export const types = `
     parent: ID
     clave: String
     title: String
-    puntos: Int
+    value: Int
     children: [ID!]
   }
 
   type SystemLog {
     _id: ID!
-    descripcion: String!
+    description: String!
     cuaser: ID!
     createdAt: Int!
   }

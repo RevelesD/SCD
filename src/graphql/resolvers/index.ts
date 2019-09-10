@@ -8,7 +8,7 @@ import { systemLogQueries, systemLogMutations } from './systemLog.resolver';
 import { userQueries, userMutations } from './user.resolver';
 
 
-const resolvers = {
+export const resolvers = {
   Query: {
     ...documentQueries,
     ...campusQueries,
@@ -30,5 +30,3 @@ const resolvers = {
     ...userMutations
   }
 };
-
-export default resolvers;

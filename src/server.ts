@@ -1,5 +1,8 @@
-import typeDefs from './graphql/schemas/index';
-import resolvers from './graphql/resolvers/index';
+import { typeDefs } from './graphql/schemas';
+import { resolvers } from './graphql/resolvers';
+//const typeDefs = require('./graphql/schemas/index');
+//const resolvers = require('./graphql/resolvers/index');
+
 const { ApolloServer } = require('apollo-server');
 
 const server = new ApolloServer({
