@@ -40,24 +40,16 @@ export const types = `
   
   type Permission {
     _id: ID!
-    name: String!
+    rank: Int!
   }
 
   input TypeInputPermission {
     _id: ID!
-    name: String!
+    rank: Int!
   }
 
   input InputPermission {
-    name: String!
-  }
-
-  input UpdatePermission {
-    name: String
-  }
-
-  input DeletePermission {
-    _id: ID!
+    rank: Int!
   }
 
   type Notice {
@@ -99,7 +91,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
-    adscription: ID!
+    adscription: Campus!
     permissions: [Permission!]!
   }
 
@@ -108,12 +100,20 @@ export const types = `
     status: String!
     name: String!
     adscription: ID!
-    permissions: [TypeInputPermission!]!
   }
 
   input UpdateUser {
     status: String
-    permissions: [TypeInputPermission!]
+  }
+  """
+  actions: 
+  1 - add permission
+  2 - remove permission
+  """
+  input UpdateUserRole {
+    userId: ID!
+    permissionId: ID!
+    action: Int!
   }
 
   type Rubro {

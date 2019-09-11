@@ -1,5 +1,5 @@
-import typeDefs from './graphql/schemas/index';
-import resolvers from './graphql/resolvers/index';
+import { typeDefs } from './graphql/schemas/index';
+import { resolvers } from './graphql/resolvers/index';
 import { config } from "../enviroments.dev";
 const mongoose = require('mongoose');
 const { ApolloServer,  } = require('apollo-server');

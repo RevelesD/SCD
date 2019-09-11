@@ -6,7 +6,7 @@ const userSchema = new Schema({
     clave: {type: String, require: true},
     status: {type: String, require: true},
     name: {type: String, require: true},
-    adscripcion: {type: Schema.Types.ObjectId, ref: '', require: true},
+    adscription: {type: Schema.Types.ObjectId, ref: 'Campus', require: true},
     permissions: [
       permissionSchema
     ]

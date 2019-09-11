@@ -1,5 +1,5 @@
 import {ApolloError} from "apollo-server";
-const Notice = require('../../models/notice.model');
+import { Notice } from "../../models/notice.model";
 
 const noticeQueries = {
     notice: async(_, args: {id}, context, info) => {
@@ -19,25 +19,25 @@ const noticeQueries = {
   };
   
   const noticeMutations = {
-    createNotice: async(_: any, args: { InputNotice }, context: any, info: any) => {
+    createNotice: async(_: any, { input }, context: any, info: any) => {
       try {
         const notice = new Notice({
-          title: args.InputNotice.title,
-          body: args.InputNotice.body,
-          status: args.InputNotice.status,
-          link: args.InputNotice.link,
-          imgLnk: args.InputNotice.imgLnk,
-          fromDate: args.InputNotice.fromDate,
-          toDate: args.InputNotice.toDate
+          title: input.title,
+          body: input.body,
+          status: input.status,
+          link: input.link,
+          imgLnk: input.imgLnk,
+          fromDate: input.fromDate,
+          toDate: input.toDate
         });
-        const res =  await notice.save();
+        return  await notice.save();
       }catch (e) {
         throw new ApolloError(e);
       }
     },
-    updateNotice: async(_, args: {id, UpdateNotice}, context, info) => {
+    updateNotice: async(_, args: {id, input}, context, info) => {
       try {
-        return await Notice.findByIdAndUpdate(args.id, args.UpdateNotice);
+        return await Notice.findByIdAndUpdate(args.id, args.input);
       }catch (e) {
         throw new ApolloError(e);
       }
