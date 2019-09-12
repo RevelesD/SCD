@@ -140,6 +140,7 @@ export const types = `
     parent: ID!
     clave: String!
     title: String!
+    path: String!
     puntos: Int
     children: [ID!]
   }
@@ -176,8 +177,5 @@ export const types = `
     _id: ID!
     filename: String!
     mimetype: String!
-    encoding: String!
   }
-  
-  
 `;

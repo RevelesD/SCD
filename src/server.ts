@@ -12,7 +12,8 @@ mongoose.connect(
   {
     useNewUrlParser: true,
     useFindAndModify: false,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useUnifiedTopology: true
   }
 );
 
