@@ -29,4 +29,5 @@ export const mutations = `
   createSystemLog(input: InputSystemLog!): SystemLog!
 
   singleUpload(file: Upload!): File!
+  multipleUpload(files: [Upload!]!): [File!]!
 `;
