@@ -4,10 +4,10 @@ export const mutations = `
   deleteDocument(id: ID!): Document!
 
   createCampus(input: InputCampus!): Campus!
-  updateCampus(input: UpdateCampus!): Campus!
+  updateCampus(id: ID! input: UpdateCampus!): Campus!
 
   createPermission(input: InputPermission!): Permission!
-  updatePermission(input: InputPermission!): Permission!
+  updatePermission(id: ID! input: InputPermission!): Permission!
   deletePermission(id: ID!): Permission!
 
   createNotice(input: InputNotice!): Notice!
@@ -15,7 +15,7 @@ export const mutations = `
   deleteNotice(id: ID!): Notice!
 
   createUser(input: InputUser!): User!
-  updateUser(input: UpdateUser!): User!
+  updateUser(id: ID! input: UpdateUser!): User!
   updateUserRole(input: UpdateUserRole!): User!
   deleteUser(id: ID!): User!
 

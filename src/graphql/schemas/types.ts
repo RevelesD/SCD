@@ -99,7 +99,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
-    adscription: ID!
+    adscription: String!
   }
 
   input UpdateUser {
