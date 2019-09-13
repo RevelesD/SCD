@@ -1,25 +1,19 @@
 export const types = `
   type Document {
     _id: ID!
-    title: String!
+    fileName: String!
+    fileId: ID!
+    mimetype: String!
     path: String!
-    category: ID!
-    owner: ID!
-    createdAt: Int!
-    updatedAt: Int
-  }
-  
-  input  InputDocument {
-    title: String!
-    path: String!
-    category: ID!
-    owner: ID!
+    category: Category!
+    owner: User!
+    createdAt: Float!
+    updatedAt: Float
   }
 
-  input UpdateDocument{
-    title: String
-    path: String
-    category: ID
+  input UpdateDocument {
+    fileName: String!
+    category: ID!
   }
   
   type Campus {
@@ -56,30 +50,40 @@ export const types = `
     _id: ID!
     title: String!
     body: String!
-    status: String!
+    status: Int!
     link: String!
     imgLnk: String!
-    createdBy: ID!
     fromDate: Float!
     toDate: Float!
+    createdBy: ID!
     createdAt: Float!
-    UpdatedAt: Float
+    updatedAt: Float
   }
-
+  """
+  Status:\n
+  0.- "Oculto"
+  1.- "Vigente"
+  2.- "Vencido"
+  """
   input InputNotice {
     title: String!
     body: String!
-    status: String!
+    status: Int!
     link: String!
     imgLnk: String!
     fromDate: Float!
     toDate: Float!
   }
-
+  """
+  Status:\n
+  0.- "Oculto"
+  1.- "Vigente"
+  2.- "Vencido"
+  """
   input UpdateNotice {
     title: String
     body: String
-    status: String
+    status: Int
     link: String
     imgLnk: String
     fromDate: Int
@@ -99,7 +103,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
-    adscription: String!
+    adscription: ID!
   }
 
   input UpdateUser {
@@ -115,7 +119,8 @@ export const types = `
     permissionId: ID!
     action: Int!
   }
-
+  
+  """
   type Rubro {
     _id: ID!
     clave: String!
@@ -134,48 +139,41 @@ export const types = `
     title: String
     categorias: [ID!]
   }
-
+  """
+  
   type Category {
     _id: ID!
-    parent: ID!
+    root: Boolean!
     clave: String!
     title: String!
     path: String!
-    puntos: Int
-    children: [ID!]
+    value: Int
+    children: [Category!]
   }
 
   input InputCategory {
-    parent: ID!
+    root: Boolean!
     clave: String!
     title: String!
-    puntos: Int
-    children: [ID!]
+    value: Int
   }
 
   input UpdateCategory {
-    parent: ID
-    clave: String
-    title: String
+    root: Boolean!
+    clave: String!
+    title: String!
     value: Int
-    children: [ID!]
   }
 
   type SystemLog {
     _id: ID!
     description: String!
-    cuaser: ID!
+    causer: ID!
     createdAt: Int!
   }
   
   input InputSystemLog {
-    descripcion: String!
-    cuaser: ID!
-  }
-  
-  type File {
-    _id: ID!
-    filename: String!
-    mimetype: String!
+    description: String!
+    causer: ID!
   }
 `;

@@ -9,7 +9,7 @@ const permissionQueries = {
           throw new ApolloError(e)
         }
   },
-  allPermisions: async(_, {page, perPage}, contex, info) => {
+  permissions: async(_, {page, perPage}, contex, info) => {
     try {
       return await Permission.find()
         .skip(page*perPage)

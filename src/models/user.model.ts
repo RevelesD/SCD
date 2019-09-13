@@ -1,5 +1,3 @@
-import {SchemaTypes} from "mongoose";
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 import { permissionSchema } from "./permission.model";

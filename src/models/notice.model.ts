@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const noticeSchema = new Schema({
   title: {type: String, required: true},
   body: {type: String, required: true},
-  status: {type: String, required: true},
+  status: {type: Number, required: true},
   link: {type: String, required: true},
   imgLnk: {type: String, required: true},
-  createdBy: {type: Schema.Types.ObjectId, ref: '', required: true},
   fromDate: {type: Number, required: true},
   toDate: {type: Number, required: true},
-  createdAt: {type: Number, default: Date.now()},
+  createdBy: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+  createdAt: {type: Number, default: Date.now},
   updatedAt: {type: Number}
 });
-export const Notice = mongoose.model('Notice', noticeSchema, 'Notice');
+export const Notice = mongoose.model('Notice', noticeSchema, 'Notices');

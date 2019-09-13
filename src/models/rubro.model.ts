@@ -7,7 +7,7 @@ const rubroSchema = new Schema({
   clave: {Type: String, required: true},
   title: {Type: String, required: true},
   categorias: [
-    {Type: Schema.Types.ObjectId, ref:'', required: true}
+    {Type: Schema.Types.ObjectId, ref:'Category', required: true}
   ]
 });
 

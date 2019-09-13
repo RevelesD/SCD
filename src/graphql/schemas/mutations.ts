@@ -1,5 +1,4 @@
 export const mutations = `
-  createDocument(input: InputDocument!): Document!
   updateDocument(input: UpdateDocument!): Document!
   deleteDocument(id: ID!): Document!
 
@@ -19,16 +18,12 @@ export const mutations = `
   updateUserRole(input: UpdateUserRole!): User!
   deleteUser(id: ID!): User!
 
-  createRubro(input: InputRubro!): Rubro!
-  updateRubro(input: UpdateRubro!): Rubro!
-  deleteRubro(id: ID!): Rubro!
-
   createCategory(input: InputCategory!): Category!
   updateCategory(input: UpdateCategory!): Category!
   deleteCategory(id: ID!): Category!
 
   createSystemLog(input: InputSystemLog!): SystemLog!
 
-  singleUpload(file: Upload!): File!
-  multipleUpload(files: [Upload!]!): [File!]!
+  singleUpload(file: Upload!): Document!
+  multipleUpload(files: [Upload!]!): [Document!]!
 `;

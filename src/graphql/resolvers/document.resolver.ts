@@ -8,9 +8,6 @@ const documentQueries = {
 };
 
 const documentMutations = {
-  createDocument: async(_, args, context, info) => {
-    return
-  },
   updateDocument: async(_, args, context, info) => {
     return
   },

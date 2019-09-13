@@ -38,12 +38,12 @@ const processUpload = async upload => {
 }
 
 const uploadsQueries = {
-  uploads: async(_, args, context, info) => {
-    return
-  },
-  upload: async(_, {id}, context, info) => {
-    return
-  }
+  // uploads: async(_, args, context, info) => {
+  //   return
+  // },
+  // upload: async(_, {id}, context, info) => {
+  //   return
+  // }
 };
 
 const uploadsMutations = {

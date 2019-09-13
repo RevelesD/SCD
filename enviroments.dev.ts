@@ -3,6 +3,6 @@ export const config = {
   dbName: 'SCD',
   mongooseURL: 'mongodb://127.0.0.1:27017/SCD',
   docente: 0,
-  administrador: 1,
-  super: 2
+  admin: 1,
+  superAdmin: 2
 };
