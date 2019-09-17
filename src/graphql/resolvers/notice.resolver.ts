@@ -31,7 +31,8 @@ const noticeQueries = {
           link: input.link,
           imgLnk: input.imgLnk,
           fromDate: input.fromDate,
-          toDate: input.toDate
+          toDate: input.toDate,
+          createdBy: input.createdBy
         });
         return  await notice.save();
       }catch (e) {
@@ -40,7 +41,7 @@ const noticeQueries = {
     },
     updateNotice: async(_, args, context, info) => {
       try {
-        return await Notice.findByIdAndUpdate(args.id, args.input);
+        return await Notice.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
       }catch (e) {
         throw new ApolloError(e);
       }

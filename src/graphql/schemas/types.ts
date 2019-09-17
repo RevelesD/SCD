@@ -73,9 +73,10 @@ export const types = `
     imgLnk: String!
     fromDate: Float!
     toDate: Float!
+    createdBy: ID!
   }
   """
-  Status:\n
+  Status:
   0.- "Oculto"
   1.- "Vigente"
   2.- "Vencido"

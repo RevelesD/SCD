@@ -55,22 +55,66 @@ const userMutations = {
   updateUserRole: async(_, args, context, info) => {
     try {
       const permission = await Permission.findOne({ _id: args.input.permissionId});
-      if (args.input.action === 1) {
-         const user = await User.findById(args.input.userId);
-         let permissions = user.permissions;
-         
-         if(user.permissions )
-           await User.findByIdAndUpdate(
-          args.input.userId,
-          { $push: {permissions: permission}}
+      const user = await User.findById(args.input.userId);
+      //const currentPermisions = user.permissions;
+
+      if(args.input.action === 1){
+        const cur = await User.findOneAndUpdate(
+          {
+            $and: [
+              {_id: args.input.userId},
+              {permissions: {$nin: [permission]}}
+            ]
+          },
+          { $push: {permissions:  permission } }
         );
-      }
-      if (args.input.action === 2) {
-        return await User.findByIdAndUpdate(
-          args.input.userId,
-          { $pull: {permissions: permission}}
+        return cur;
+
+      }else if(args.input.action === 2){
+        const cur = await User.findOneAndUpdate(
+          {
+            $and: [
+              {_id: args.input.userId},
+              {permissions: {$in: [permission]}}
+            ]
+          },
+          { $pull: {permissions:  permission } }
         );
+        return cur;
       }
+
+      /*
+      //console.log(currentPermisions);
+      let found = false;
+
+      if(args.input.action === 1) {
+        for (let i = 0; i < currentPermisions.length; i++){
+          console.log("for entro");
+          if(permission.rank == currentPermisions[i].rank){
+            found = true;
+            console.log("flag cambio")
+          }
+        }
+        if(found) {
+          console.log("Ya tiene permiso");
+        }else {
+          return  await User.findByIdAndUpdate(
+            args.input.userId,
+            { $push: {permissions: permission}}
+          );
+        }
+      }else if (args.input.action === 2){
+        for (let i = 0; i < currentPermisions.length; i++){
+          if(permission.rank == currentPermisions[i].rank){
+            return await User.findByIdAndUpdate(
+              args.input.userId,
+              { $pull: {permissions: permission}}
+            );
+          }
+        }
+      }
+     */
+
     }catch (e) {
       throw new ApolloError(e);
     }
