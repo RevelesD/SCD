@@ -4,16 +4,22 @@ export const types = `
     fileName: String!
     fileId: ID!
     mimetype: String!
+    size: Float!
     path: String!
     category: Category!
     owner: User!
     createdAt: Float!
     updatedAt: Float
   }
+  
+  input InputDocument {
+    category: ID!
+    owner: ID!
+  }
 
   input UpdateDocument {
-    fileName: String!
-    category: ID!
+    fileName: String
+    category: ID
   }
   
   type Campus {
@@ -153,16 +159,14 @@ export const types = `
   }
 
   input InputCategory {
-    root: Boolean!
     clave: String!
     title: String!
     value: Int
-  }
+  } 
 
   input UpdateCategory {
-    root: Boolean!
-    clave: String!
-    title: String!
+    clave: String
+    title: String
     value: Int
   }
 

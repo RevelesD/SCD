@@ -5,6 +5,7 @@ const documentSchema = new Schema({
   fileName: {type: String, required: true},
   fileId: {type: String, required: true},
   mimetype: {type: String, required: true},
+  size: {type: Number, required: true},
   path: {type: String, required: true},
   category: {type: Schema.Types.ObjectId, ref: 'Category', required: true},
   owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
