@@ -1,4 +1,6 @@
 export const mutations = `
+  singleUpload(file: Upload!, input: InputDocument!): Document!
+  multipleUpload(files: [Upload!]!, input: InputDocument!): [Document!]!
   updateDocument(input: UpdateDocument!): Document!
   deleteDocument(id: ID!): Document!
 
@@ -18,12 +20,10 @@ export const mutations = `
   updateUserRole(input: UpdateUserRole!): User!
   deleteUser(id: ID!): User!
 
-  createCategory(input: InputCategory!): Category!
-  updateCategory(input: UpdateCategory!): Category!
+  createRootCategory(input: InputCategory!): Category!
+  createLeafCategory(parent: ID!, input: InputCategory!): Category!
+  updateCategory(id: ID!, input: UpdateCategory!): Category!
   deleteCategory(id: ID!): Category!
 
   createSystemLog(input: InputSystemLog!): SystemLog!
-
-  singleUpload(file: Upload!): Document!
-  multipleUpload(files: [Upload!]!): [Document!]!
 `;

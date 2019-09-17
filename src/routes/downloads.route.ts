@@ -1,12 +1,10 @@
 import * as assert from "assert";
-
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-// const mongoose = require('mongoose');
 import { config } from "../../enviroments.dev";
-// import { MongoClient, Db, GridFSBucket } from 'mongodb';
 const mongo = require('mongodb');
+const fs = require('fs');
+
 // retrieve single file
 router.get('/:id', async (req, res) => {
   try {
@@ -34,7 +32,8 @@ router.get('/:id', async (req, res) => {
     // Begging streaming of file
     const stream = grid.openDownloadStream(id);
     stream.pipe(res)
-      .on('error', (err) => {
+      .on('error', async (err) => {
+        await client.close();
         assert.ifError(err)
       })
       .on('finish', async() => {
@@ -45,24 +44,57 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/upload', async (req, res) => {
+router.get('/zip/:id', async (req, res) => {
   try {
-    const body = req.body;
-    const storage = multer.memoryStorage();
-    const upload = multer({storage: storage});
     const client = await mongo.MongoClient.connect(config.dbPath,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true
       }
     );
+    const id = mongo.ObjectID(req.params.id);
     const db = client.db(config.dbName);
     const grid = new mongo.GridFSBucket(db, {bucketName: 'archivos'});
+    const found = await grid.find({_id: id}).toArray();
+    if (found.length != 1) {
+      res.status(400);
+      res.json({error: 'S2'});
+    }
+    console.log(found);
 
+    const ws = fs.createWriteStream('./tmps.pdf');
+    const stream = grid.openDownloadStream(id);
+    stream.pipe(ws)
+      .on('error', (err) => {
+        assert.ifError(err)
+      })
+      .on('finish', async() => {
+        await client.close()
+        res.json({done: 'all good'});
+      });
+
+    ws.on('error', function (err) {
+      console.log(err);
+    })
+  } catch (e) {
+    throw e;
+  }
+});
+
+router.post('/joinInZip', async(req, res) => {
+  try {
 
   } catch (e) {
-
+    throw e;
   }
-})
+});
+
+router.post('/joinInPdf', async(req, res) => {
+  try {
+    
+  } catch (e) {
+    throw e;
+  }
+});
 
 module.exports = router;
