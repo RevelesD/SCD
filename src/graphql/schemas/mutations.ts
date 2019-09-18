@@ -12,7 +12,7 @@ export const mutations = `
   deletePermission(id: ID!): Permission!
 
   createNotice(input: InputNotice!): Notice!
-  updateNotice(input: UpdateNotice!): Notice!
+  updateNotice(id: ID! input: UpdateNotice!): Notice!
   deleteNotice(id: ID!): Notice!
 
   createUser(input: InputUser!): User!

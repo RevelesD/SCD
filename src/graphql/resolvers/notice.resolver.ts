@@ -1,18 +1,21 @@
 import {ApolloError} from "apollo-server";
 import { Notice } from "../../models/notice.model";
+import {getProjection} from "./merge";
 
 const noticeQueries = {
     notice: async(_, args, context, info) => {
       try {
-        return await Notice.findById(args.id);
+        const projections = getProjection(info);
+        return await Notice.findById(args.id, projections);
       } catch (e) {
         throw new ApolloError(e);
       }
     },
     notices: async(_, {page, perPage}, context, info) => {
       try {
+        const projections = getProjection(info);
         return await Notice
-          .find()
+          .find({}, projections)
           .skip(page*perPage)
           .limit(perPage).exec();
       } catch (e) {
@@ -41,14 +44,18 @@ const noticeQueries = {
     },
     updateNotice: async(_, args, context, info) => {
       try {
-        return await Notice.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
+        const projections = getProjection(info);
+        return await Notice.findById(args.id, projections).update(args.input, {new: true}).exec();
+        // return await Notice.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
       }catch (e) {
         throw new ApolloError(e);
       }
     },
     deleteNotice: async(_, args, context, info) => {
       try {
-        return await Notice.findByIdAndDelete(args.id).exec();
+        const projections = getProjection(info);
+        return await Notice.findById(args.id, projections).delete().exec();
+        //return await Notice.findByIdAndDelete(args.id).exec();
       } catch (e) {
         throw new ApolloError(e);
       }

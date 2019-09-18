@@ -3,11 +3,14 @@ import { User } from "../../models/user.model"
 import { Permission } from "../../models/permission.model"
 import { Campus } from '../../models/campus.model';
 import { config } from  "../../../enviroments.dev"
+import {getProjection} from "./merge";
+import {Notice} from "../../models/notice.model";
 
 const userQueries = {
   user: async(_, args, context, info) => {
     try {
-      return await User.findOne({_id: args.id})
+      const projections = getProjection(info);
+      return await User.findOne({_id: args.id}, projections)
         .populate('adscription').exec();
     }catch (e) {
       throw new ApolloError(e);
@@ -15,8 +18,9 @@ const userQueries = {
   },
   users: async(_, args, context, info) => {
     try {
+      const projections = getProjection(info);
       return await User
-        .find()
+        .find({}, projections)
         .populate('adscription').exec();
     }catch (e) {
       throw new ApolloError(e);
@@ -47,27 +51,28 @@ const userMutations = {
   },
   updateUser: async(_, args, context, info) =>{
     try {
-      return await User.findByIdAndUpdate(args.id, args.input, {new:true});
+      const projections = getProjection(info);
+      return await User.findById(args.id, projections).update(args.input, {new: true}).exec();
+      //return await User.findByIdAndUpdate(args.id, args.input, {new:true});
     }catch (e) {
       throw new ApolloError(e)
     }
   },
   updateUserRole: async(_, args, context, info) => {
     try {
-      const permission = await Permission.findOne({ _id: args.input.permissionId});
+      const projections = getProjection(info);
+      const permission = await Permission.findOne({ _id: args.input.permissionId}, projections);
       const user = await User.findById(args.input.userId);
       //const currentPermisions = user.permissions;
 
       if(args.input.action === 1){
-        const cur = await User.findOneAndUpdate(
+        const cur = await User.findOne(
           {
             $and: [
               {_id: args.input.userId},
               {permissions: {$nin: [permission]}}
             ]
-          },
-          { $push: {permissions:  permission } }
-        );
+          }, projections).update({ $push: {permissions:  permission } }).exec();
         return cur;
 
       }else if(args.input.action === 2){
@@ -77,9 +82,7 @@ const userMutations = {
               {_id: args.input.userId},
               {permissions: {$in: [permission]}}
             ]
-          },
-          { $pull: {permissions:  permission } }
-        );
+          }, projections).update({ $pull: {permissions:  permission } }).exec();
         return cur;
       }
 
@@ -121,7 +124,8 @@ const userMutations = {
 },
   deleteUser: async(_, args, context, info) => {
 		try{
-		  return await User.findByIdAndDelete(args.id).exec();
+      const projections = getProjection(info);
+		  return await User.findByIdAndDelete(args.id, projections).exec();
     }catch (e) {
       throw new ApolloError(e)
     }

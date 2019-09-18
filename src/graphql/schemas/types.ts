@@ -126,28 +126,7 @@ export const types = `
     permissionId: ID!
     action: Int!
   }
-  
-  """
-  type Rubro {
-    _id: ID!
-    clave: String!
-    title: String!
-    categorias: [ID!]!
-  }
-
-  input InputRubro {
-    clave: String!
-    title: String!
-    categorias: [ID!]!
-  }
-
-  input UpdateRubro {
-    clave: String
-    title: String
-    categorias: [ID!]
-  }
-  """
-  
+ 
   type Category {
     _id: ID!
     root: Boolean!
