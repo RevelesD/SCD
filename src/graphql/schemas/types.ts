@@ -87,9 +87,10 @@ export const types = `
     imgLnk: String!
     fromDate: Float!
     toDate: Float!
+    createdBy: ID!
   }
   """
-  Status:\n
+  Status:
   0.- "Oculto"
   1.- "Vigente"
   2.- "Vencido"
@@ -133,28 +134,7 @@ export const types = `
     permissionId: ID!
     action: Int!
   }
-  
-  """
-  type Rubro {
-    _id: ID!
-    clave: String!
-    title: String!
-    categorias: [ID!]!
-  }
-
-  input InputRubro {
-    clave: String!
-    title: String!
-    categorias: [ID!]!
-  }
-
-  input UpdateRubro {
-    clave: String
-    title: String
-    categorias: [ID!]
-  }
-  """
-  
+ 
   type Category {
     _id: ID!
     root: Boolean!

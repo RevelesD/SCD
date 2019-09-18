@@ -1,17 +1,21 @@
 import {ApolloError} from "apollo-server";
 import { Campus } from "../../models/campus.model";
+import {getProjection} from "./merge";
 
 const campusQueries = {
     campus: async(_, args, context, info) => {
         try {
-            return await Campus.findById(args.id);
+            const projections = getProjection(info);
+            return await Campus.findById(args.id), projections;
         }catch (e) {
             throw new ApolloError(e)
         }
     },
     allCampus: async(_, {page, perPage}, contex, info) => {
       try {
-          return await Campus.find()
+          const projections = getProjection(info);
+          return await Campus
+            .find({}, projections)
             .skip(page*perPage)
             .limit(perPage).exec();
       }  catch (e) {
@@ -34,7 +38,9 @@ const campusMutations = {
     },
     updateCampus: async(_, args, context, info) => {
         try {
-            return await Campus.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
+            const projections = getProjection(info);
+            return await Campus.findById(args.id, projections).update(args.input, {new: true}).exec();
+            //return await Campus.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
         }catch (e) {
             throw new ApolloError(e);
         }

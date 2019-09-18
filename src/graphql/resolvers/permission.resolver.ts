@@ -1,17 +1,22 @@
 import {ApolloError} from "apollo-server";
 import { Permission } from "../../models/permission.model"
+import {getProjection} from "./merge";
+import {Notice} from "../../models/notice.model";
 
 const permissionQueries = {
   permission: async(_, args, context, info) => {
         try {
-          return await Permission.findById(args.id);
+          const projections = getProjection(info);
+          return await Permission.findById(args.id, projections);
         }catch (e) {
           throw new ApolloError(e)
         }
   },
   permissions: async(_, {page, perPage}, contex, info) => {
     try {
-      return await Permission.find()
+      const projections = getProjection(info);
+      return await Permission
+        .find({}, projections)
         .skip(page*perPage)
         .limit(perPage).exec();
     }  catch (e) {
@@ -34,14 +39,17 @@ const permissionMutations = {
     },
   updatePermission: async(_, args, context, info) => {
     try {
-      return await Permission.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
+      const projections = getProjection(info);
+      return await Permission.findById(args.id, projections).update(args.input, {new: true}).exec();
+      //return await Permission.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
     }catch (e) {
       throw new ApolloError(e);
     }
     },
   deletePermission: async(_, args, context, info) => {
         try {
-          return
+          const projections = getProjection(info);
+          return await Permission.findById(args.id, projections).delete().exec();
         }catch (e) {
           throw new ApolloError(e)
         }
