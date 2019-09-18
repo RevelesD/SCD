@@ -12,6 +12,9 @@ const processUpload = async (upload, input) => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
     const stream = createReadStream();
+    if (mimetype !== 'application/pdf') {
+      throw new ApolloError('Tipo de documento no valido');
+    }
 
     const con = await MongoClient.connect(
       config.dbPath,
@@ -66,20 +69,11 @@ async function createDocument(catId, owner, docData) {
 }
 
 const uploadsQueries = {
-  // uploads: async(_, args, context, info) => {
-  //   return
-  // },
-  // upload: async(_, {id}, context, info) => {
-  //   return
-  // }
 };
 
 const uploadsMutations = {
   singleUpload: async(_, {file, input}) => {
     try {
-      // 1. Validate file metadata.
-      // console.log('filename:',filename);
-      // console.log('mimetype:',mimetype);
       const res = await processUpload(file, input);
       return res;
     } catch (e) {
@@ -88,10 +82,6 @@ const uploadsMutations = {
   },
   multipleUpload: async (_, {files, input}) => {
     try {
-      // 1. Validate file metadata.
-      // console.log('filename:',filename);
-      // console.log('mimetype:',mimetype);
-
       const { resolve, reject } = await PromiseAll.all(
         files.map(
           async (x) => await processUpload(x, input)

@@ -1,6 +1,6 @@
 export const queries = `
   document(id: ID!): Document!
-  documents(page: Int!, perPage: Int!): [Document!]!
+  documents(search: SearchDocument!): [Document!]!
   
   campus(id: ID!): Campus!
   allCampus(page: Int!, perPage: Int!): [Campus!]!

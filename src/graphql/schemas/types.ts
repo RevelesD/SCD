@@ -22,6 +22,14 @@ export const types = `
     category: ID
   }
   
+  input SearchDocument {
+    user: ID!
+    page: Int!
+    perPage: Int!
+    category: ID
+    fileName: String
+  }
+  
   type Campus {
     _id: ID!
     name: String!

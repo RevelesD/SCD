@@ -6,11 +6,13 @@ const categoryQueries = {
     category: async(_, args, context, info) => {
       try {
         const projections = getProjection(info);
-        const query = Category.findById(args.id, projections);
+
+        const doc = Category.findById(args.id, projections);
+
         if (projections.children) {
-          query.populate({path: 'children'});
+          doc.populate({path: 'children'});
         }
-        return await query.exec();
+        return await doc.exec();
       } catch (e) {
         throw new ApolloError(e);
       }
@@ -30,7 +32,7 @@ const categoryQueries = {
   };
   
   const categoryMutations = {
-    createRootCategory: async(_, {input}, context, info) => {
+    createRootCategory: async(_, {input}) => {
       try {
         // Create the base doc for model
         const doc = {
@@ -49,7 +51,7 @@ const categoryQueries = {
       }
       return
     },
-    createLeafCategory: async(_, {parent, input}, context, info) => {
+    createLeafCategory: async(_, {parent, input}) => {
       try {
         // Retrieve the parent category
         const pquery = Category.findById(parent);
