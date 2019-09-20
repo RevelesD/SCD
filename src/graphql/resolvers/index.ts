@@ -6,6 +6,7 @@ import { permissionQueries, permissionMutations } from './permission.resolver';
 import { systemLogQueries, systemLogMutations } from './systemLog.resolver';
 import { userQueries, userMutations } from './user.resolver';
 import { uploadsMutations, uploadsQueries } from './uploads.resolver';
+import { loginQueries } from './authLogin.resolver';
 
 
 export const resolvers = {
@@ -17,7 +18,8 @@ export const resolvers = {
     ...permissionQueries,
     ...systemLogQueries,
     ...userQueries,
-    ...uploadsQueries
+    ...uploadsQueries,
+    ...loginQueries
   },
   Mutation: {
     ...documentMutations,
