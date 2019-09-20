@@ -18,5 +18,5 @@ export const queries = `
   categories(page: Int!, perPage: Int!): [Category!]!
   
   systemLog(id: ID!): SystemLog!
-  systemLogs(from: Int!, to: Int!): [SystemLog!]!
+  systemLogs(input: SearchLogs!): [SystemLog!]!
 `;

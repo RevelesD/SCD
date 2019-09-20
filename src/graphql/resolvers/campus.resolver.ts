@@ -39,7 +39,9 @@ const campusMutations = {
     updateCampus: async(_, args, context, info) => {
         try {
             const projections = getProjection(info);
-            return await Campus.findById(args.id, projections).update(args.input, {new: true}).exec();
+            return await Campus
+              .findById(args.id, projections)
+              .update(args.input, {new: true}).exec();
             //return await Campus.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
         }catch (e) {
             throw new ApolloError(e);

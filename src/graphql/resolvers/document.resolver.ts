@@ -1,12 +1,22 @@
-import {getProjection} from "./merge";
+import {getProjection, transCatInDocument, transOwnerInDocument} from "./merge";
 import { Document } from "../../models/documents.model";
 import { ApolloError } from "apollo-server";
+import { config } from '../../../enviroments.dev'
 
 const documentQueries = {
   document: async(_, args, context, info) => {
     try {
+      // if (!authorize(context, [config.docente, config.admin])) {
+      //   throw new ApolloError('Unauthenticated!')
+      // }
       const projections = getProjection(info);
-      const doc = await Document.findById(args.id, projections);
+      let doc = await Document.findById(args.id, projections);
+      if (projections.category) {
+        doc = transCatInDocument(doc);
+      }
+      if (projections.owner) {
+        doc = transOwnerInDocument(doc);
+      }
       return doc;
     } catch (e) {
       throw new ApolloError(e);
@@ -29,10 +39,18 @@ const documentQueries = {
         // @ts-ignore
         conditions.$and.push({fileName: /args.search.fileName/});
       }
-      const docs = await Document
+      let docs = await Document
         .find(conditions, projections)
         .skip(args.search.page * args.search.perPage)
         .limit(args.search.perPage).exec();
+      if (projections.category) {
+        docs = docs.map(transCatInDocument);
+        // doc = transCatInDocument(doc);
+      }
+      if (projections.owner) {
+        docs = docs.map(transOwnerInDocument);
+        // doc = transOwnerInDocument(doc);
+      }
       return docs;
     } catch (e) {
       throw new ApolloError(e);
@@ -45,18 +63,18 @@ const documentMutations = {
     try {
       const projections = getProjection(info);
       args.input.updatedAt = Date.now();
-      const query =
+      let doc = await
         Document
           .findById(args.id, projections)
-          .update(args.input);
+          .update(args.input).exec();
 
       if (projections.category) {
-        query.populate('category');
+        doc = transCatInDocument(doc);
       }
       if (projections.owner) {
-        query.populate('owner');
+        doc = transOwnerInDocument(doc);
       }
-      return await query.exec();
+      return doc;
     } catch (e) {
       throw new ApolloError(e);
     }

@@ -2,10 +2,13 @@ import { typeDefs } from './graphql/schemas/index';
 import { resolvers } from './graphql/resolvers/index';
 import { config } from "../enviroments.dev";
 const mongoose = require('mongoose');
-const { ApolloServer,  } = require('apollo-server');
+const { ApolloError } = require('apollo-server');
+const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const port = 4000;
+import { router } from './routes/downloads.route';
 
 mongoose.connect(
   config.mongooseURL,
@@ -17,27 +20,35 @@ mongoose.connect(
   }
 );
 
-const app = express();
-const downloads = require('./routes/downloads.route')
-app.use(cors());
-app.use(bodyParser.json());
-app.use('/download', downloads);
-
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log('Connected to the database');
-  const port = process.env.PORT || '3000';
-  app.listen(port, () => console.log(`Running on localhost:${port}`));
+  // const port = process.env.PORT || '3000';
+  // app.listen(port, () => console.log(`Running on localhost:${port}`));
 });
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 // apollo server
 const server = new ApolloServer({
   typeDefs,
   resolvers: resolvers,
   introspection: true,
-  playground: true
+  playground: true,
+  // context: ({ req }) => {
+  //   // get the user token from the headers
+  //   const token = req.headers.authorization || '';
+  //   // try to retrieve a user with the token
+  //   const user = getUser(token);
+  //   // add the user to the context
+  //   return { user };
+  // },
 });
+server.applyMiddleware({ app, path: '/graphql' });
+app.use('/downloads', router);
 
-server.listen().then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
+app.listen({port}, () => {
+  console.log(`🚀  server ready at http://localhost:${port}${server.graphqlPath}`);
 });

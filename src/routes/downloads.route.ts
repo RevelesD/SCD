@@ -1,21 +1,20 @@
 import * as assert from "assert";
 const express = require('express');
-const router = express.Router();
+export const router = express.Router();
 import { config } from "../../enviroments.dev";
 const mongo = require('mongodb');
 const fs = require('fs');
-
 // retrieve single file
-router.get('/:id', async (req, res) => {
+
+router.post('/getFile', async (req, res) => {
   try {
-    console.log(req.params.id);
     const client = await mongo.MongoClient.connect(config.dbPath,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true
       }
     );
-    const id = mongo.ObjectID(req.params.id);
+    const id = mongo.ObjectID(req.body.id);
     const db = client.db(config.dbName);
     const grid = new mongo.GridFSBucket(db, {bucketName: 'archivos'});
     const doc = await grid.find({_id: id}).toArray();
@@ -96,5 +95,3 @@ router.post('/joinInPdf', async(req, res) => {
     throw e;
   }
 });
-
-module.exports = router;

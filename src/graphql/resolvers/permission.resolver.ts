@@ -1,16 +1,15 @@
 import {ApolloError} from "apollo-server";
 import { Permission } from "../../models/permission.model"
 import {getProjection} from "./merge";
-import {Notice} from "../../models/notice.model";
 
 const permissionQueries = {
   permission: async(_, args, context, info) => {
-        try {
-          const projections = getProjection(info);
-          return await Permission.findById(args.id, projections);
-        }catch (e) {
-          throw new ApolloError(e)
-        }
+    try {
+      const projections = getProjection(info);
+      return await Permission.findById(args.id, projections);
+    }catch (e) {
+      throw new ApolloError(e)
+    }
   },
   permissions: async(_, {page, perPage}, contex, info) => {
     try {
@@ -27,16 +26,16 @@ const permissionQueries = {
 
 const permissionMutations = {
   createPermission: async(_, args , context, info) => {
-        try {
-          console.log(args.input.rank);
-          const permission = new Permission({
-            rank: args.input.rank
-          });
-          return await permission.save();
-        }catch (e) {
-          throw new ApolloError(e)
-        }
-    },
+    try {
+      console.log(args.input.rank);
+      const permission = new Permission({
+        rank: args.input.rank
+      });
+      return await permission.save();
+    }catch (e) {
+      throw new ApolloError(e)
+    }
+  },
   updatePermission: async(_, args, context, info) => {
     try {
       const projections = getProjection(info);
@@ -45,15 +44,14 @@ const permissionMutations = {
     }catch (e) {
       throw new ApolloError(e);
     }
-    },
+  },
   deletePermission: async(_, args, context, info) => {
-        try {
-          const projections = getProjection(info);
-          return await Permission.findById(args.id, projections).delete().exec();
-        }catch (e) {
-          throw new ApolloError(e)
-        }
+    try {
+      return await Permission.findByIdAndDelete(args.id).exec();
+    }catch (e) {
+      throw new ApolloError(e)
     }
+  }
 };
 
 export { permissionQueries, permissionMutations };

@@ -104,7 +104,10 @@ export const types = `
     fromDate: Int
     toDate: Int
   }
-
+  """
+  Activo
+  Inactivo
+  """
   type User {
     _id: ID!
     clave: String!
@@ -167,5 +170,13 @@ export const types = `
   input InputSystemLog {
     description: String!
     causer: ID!
+  }
+  
+  input SearchLogs {
+    from: Float!
+    to: Float!
+    page: Int!
+    perPage: Int!
+    user: ID
   }
 `;

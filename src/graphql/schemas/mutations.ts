@@ -24,6 +24,4 @@ export const mutations = `
   createLeafCategory(parent: ID!, input: InputCategory!): Category!
   updateCategory(id: ID!, input: UpdateCategory!): Category!
   deleteCategory(id: ID!): Category!
-
-  createSystemLog(input: InputSystemLog!): SystemLog!
 `;

@@ -1,11 +1,9 @@
-import {Category} from "../../models/category.model";
-
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const PromiseAll = require('promises-all');
 import { Document } from "../../models/documents.model";
 import { config } from '../../../enviroments.dev';
-// const ObjectID = require('mongodb').ObjectID;
+import { Category } from "../../models/category.model";
 import { ApolloError } from 'apollo-server';
 
 const processUpload = async (upload, input) => {
