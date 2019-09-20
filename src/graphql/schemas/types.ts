@@ -116,6 +116,12 @@ export const types = `
     adscription: Campus!
     permissions: [Permission!]!
   }
+  
+  type AuthData {
+    userId: ID!
+    token: String!
+    tokenExpiration: Int!
+  }
 
   input InputUser {
     clave: String!
