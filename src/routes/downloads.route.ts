@@ -43,7 +43,7 @@ router.post('/getFile', async (req, res) => {
   }
 });
 
-router.get('/zip/:id', async (req, res) => {
+router.post('/test', async (req, res) => {
   try {
     const client = await mongo.MongoClient.connect(config.dbPath,
       {
@@ -51,7 +51,7 @@ router.get('/zip/:id', async (req, res) => {
         useUnifiedTopology: true
       }
     );
-    const id = mongo.ObjectID(req.params.id);
+    const id = mongo.ObjectID(req.body.id);
     const db = client.db(config.dbName);
     const grid = new mongo.GridFSBucket(db, {bucketName: 'archivos'});
     const found = await grid.find({_id: id}).toArray();
@@ -60,9 +60,8 @@ router.get('/zip/:id', async (req, res) => {
       res.json({error: 'S2'});
     }
     console.log(found);
-
-    const ws = fs.createWriteStream('./tmps.pdf');
     const stream = grid.openDownloadStream(id);
+    const ws = fs.createWriteStream('./temps/tmps.pdf');
     stream.pipe(ws)
       .on('error', (err) => {
         assert.ifError(err)
