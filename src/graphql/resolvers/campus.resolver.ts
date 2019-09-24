@@ -1,6 +1,8 @@
 import {ApolloError} from "apollo-server";
 import { Campus } from "../../models/campus.model";
 import {getProjection} from "./merge";
+import { isAuth } from "../../middleware/is-auth"
+import {config} from "../../../enviroments.dev";
 
 const campusQueries = {
     campus: async(_, args, context, info) => {
@@ -26,6 +28,9 @@ const campusQueries = {
 
 const campusMutations = {
     createCampus: async(_, { input }, context, info) => {
+        console.log('Context: ', context);
+        if (!isAuth(context, [config.permission.admin, config.permission.superAdmin]))
+            throw new ApolloError('Unauthenticated');
         try {
             const campus = new Campus({
                 name: input.name,
