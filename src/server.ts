@@ -1,6 +1,7 @@
 import { typeDefs } from './graphql/schemas/index';
 import { resolvers } from './graphql/resolvers/index';
 import { config } from "../enviroments.dev";
+import { getUser } from "./middleware/is-auth";
 const mongoose = require('mongoose');
 const { ApolloError } = require('apollo-server');
 const { ApolloServer } = require('apollo-server-express');
@@ -31,20 +32,21 @@ db.once('open', () => {
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
 // apollo server
 const server = new ApolloServer({
   typeDefs,
   resolvers: resolvers,
   introspection: true,
   playground: true,
-  // context: ({ req }) => {
-  //   // get the user token from the headers
-  //   const token = req.headers.authorization || '';
-  //   // try to retrieve a user with the token
-  //   const user = getUser(token);
-  //   // add the user to the context
-  //   return { user };
-  // },
+  context: ({ req }) => {
+    // get the user token from the headers
+    const token = req.headers.authorization || '';
+    // try to retrieve a user with the token
+    const user = getUser(token);
+    // add the user to the context
+    return { user };
+  },
 });
 server.applyMiddleware({ app, path: '/graphql' });
 app.use('/downloads', router);
