@@ -25,9 +25,10 @@ export const getUser = (token) => {
 };
 export const isAuth = async (contex: any, permissions: number[]): Promise<boolean> => {
   try{
+    console.log(permissions);
     const conditions = {
         _id: contex.user.userId,
-        'permissions.rank': {$in: permissions}};
+        'permissions.rank': {$all: permissions}};
     const found = await User.find(conditions);
     return found.length > 0;
   }catch (e) {

@@ -1,9 +1,14 @@
 import { ApolloError } from 'apollo-server'
 import { Category } from "../../models/category.model";
+import {config} from "../../../enviroments.dev";
 import { getProjection, transformCategory } from "./merge";
+import {isAuth} from "../../middleware/is-auth";
+
 
 const categoryQueries = {
     category: async(_, args, context, info) => {
+      // if (!await isAuth(context, [config.permission.admin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         const projections = getProjection(info);
 
@@ -18,6 +23,8 @@ const categoryQueries = {
       }
     },
     categories: async(_, args, context, info) => {
+      // if (!await isAuth(context, [config.permission.admin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         const projections = getProjection(info);
         const docs = await Category.find({}, projections).exec();
@@ -33,6 +40,8 @@ const categoryQueries = {
   
   const categoryMutations = {
     createRootCategory: async(_, {input}, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         const projections = getProjection(info);
         // Create the base doc for model
@@ -42,7 +51,7 @@ const categoryQueries = {
           title: input.clave,
           path: `/${input.clave}`,
           children: []
-        }
+        };
         // Save document in db
         const dbdoc = await Category.create(doc);
         // Returns the saved document to client
@@ -56,6 +65,8 @@ const categoryQueries = {
       return
     },
     createLeafCategory: async(_, {parent, input}, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         const projections = getProjection(info);
         // Retrieve the parent category
@@ -90,6 +101,8 @@ const categoryQueries = {
       return
     },
     updateCategory: async(_, {id, input}, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         // Read the fields requested by the client.
         const projections = getProjection(info);
@@ -126,6 +139,8 @@ const categoryQueries = {
       }
     },
     deleteCategory: async(_, args, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
         return
       } catch (e) {
