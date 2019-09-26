@@ -1,4 +1,5 @@
 import {decode} from "jsonwebtoken";
+import { User } from "../models/user.model";
 
 const jwt = require('jsonwebtoken');
 
@@ -11,7 +12,6 @@ export const getUser = (token) => {
   try {
     decodeToken = jwt.verify(token, 'key');
   }catch (e) {
-    console.log("e3");
     return null
   }
   if(!decodeToken){
@@ -21,12 +21,16 @@ export const getUser = (token) => {
     req['userId'] = decodeToken.userId;
     req['isAuth'] = true;
   }
-  // console.log('token: ', req);
   return req
 };
-export const isAuth = (contex: any, permissions: number[]): boolean => {
-  if() {
-
+export const isAuth = async (contex: any, permissions: number[]): Promise<boolean> => {
+  try{
+    const conditions = {
+        _id: contex.user.userId,
+        'permissions.rank': {$in: permissions}};
+    const found = await User.find(conditions);
+    return found.length > 0;
+  }catch (e) {
+    return false;
   }
-  return false
 };

@@ -6,6 +6,7 @@ export const mutations = `
 
   createCampus(input: InputCampus!): Campus!
   updateCampus(id: ID! input: UpdateCampus!): Campus!
+  deleteCampus(id: ID!): Campus!
 
   createPermission(input: InputPermission!): Permission!
   updatePermission(id: ID! input: InputPermission!): Permission!
