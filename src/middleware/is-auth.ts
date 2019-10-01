@@ -12,7 +12,6 @@ export const getUser = (token) => {
   try {
     decodeToken = jwt.verify(token, 'key');
   }catch (e) {
-    console.log("e3");
     return null
   }
   if(!decodeToken){
@@ -22,8 +21,17 @@ export const getUser = (token) => {
     req['userId'] = decodeToken.userId;
     req['isAuth'] = true;
   }
-  // console.log('token: ', req);
   return req
 };
-export const isAuth = async (contex: any, permissions: number[]) => {
+export const isAuth = async (contex: any, permissions: number[]): Promise<boolean> => {
+  try{
+    console.log(permissions);
+    const conditions = {
+        _id: contex.user.userId,
+        'permissions.rank': {$all: permissions}};
+    const found = await User.find(conditions);
+    return found.length > 0;
+  }catch (e) {
+    return false;
+  }
 };

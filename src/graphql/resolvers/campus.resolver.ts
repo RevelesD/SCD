@@ -3,9 +3,12 @@ import { Campus } from "../../models/campus.model";
 import {getProjection} from "./merge";
 import { isAuth } from "../../middleware/is-auth"
 import {config} from "../../../enviroments.dev";
+import {Notice} from "../../models/notice.model";
 
 const campusQueries = {
     campus: async(_, args, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
         try {
             const projections = getProjection(info);
             return await Campus.findById(args.id), projections;
@@ -13,7 +16,9 @@ const campusQueries = {
             throw new ApolloError(e)
         }
     },
-    allCampus: async(_, {page, perPage}, contex, info) => {
+    allCampus: async(_, {page, perPage}, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
       try {
           const projections = getProjection(info);
           return await Campus
@@ -28,9 +33,8 @@ const campusQueries = {
 
 const campusMutations = {
     createCampus: async(_, { input }, context, info) => {
-        console.log('Context: ', context);
-        if (!isAuth(context, [config.permission.admin, config.permission.superAdmin]))
-            throw new ApolloError('Unauthenticated');
+        // if (!await isAuth(context, [config.permission.superAdmin]))
+        //     throw new ApolloError('Unauthenticated');
         try {
             const campus = new Campus({
                 name: input.name,
@@ -42,6 +46,8 @@ const campusMutations = {
         }
     },
     updateCampus: async(_, args, context, info) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
         try {
             const projections = getProjection(info);
             return await Campus
@@ -52,7 +58,16 @@ const campusMutations = {
             throw new ApolloError(e);
         }
     },
-
+    deleteCampus: async (_, args, context) => {
+      // if (!await isAuth(context, [config.permission.superAdmin]))
+      //   throw new ApolloError('Unauthenticated');
+      try {
+        const res = await Campus.findByIdAndDelete(args.id);
+        return res
+      }catch (e) {
+        throw new ApolloError(e);
+      }
+    }
 };
 
 export { campusQueries, campusMutations };

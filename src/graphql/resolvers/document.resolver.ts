@@ -2,13 +2,13 @@ import {getProjection, transCatInDocument, transOwnerInDocument} from "./merge";
 import { Document } from "../../models/documents.model";
 import { ApolloError } from "apollo-server";
 import { config } from '../../../enviroments.dev'
+import {isAuth} from "../../middleware/is-auth";
 
 const documentQueries = {
   document: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
-      // if (!authorize(context, [config.docente, config.admin])) {
-      //   throw new ApolloError('Unauthenticated!')
-      // }
       const projections = getProjection(info);
       let doc = await Document.findById(args.id, projections);
       if (projections.category) {
@@ -23,6 +23,8 @@ const documentQueries = {
     }
   },
   documents: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const user = context.user;
       const projections = getProjection(info);
@@ -60,6 +62,8 @@ const documentQueries = {
 
 const documentMutations = {
   updateDocument: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       args.input.updatedAt = Date.now();
@@ -79,7 +83,9 @@ const documentMutations = {
       throw new ApolloError(e);
     }
   },
-  deleteDocument: async(_, args) => {
+  deleteDocument: async(_, args, context) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const res = await Document.findByIdAndDelete(args.id);
       return res;

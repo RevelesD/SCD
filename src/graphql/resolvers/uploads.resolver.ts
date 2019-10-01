@@ -1,3 +1,5 @@
+import {isAuth} from "../../middleware/is-auth";
+
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const PromiseAll = require('promises-all');
@@ -70,7 +72,9 @@ const uploadsQueries = {
 };
 
 const uploadsMutations = {
-  singleUpload: async(_, {file, input}) => {
+  singleUpload: async(_, {file, input}, context) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const res = await processUpload(file, input);
       return res;
@@ -78,7 +82,9 @@ const uploadsMutations = {
       throw new ApolloError(e);
     }
   },
-  multipleUpload: async (_, {files, input}) => {
+  multipleUpload: async (_, {files, input}, context) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const { resolve, reject } = await PromiseAll.all(
         files.map(

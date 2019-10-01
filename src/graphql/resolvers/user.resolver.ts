@@ -3,9 +3,12 @@ import { User } from "../../models/user.model"
 import { Permission } from "../../models/permission.model"
 import { config } from  "../../../enviroments.dev"
 import {getProjection, transformUser} from "./merge";
+import {isAuth} from "../../middleware/is-auth";
 
 const userQueries = {
   user: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let doc = await User.findOne({_id: args.id}, projections).exec();
@@ -19,6 +22,8 @@ const userQueries = {
     }
   },
   users: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let docs = await User.find({}, projections).exec();
@@ -35,6 +40,8 @@ const userQueries = {
 
 const userMutations = {
   createUser: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const permission = await Permission.findOne({ rank: config.permission.docente});
 
@@ -55,6 +62,8 @@ const userMutations = {
     }
   },
   updateUser: async(_, args, context, info) =>{
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let doc = await
@@ -72,6 +81,8 @@ const userMutations = {
     }
   },
   updateUserRole: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       const permission = await Permission.findOne({ _id: args.input.permissionId}, projections);
@@ -112,7 +123,9 @@ const userMutations = {
       throw new ApolloError(e);
     }
   },
-  deleteUser: async(_, args) => {
+  deleteUser: async(_, args, context) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
 		try{
 		  return await User.findByIdAndDelete(args.id).exec();
     }catch (e) {

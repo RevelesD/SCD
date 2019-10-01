@@ -1,9 +1,14 @@
 import {ApolloError} from "apollo-server";
 import { Notice } from "../../models/notice.model";
+import { Campus } from "../../models/campus.model";
 import {getProjection, transformNotice} from "./merge";
+import {isAuth} from "../../middleware/is-auth";
+import {config} from "../../../enviroments.dev";
 
 const noticeQueries = {
   notice: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let doc = await Notice.findById(args.id, projections).exec();
@@ -17,6 +22,8 @@ const noticeQueries = {
     }
   },
   notices: async(_, {page, perPage}, context, info) => {
+    // if (!await isAuth(context, [config.permission.docente]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let docs = await Notice
@@ -37,6 +44,8 @@ const noticeQueries = {
 
 const noticeMutations = {
   createNotice: async(_: any, { input }, context: any, info: any) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const notice = new Notice({
         title: input.title,
@@ -54,6 +63,8 @@ const noticeMutations = {
     }
   },
   updateNotice: async(_, args, context, info) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
       let doc = await Notice
@@ -69,7 +80,9 @@ const noticeMutations = {
       throw new ApolloError(e);
     }
   },
-  deleteNotice: async(_, args) => {
+  deleteNotice: async(_, args, context) => {
+    // if (!await isAuth(context, [config.permission.admin]))
+    //   throw new ApolloError('Unauthenticated');
     try {
       const res = await Notice.findByIdAndDelete(args.id);
       return res;
