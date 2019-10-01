@@ -106,6 +106,49 @@ function mergePDFs(files: string[]): string {
   outStream.close(function () {});
   return finalName;
 }
+/**
+ * Handles and array of readable streams as async functions and returns
+ * an array of dynamically created names for each file that was retrieved
+ * from the stream
+ * @param { streams } an array of streams that pipe a file
+ * @param { names } an array of names filled on each iteration of the recursively call
+ * @returns { names } a promise containing the same array of strings as the one passed
+ * as parameter but filled with data
+ */
+async function continueStream(streams, outStream): Promise<WritableStream> {
+  try {
+    console.log('Entro !!');
+    if (streams.length) {
+      // extract GridFS stream from array
+      const resolved =  streams.shift();
+      const promise = new Promise(function (resolve, reject) {
+        // write the file onto disk
+        resolved.on('data', (chunk) => {
+          outStream.write(chunk);
+        });
+        // once the file is written resolve the promise
+        resolved.on('end', () => {
+          resolve(true)
+        });
+        resolved.on('error', (err) => {
+          reject(err);
+        });
+      });
+      // await for the file to write on disk before continue
+      const resolve = await promise;
+      if (resolve) {
+        // recursively dive into the streams array until none is left
+        // returning an incremented names array on each iteration
+        return await continueStream(streams, outStream);
+      }
+    } else {
+      // when no more streams are left return the array of names as it is
+      return outStream;
+    }
+  } catch (e) {
+    throw e
+  }
+}
 
 router.post('/getFile', async (req, res) => {
   try {
@@ -245,10 +288,13 @@ router.post('/joinInPdf', async(req, res) => {
     res.setHeader("Content-Disposition", "attachment; filename=" + body.file_name);
     res.setHeader("Content-Type", "application/pdf");
     // pipe the streams and get the filenames of the files written on disk
-    let names = [];
-    names = await promiseStream(gsf, names);
-    const finalName = mergePDFs(names);
-
+    // let names = [];
+    let pdfWriter = hummus.createWriter(new hummus.PDFStreamForResponse(res));
+    pdfWriter = await continueStream(gsf, pdfWriter);
+    pdfWriter.end();
+    res.end();
+    /** Enviar guardarndo en disco
+     * // const finalName = mergePDFs(names);
     const sender = fs.createReadStream(__dirname + `/temps/${finalName}.pdf`);
     sender.pipe(res)
       .on('finish', () => {
@@ -261,6 +307,7 @@ router.post('/joinInPdf', async(req, res) => {
       .on('error', (err) => {
         console.log(err);
       });
+     */
   } catch (e) {
     client.close();
     res.status(500);
