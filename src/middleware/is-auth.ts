@@ -1,4 +1,5 @@
 import {decode} from "jsonwebtoken";
+import { User } from "../models/user.model";
 
 const jwt = require('jsonwebtoken');
 
@@ -24,9 +25,5 @@ export const getUser = (token) => {
   // console.log('token: ', req);
   return req
 };
-export const isAuth = (contex: any, permissions: number[]): boolean => {
-  if() {
-
-  }
-  return false
+export const isAuth = async (contex: any, permissions: number[]) => {
 };

@@ -36,7 +36,7 @@ const userQueries = {
 const userMutations = {
   createUser: async(_, args, context, info) => {
     try {
-      const permission = await Permission.findOne({ rank: config.docente});
+      const permission = await Permission.findOne({ rank: config.permission.docente});
 
       const user = await User.create({
         clave: args.input.clave,

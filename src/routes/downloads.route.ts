@@ -1,22 +1,141 @@
 import * as assert from "assert";
-const express = require('express');
-export const router = express.Router();
 import { config } from "../../enviroments.dev";
+import {MongoClient} from "mongodb";
+import { Document } from "../models/documents.model";
+
+const express = require('express');
 const mongo = require('mongodb');
+const archiver = require('archiver');
+const hummus = require('hummus');
+const MemoryStream = require('memorystream');
 const fs = require('fs');
-// retrieve single file
+
+// router object to export
+export const router = express.Router();
+/**
+ * Creates a mongodb connection
+ * @returns {client} - a mongodb client
+ */
+function getConnection(): Promise<MongoClient> {
+  return mongo.MongoClient.connect(config.dbPath,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  );
+}
+/**
+ * Creates a GridFS bucket
+ * @param {client} - a MongoClient instance
+ * @returns {gri} - a gridfs bucket with specific name
+ */
+function getGrid(client) {
+  const db = client.db(config.dbName);
+  return new mongo.GridFSBucket(db, {bucketName: 'archivos'});
+}
+/**
+ * Handles and array of readable streams as async functions and returns
+ * an array of dynamically created names for each file that was retrieved
+ * from the stream
+ * @param { streams } an array of streams that pipe a file
+ * @param { names } an array of names filled on each iteration of the recursively call
+ * @returns { names } a promise containing the same array of strings as the one passed
+ * as parameter but filled with data
+ */
+async function promiseStream(streams, names: string[]): Promise<string[]> {
+  try {
+    if (streams.length) {
+      // create new name
+      const name = String(Date.now());
+      // extract GridFS stream from array
+      const resolved =  streams.shift();
+      // create a writer stream
+      const diskStream = fs.createWriteStream(`./temps/${name}.pdf`);
+
+      const promise = new Promise(function (resolve, reject) {
+        // write the file onto disk
+        resolved.on('data', (chunk) => {
+          diskStream.write(chunk);
+        });
+        // once the file is written resolve the promise
+        resolved.on('end', async () => {
+          resolve(true)
+        });
+        resolved.on('error', (err) => {
+          reject(err);
+        });
+      });
+      // await for the file to write on disk before continue
+      const resolve = await promise;
+      if (resolve) {
+        // new name is pushed to the array of names of created files
+        names.push(name);
+        // recursively dive into the streams array until none is left
+        // returning an incremented names array on each iteration
+        return await promiseStream(streams, names);
+      }
+    } else {
+      // when no more streams are left return the array of names as it is
+      return names;
+    }
+  } catch (e) {
+    throw e
+  }
+}
+/**
+ * Creates the final pdf
+ * @param {filesNames} list of names to be merged
+ * @return { filePath } path to the resulting pdf
+ */
+function mergePDFs(files: string[]): string {
+  // create the writer stream to join pdfs and send them to the client
+  const finalName = 'final_' + String(Date.now());
+  let streams = [];
+  let pdfWriter = hummus.createWriter(`./temps/${finalName}.pdf`, {log: 'MY_LOG_FILE.txt'});
+  pdfWriter.end();
+
+  let inStream1 = fs.createReadStream(`./temps/${files[0]}.pdf`);
+  let inStream2 = fs.createReadStream(`./temps/${files[1]}.pdf`);
+  let inStream3 = fs.createReadStream(`./temps/${files[2]}.pdf`);
+
+  let initStream1 = new hummus.PDFStreamForResponse(inStream1);
+  let initStream2 = new hummus.PDFStreamForResponse(inStream2);
+  let initStream3 = new hummus.PDFStreamForResponse(inStream3);
+
+  let outStream = new hummus.PDFWStreamForFile(`./temps/${finalName}.pdf`);
+  // streams.push(initStream);
+  // streams.push(outStream);
+  pdfWriter = hummus.createWriterToModify(initStream1, outStream);
+  pdfWriter.appendPDFPagesFromPDF(initStream2);
+  pdfWriter.appendPDFPagesFromPDF(initStream3);
+  // append all the files to a single pdf
+  // files.forEach(fn => {
+  //   let inStream = new hummus.PDFRStreamForFile(`./temps/${fn}.pdf`);
+  //   // const input = hummus.createReader(inStream);
+  //   pdfWriter.appendPDFPagesFromPDF(inStream);
+  //   streams.push(inStream);
+  // });
+  // once all files were appended end the end stream
+  pdfWriter.end();
+  // streams.forEach(s => {
+  //   s.close(function () {});
+  // })
+  inStream1.close();
+  inStream2.close();
+  inStream3.close();
+  // initStream1.close(function () {console.log('Closed 1');});
+  // initStream2.end(function () {console.log('Closed 2');});
+  // initStream3.end(function () {console.log('Closed 3');});
+  outStream.close(function () {console.log('Closed out');});
+  return finalName;
+}
 
 router.post('/getFile', async (req, res) => {
   try {
-    const client = await mongo.MongoClient.connect(config.dbPath,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      }
-    );
+    const client = await getConnection();
+    const grid = getGrid(client);
+
     const id = mongo.ObjectID(req.body.id);
-    const db = client.db(config.dbName);
-    const grid = new mongo.GridFSBucket(db, {bucketName: 'archivos'});
     const doc = await grid.find({_id: id}).toArray();
     if (doc.length != 1) {
       res.status(400);
@@ -45,35 +164,7 @@ router.post('/getFile', async (req, res) => {
 
 router.post('/test', async (req, res) => {
   try {
-    const client = await mongo.MongoClient.connect(config.dbPath,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      }
-    );
-    const id = mongo.ObjectID(req.body.id);
-    const db = client.db(config.dbName);
-    const grid = new mongo.GridFSBucket(db, {bucketName: 'archivos'});
-    const found = await grid.find({_id: id}).toArray();
-    if (found.length != 1) {
-      res.status(400);
-      res.json({error: 'S2'});
-    }
-    console.log(found);
-    const stream = grid.openDownloadStream(id);
-    const ws = fs.createWriteStream('./temps/tmps.pdf');
-    stream.pipe(ws)
-      .on('error', (err) => {
-        assert.ifError(err)
-      })
-      .on('finish', async() => {
-        await client.close()
-        res.json({done: 'all good'});
-      });
 
-    ws.on('error', function (err) {
-      console.log(err);
-    })
   } catch (e) {
     throw e;
   }
@@ -81,16 +172,138 @@ router.post('/test', async (req, res) => {
 
 router.post('/joinInZip', async(req, res) => {
   try {
+    const body = req.body.files;
+    const client = await getConnection();
+    const grid = getGrid(client);
+    const docs = await Document.find(
+      {_id: {$in: body.files_list}},
+      {fileId: true, path: true}).exec();
+    // convert strings into ObjectsId
+    const ids = docs.map((e) => {
+      return mongo.ObjectID(e.fileId)
+    });
+    // verify if files exist in db
+    let gsf = await grid.find({_id: {$in: ids}}).toArray();
+    // let gsf = await grid.find({}).toArray();
+    if (gsf.length !== docs.length) {
+      client.close();
+      res.status(400);
+      res.json({error: 'S2'});
+    }
+    // convert the documents found into readable streams
+    gsf = ids.map((e) => {
+      return grid.openDownloadStream(e);
+    });
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Sets the compression level.
+    });
 
+    archive.on('warning', function(err) {
+      if (err.code === 'ENOENT') {
+        // log warning
+        client.close();
+      } else {
+        // throw error
+        client.close();
+        throw err;
+      }
+    });
+    archive.on('error', function(err) {
+      client.close();
+      throw err;
+    });
+    // definition of headers for file transfer
+    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition")
+    res.setHeader("Content-Description", "File Transfer")
+    res.setHeader("Content-Transfer-Encoding", "binary")
+    res.setHeader("Content-Disposition", "attachment; filename=" + body.file_name)
+    res.setHeader("Content-Type", "application/x-zip-compressed")
+    // pipe archive data to the client
+    archive.pipe(res)
+      .on('error', async (err) => {
+        await client.close();
+        assert.ifError(err)
+      })
+      .on('finish', async() => {
+        await client.close()
+      });
+    // append every stream into the final zip
+    gsf.forEach((e, i) => {
+      archive.append(e, {name: docs[i].path});
+    });
+    archive.finalize();
   } catch (e) {
     throw e;
   }
 });
 
 router.post('/joinInPdf', async(req, res) => {
+  const client = await getConnection();
   try {
-    
+    const body = req.body.files;
+    const grid = getGrid(client);
+    const docs = await Document.find(
+      {_id: {$in: body.files_list}},
+      {fileId: true, path: true}).exec();
+    // convert strings into ObjectsId
+    const ids = docs.map((e) => {
+      return mongo.ObjectID(e.fileId)
+    });
+    // verify if the files exists in the db
+    let gsf = await grid.find({_id: {$in: ids}}).toArray();
+    if (gsf.length !== docs.length) {
+      client.close();
+      res.status(400);
+      res.json({error: 'S2'});
+    }
+    // convert the documents found into readable streams
+    gsf = ids.map((e) => {
+      return grid.openDownloadStream(e);
+    });
+    // definition of headers for file transfer
+    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+    res.setHeader("Content-Description", "File Transfer");
+    res.setHeader("Content-Transfer-Encoding", "binary");
+    res.setHeader("Content-Disposition", "attachment; filename=" + body.file_name);
+    res.setHeader("Content-Type", "application/pdf");
+    // pipe the streams and get the filenames of the files written on disk
+    let names = [];
+    names = await promiseStream(gsf, names);
+    const finalName = mergePDFs(names);
+
+    const sender = fs.createReadStream(`./temps/${finalName}.pdf`);
+    sender.pipe(res)
+      .on('finish', () => {
+        names.forEach((n, i) => {
+          fs.unlinkSync(`C:\\UAQ\\SCD\\temps\\${n}.pdf`);
+        });
+        fs.unlinkSync(`C:\\UAQ\\SCD\\temps\\${finalName}.pdf`);
+      })
+      .on('error', (err) => {
+        console.log(err);
+      });
   } catch (e) {
-    throw e;
+    client.close();
+    res.status(500);
+    res.send({error: 'Something blew up'});
   }
 });
+
+// const output = fs.createWriteStream(`./temps/example.zip`);
+// gridStream.pipe(output)
+//   .on('error', (err) => {
+//     assert.ifError(err)
+//   })
+//   .on('finish', async() => {
+//     await client.close()
+//     res.json({done: 'all good'});
+//   });
+
+// output.on('close', function() {
+//   console.log(archive.pointer() + ' total bytes');
+//   console.log('archiver has been finalized and the output file descriptor has closed.');
+// });
+// output.on('end', function() {
+//   console.log('Data has been drained');
+// });
+// good practice to catch warnings (ie stat failures and other non-blocking errors)

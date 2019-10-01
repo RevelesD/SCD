@@ -10,9 +10,9 @@ const processUpload = async (upload, input) => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
     const stream = createReadStream();
-    if (mimetype !== 'application/pdf') {
-      throw new ApolloError('Tipo de documento no valido');
-    }
+    // if (mimetype !== 'application/pdf') {
+    //   throw new ApolloError('Tipo de documento no valido');
+    // }
 
     const con = await MongoClient.connect(
       config.dbPath,
