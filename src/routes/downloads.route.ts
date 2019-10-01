@@ -50,7 +50,7 @@ async function promiseStream(streams, names: string[]): Promise<string[]> {
       // extract GridFS stream from array
       const resolved =  streams.shift();
       // create a writer stream
-      const diskStream = fs.createWriteStream(`./temps/${name}.pdf`);
+      const diskStream = fs.createWriteStream(__dirname + `/temps/${name}.pdf`);
 
       const promise = new Promise(function (resolve, reject) {
         // write the file onto disk
@@ -88,45 +88,22 @@ async function promiseStream(streams, names: string[]): Promise<string[]> {
  * @return { filePath } path to the resulting pdf
  */
 function mergePDFs(files: string[]): string {
-  // create the writer stream to join pdfs and send them to the client
+  // define the name of the temp file where the other PDFs are going to be appended to
   const finalName = 'final_' + String(Date.now());
-  let streams = [];
-  let pdfWriter = hummus.createWriter(`./temps/${finalName}.pdf`, {log: 'MY_LOG_FILE.txt'});
+  // create the writer stream to join PDFs and send them to the client
+  let pdfWriter = hummus.createWriter(__dirname + `/temps/${finalName}.pdf`);
   pdfWriter.end();
 
-  let inStream1 = fs.createReadStream(`./temps/${files[0]}.pdf`);
-  let inStream2 = fs.createReadStream(`./temps/${files[1]}.pdf`);
-  let inStream3 = fs.createReadStream(`./temps/${files[2]}.pdf`);
-
-  let initStream1 = new hummus.PDFStreamForResponse(inStream1);
-  let initStream2 = new hummus.PDFStreamForResponse(inStream2);
-  let initStream3 = new hummus.PDFStreamForResponse(inStream3);
-
-  let outStream = new hummus.PDFWStreamForFile(`./temps/${finalName}.pdf`);
-  // streams.push(initStream);
-  // streams.push(outStream);
-  pdfWriter = hummus.createWriterToModify(initStream1, outStream);
-  pdfWriter.appendPDFPagesFromPDF(initStream2);
-  pdfWriter.appendPDFPagesFromPDF(initStream3);
+  let outStream = new hummus.PDFWStreamForFile(__dirname + `/temps/${finalName}.pdf`);
+  pdfWriter = hummus.createWriter(outStream);
   // append all the files to a single pdf
-  // files.forEach(fn => {
-  //   let inStream = new hummus.PDFRStreamForFile(`./temps/${fn}.pdf`);
-  //   // const input = hummus.createReader(inStream);
-  //   pdfWriter.appendPDFPagesFromPDF(inStream);
-  //   streams.push(inStream);
-  // });
+  files.forEach(fn => {
+    let inStream = new hummus.PDFRStreamForFile(__dirname + `/temps/${fn}.pdf`);
+    pdfWriter.appendPDFPagesFromPDF(inStream);
+  });
   // once all files were appended end the end stream
   pdfWriter.end();
-  // streams.forEach(s => {
-  //   s.close(function () {});
-  // })
-  inStream1.close();
-  inStream2.close();
-  inStream3.close();
-  // initStream1.close(function () {console.log('Closed 1');});
-  // initStream2.end(function () {console.log('Closed 2');});
-  // initStream3.end(function () {console.log('Closed 3');});
-  outStream.close(function () {console.log('Closed out');});
+  outStream.close(function () {});
   return finalName;
 }
 
@@ -142,11 +119,11 @@ router.post('/getFile', async (req, res) => {
       res.json({error: 'S2'});
     }
     // definition of headers for file transfer
-    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition")
-    res.setHeader("Content-Description", "File Transfer")
-    res.setHeader("Content-Transfer-Encoding", "binary")
-    res.setHeader("Content-Disposition", "attachment; filename=" + doc[0].filename)
-    res.setHeader("Content-Type", "application/x-zip-compressed")
+    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+    res.setHeader("Content-Description", "File Transfer");
+    res.setHeader("Content-Transfer-Encoding", "binary");
+    res.setHeader("Content-Disposition", "attachment; filename=" + doc[0].filename);
+    res.setHeader("Content-Type", "application/x-zip-compressed");
     // Begging streaming of file
     const stream = grid.openDownloadStream(id);
     stream.pipe(res)
@@ -238,6 +215,7 @@ router.post('/joinInZip', async(req, res) => {
 });
 
 router.post('/joinInPdf', async(req, res) => {
+  console.log("entro");
   const client = await getConnection();
   try {
     const body = req.body.files;
@@ -271,13 +249,14 @@ router.post('/joinInPdf', async(req, res) => {
     names = await promiseStream(gsf, names);
     const finalName = mergePDFs(names);
 
-    const sender = fs.createReadStream(`./temps/${finalName}.pdf`);
+    const sender = fs.createReadStream(__dirname + `/temps/${finalName}.pdf`);
     sender.pipe(res)
       .on('finish', () => {
         names.forEach((n, i) => {
-          fs.unlinkSync(`C:\\UAQ\\SCD\\temps\\${n}.pdf`);
+          fs.unlink(__dirname + `/temps/${n}.pdf`, function() {});
         });
-        fs.unlinkSync(`C:\\UAQ\\SCD\\temps\\${finalName}.pdf`);
+        fs.unlink(__dirname + `/temps/${finalName}.pdf`, function (){});
+        client.close();
       })
       .on('error', (err) => {
         console.log(err);

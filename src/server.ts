@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 4000;
 import { router } from './routes/downloads.route';
+import * as path from "path";
 
 mongoose.connect(
   config.mongooseURL,
@@ -50,6 +51,8 @@ const server = new ApolloServer({
 });
 server.applyMiddleware({ app, path: '/graphql' });
 app.use('/downloads', router);
+
+app.get('/serverAng', express.static('./uploader'));
 
 app.listen({port}, () => {
   console.log(`🚀  server ready at http://localhost:${port}${server.graphqlPath}`);
