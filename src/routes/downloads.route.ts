@@ -115,7 +115,7 @@ function mergePDFs(files: string[]): string {
  * @returns { names } a promise containing the same array of strings as the one passed
  * as parameter but filled with data
  */
-async function continueStream(streams, outStream): Promise<WritableStream> {
+async function continueStream(streams, outStream) {
   try {
     console.log('Entro !!');
     if (streams.length) {
@@ -124,11 +124,12 @@ async function continueStream(streams, outStream): Promise<WritableStream> {
       const promise = new Promise(function (resolve, reject) {
         // write the file onto disk
         resolved.on('data', (chunk) => {
-          outStream.write(chunk);
+
+          outStream.appendPDFPagesFromPDF(chunk);
         });
         // once the file is written resolve the promise
         resolved.on('end', () => {
-          resolve(true)
+          resolve(true);
         });
         resolved.on('error', (err) => {
           reject(err);
