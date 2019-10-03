@@ -33,8 +33,8 @@ const campusQueries = {
 
 const campusMutations = {
     createCampus: async(_, { input }, context, info) => {
-        // if (!await isAuth(context, [config.permission.superAdmin]))
-        //     throw new ApolloError('Unauthenticated');
+        if (!await isAuth(context, [config.permission.superAdmin]))
+            throw new ApolloError('Unauthenticated');
         try {
             const campus = new Campus({
                 name: input.name,
