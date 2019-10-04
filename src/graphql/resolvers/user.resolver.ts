@@ -85,19 +85,19 @@ const userMutations = {
     //   throw new ApolloError('Unauthenticated');
     try {
       const projections = getProjection(info);
-      const permission = await Permission.findOne({ _id: args.input.permissionId}, projections);
-
+      const permission = await Permission.findOne({ _id: args.input.permissionId});
+      console.log('permisos', permission);
       if(args.input.action === 1){
         let doc = await
           User
-            .findOne(
+            .findOneAndUpdate(
             {
               $and: [
                 { _id: args.input.userId},
                 {permissions: {$nin: [permission]}}
               ]
-            }, projections)
-            .update({ $push: {permissions:  permission } }).exec();
+            }, { $push: {permissions:  permission } }, projections);
+            //.update().exec();
 
         if (projections.adscription) {
           // query.populate('adscription');
