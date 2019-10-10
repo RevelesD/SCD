@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const documentSchema = new Schema({
   fileName: {type: String, required: true},
-  fileId: {type: String, required: true},
+  fileId: {type: Schema.Types.ObjectId, required: true},
   mimetype: {type: String, required: true},
   size: {type: Number, required: true},
   path: {type: String, required: true},
