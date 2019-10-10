@@ -1,4 +1,5 @@
 import {isAuth} from "../../middleware/is-auth";
+const mongoose = require('mongoose');
 
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
@@ -12,9 +13,9 @@ const processUpload = async (upload, input) => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
     const stream = createReadStream();
-    if (mimetype !== 'application/pdf') {
-      throw new ApolloError('Tipo de documento no valido');
-    }
+    // if (mimetype !== 'application/pdf') {
+    //   throw new ApolloError('Tipo de documento no valido');
+    // }
 
     const con = await MongoClient.connect(
       config.dbPath,
@@ -52,10 +53,9 @@ const processUpload = async (upload, input) => {
 async function createDocument(catId, owner, docData) {
   try {
     const category = await Category.findById(catId);
-
     const doc = await Document.create({
       fileName: docData.filename,
-      fileId: docData._id,
+      fileId: mongoose.Types.ObjectId(docData._id),
       mimetype: docData.mimetype,
       size: docData.length,
       path: `${category.path}/${docData.filename}`,

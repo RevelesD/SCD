@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 4000;
 import { router } from './routes/downloads.route';
+import * as path from "path";
 
 mongoose.connect(
   config.mongooseURL,
@@ -44,6 +45,7 @@ const server = new ApolloServer({
     const token = req.headers.authorization || '';
     // try to retrieve a user with the token
     const user = getUser(token);
+    user['ip'] = req.ip;
     // add the user to the context
     return { user };
   },
