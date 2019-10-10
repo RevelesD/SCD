@@ -2,24 +2,17 @@ import {ApolloError} from "apollo-server";
 import {Campus} from "../../models/campus.model";
 import {getProjection} from "./merge";
 import {Context, isAuth} from "../../middleware/is-auth"
-import {logAction} from "../../middleware/logAction"
+import {registerLog} from "../../middleware/logAction"
 import {config} from "../../../enviroments.dev";
-import {Notice} from "../../models/notice.model";
 
 const campusQueries = {
   campus: async (_, args, context: Context, info) => {
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        if (!context.user) {
-          logAction('Unauthenticated', 'Requested the query campus', context.user.ip)
-        } else {
-          logAction(
-            context.user.userId,
-            'Requested the query campus without permissions to access this query',
-            context.user.ip)
-        }
-        throw new ApolloError('Unauthenticated');
+        registerLog(context, 'query campus');
+        throw new ApolloError('Error: S5');
       }
+
       const projections = getProjection(info);
       return await Campus.findById(args.id), projections;
     } catch (e) {
@@ -28,8 +21,11 @@ const campusQueries = {
   },
   allCampus: async (_, {page, perPage}, context, info) => {
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin]))
-      //   throw new ApolloError('Unauthenticated');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerLog(context, 'query "allCampus');
+        throw new ApolloError('Error: S5');
+      }
+
       const projections = getProjection(info);
       return await Campus
         .find({}, projections)
@@ -44,8 +40,11 @@ const campusQueries = {
 const campusMutations = {
   createCampus: async (_, {input}, context, info) => {
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin]))
-      //     throw new ApolloError('Unauthenticated');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerLog(context, 'mutation "createCampus');
+        throw new ApolloError('Error: S5');
+      }
+
       const campus = new Campus({
         name: input.name,
         phone: input.phone

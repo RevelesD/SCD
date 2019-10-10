@@ -10,13 +10,8 @@ const campusQueries = {
     campus: async (_, args, context, info) => {
         try {
             if (!await is_auth_1.isAuth(context, [enviroments_dev_1.config.permission.superAdmin])) {
-                if (!context.user) {
-                    logAction_1.logAction('Unauthenticated', 'Requested the query campus', context.user.ip);
-                }
-                else {
-                    logAction_1.logAction(context.user.userId, 'Requested the query campus without permissions to access this query', context.user.ip);
-                }
-                throw new apollo_server_1.ApolloError('Unauthenticated');
+                logAction_1.registerLog(context, 'query campus');
+                throw new apollo_server_1.ApolloError('Error: S5');
             }
             const projections = merge_1.getProjection(info);
             return await campus_model_1.Campus.findById(args.id), projections;
@@ -27,8 +22,10 @@ const campusQueries = {
     },
     allCampus: async (_, { page, perPage }, context, info) => {
         try {
-            // if (!await isAuth(context, [config.permission.superAdmin]))
-            //   throw new ApolloError('Unauthenticated');
+            if (!await is_auth_1.isAuth(context, [enviroments_dev_1.config.permission.superAdmin])) {
+                logAction_1.registerLog(context, 'query "allCampus');
+                throw new apollo_server_1.ApolloError('Error: S5');
+            }
             const projections = merge_1.getProjection(info);
             return await campus_model_1.Campus
                 .find({}, projections)
@@ -44,8 +41,10 @@ exports.campusQueries = campusQueries;
 const campusMutations = {
     createCampus: async (_, { input }, context, info) => {
         try {
-            // if (!await isAuth(context, [config.permission.superAdmin]))
-            //     throw new ApolloError('Unauthenticated');
+            if (!await is_auth_1.isAuth(context, [enviroments_dev_1.config.permission.superAdmin])) {
+                logAction_1.registerLog(context, 'mutation "createCampus');
+                throw new apollo_server_1.ApolloError('Error: S5');
+            }
             const campus = new campus_model_1.Campus({
                 name: input.name,
                 phone: input.phone

@@ -10,6 +10,7 @@ exports.getUser = (token) => {
     let req = {};
     try {
         decodeToken = jwt.verify(token, 'key');
+        console.log(decodeToken);
         if (!decodeToken) {
             // console.log("e4");
             req['isAuth'] = false;

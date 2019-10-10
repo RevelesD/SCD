@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert = require("assert");
 const enviroments_dev_1 = require("../../enviroments.dev");
 const documents_model_1 = require("../models/documents.model");
 const { execFileSync } = require('child_process');
@@ -50,7 +49,7 @@ exports.router.post('/getFile', async (req, res) => {
         stream.pipe(res)
             .on('error', async (err) => {
             await client.close();
-            assert.ifError(err);
+            res.json({ error: 'X4' });
         })
             .on('finish', async () => {
             await client.close();
@@ -79,7 +78,6 @@ exports.router.post('/joinInZip', async (req, res) => {
         });
         // verify if files exist in db
         let gsf = await grid.find({ _id: { $in: ids } }).toArray();
-        // let gsf = await grid.find({}).toArray();
         if (gsf.length !== docs.length) {
             client.close();
             res.status(400);
@@ -105,7 +103,8 @@ exports.router.post('/joinInZip', async (req, res) => {
         });
         archive.on('error', function (err) {
             client.close();
-            throw err;
+            res.json({ error: 'S7' });
+            // throw err;
         });
         // definition of headers for file transfer
         res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
@@ -117,7 +116,7 @@ exports.router.post('/joinInZip', async (req, res) => {
         archive.pipe(res)
             .on('error', async (err) => {
             await client.close();
-            assert.ifError(err);
+            res.json({ error: 'X4' });
         })
             .on('finish', async () => {
             await client.close();
@@ -155,7 +154,7 @@ exports.router.post('/joinInPdf', async (req, res) => {
             fs.unlinkSync(path);
         })
             .on('error', (err) => {
-            console.log(err);
+            res.json({ error: 'X4' });
         });
     }
     catch (e) {

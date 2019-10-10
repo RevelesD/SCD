@@ -8,11 +8,19 @@ exports.logAction = async (causer, description, ip) => {
             causer: causer,
             from: ip
         });
-        console.log(`log: ${causer} ${description} ${ip}`);
         await doc.save();
     }
     catch (e) {
         throw e;
     }
 };
+function registerLog(context, resolver) {
+    if (context.user.isAuth === undefined) {
+        exports.logAction('Unauthenticated', `Requested the ${resolver}`, context.user.ip);
+    }
+    else {
+        exports.logAction(context.user.userId, `Requested the ${resolver} without sufficient permissions`, context.user.ip);
+    }
+}
+exports.registerLog = registerLog;
 //# sourceMappingURL=logAction.js.map
