@@ -45,14 +45,13 @@ const server = new ApolloServer({
     const token = req.headers.authorization || '';
     // try to retrieve a user with the token
     const user = getUser(token);
+    user['ip'] = req.ip;
     // add the user to the context
     return { user };
   },
 });
 server.applyMiddleware({ app, path: '/graphql' });
 app.use('/downloads', router);
-
-app.get('/serverAng', express.static('./uploader'));
 
 app.listen({port}, () => {
   console.log(`🚀  server ready at http://localhost:${port}${server.graphqlPath}`);

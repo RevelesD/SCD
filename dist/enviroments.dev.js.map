@@ -1,0 +1,1 @@
+{"version":3,"file":"enviroments.dev.js","sourceRoot":"","sources":["../enviroments.dev.ts"],"names":[],"mappings":";;AAAa,QAAA,MAAM,GAAG;IACpB,MAAM,EAAE,2BAA2B;IACnC,MAAM,EAAE,KAAK;IACb,WAAW,EAAE,+BAA+B;IAC5C,UAAU,EAAE;QACV,OAAO,EAAE,CAAC;QACV,KAAK,EAAE,CAAC;QACR,UAAU,EAAE,CAAC;KACd;CACF,CAAC"}
