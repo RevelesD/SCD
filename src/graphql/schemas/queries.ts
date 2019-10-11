@@ -13,7 +13,7 @@ export const queries = `
   
   user(id: ID!): User!
   users(page: Int!, perPage: Int!): [User!]!
-  login(name: String!, clave: String!): AuthData!
+  login(clave: String!, password: String!): AuthData!
   
   category(id: ID!): Category!
   categories(page: Int!, perPage: Int!): [Category!]!
