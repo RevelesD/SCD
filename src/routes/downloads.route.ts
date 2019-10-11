@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { config } from "../../enviroments.dev";
 import {MongoClient} from "mongodb";
 import { Document } from "../models/documents.model";

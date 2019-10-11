@@ -1,7 +1,4 @@
 import {SystemLog} from "../models/systemLog.model";
-import {isAuth} from "./is-auth";
-import {config} from "../../enviroments.dev";
-import {ApolloError} from "apollo-server-errors";
 
 export const logAction = async (causer: string,
                                 queryType: string,

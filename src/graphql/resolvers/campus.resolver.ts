@@ -2,14 +2,21 @@ import {ApolloError} from "apollo-server";
 import {Campus} from "../../models/campus.model";
 import {getProjection} from "./merge";
 import {Context, isAuth} from "../../middleware/is-auth"
-import {registerLog} from "../../middleware/logAction"
+import {
+  registerGoodLog,
+  registerBadLog,
+  registerErrorLog,
+  registerGenericLog
+} from "../../middleware/logAction"
 import {config} from "../../../enviroments.dev";
 
 const campusQueries = {
   campus: async (_, args, context: Context, info) => {
+    const qType = 'Query';
+    const qName = 'campus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerLog(context, 'query campus');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -20,9 +27,11 @@ const campusQueries = {
     }
   },
   allCampus: async (_, {page, perPage}, context, info) => {
+    const qType = 'Query';
+    const qName = 'allCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerLog(context, 'query "allCampus');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -39,9 +48,11 @@ const campusQueries = {
 
 const campusMutations = {
   createCampus: async (_, {input}, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'createCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerLog(context, 'mutation "createCampus');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -55,9 +66,11 @@ const campusMutations = {
     }
   },
   updateCampus: async (_, args, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'updateCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerLog(context, 'mutation updateCampus');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -71,9 +84,11 @@ const campusMutations = {
     }
   },
   deleteCampus: async (_, args, context) => {
+    const qType = 'Mutation';
+    const qName = 'deleteCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerLog(context, 'mutation deleteCampus');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
