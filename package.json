@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "codegen": "gql-gen"
   },
   "keywords": [],
   "author": "",
@@ -28,5 +29,10 @@
     "mongoose": "^5.6.13",
     "promises-all": "^1.0.0",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^1.8.1",
+    "@graphql-codegen/typescript": "^1.8.1",
+    "@graphql-codegen/typescript-operations": "^1.8.1"
   }
 }

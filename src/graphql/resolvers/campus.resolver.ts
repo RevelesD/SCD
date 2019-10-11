@@ -56,8 +56,11 @@ const campusMutations = {
   },
   updateCampus: async (_, args, context, info) => {
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin]))
-      //   throw new ApolloError('Unauthenticated');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerLog(context, 'mutation updateCampus');
+        throw new ApolloError('Error: S5');
+      }
+
       const projections = getProjection(info);
       return await Campus
         .findById(args.id, projections)
@@ -69,8 +72,11 @@ const campusMutations = {
   },
   deleteCampus: async (_, args, context) => {
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin]))
-      //   throw new ApolloError('Unauthenticated');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerLog(context, 'mutation deleteCampus');
+        throw new ApolloError('Error: S5');
+      }
+
       const res = await Campus.findByIdAndDelete(args.id);
       return res
     } catch (e) {

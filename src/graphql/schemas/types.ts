@@ -170,12 +170,9 @@ export const types = `
     _id: ID!
     description: String!
     causer: ID!
-    createdAt: Int!
-  }
-  
-  input InputSystemLog {
-    description: String!
-    causer: ID!
+    from: String!
+    requestType: String!
+    createdAt: Float!
   }
   
   input SearchLogs {
