@@ -28,7 +28,7 @@ const documentQueries = {
       if (projections.owner) {
         doc = transOwnerInDocument(doc);
       }
-      registerGoodLog(context, qType, qName, args.id)
+       registerGoodLog(context, qType, qName, args.id)
       return doc;
     } catch (e) {
       registerErrorLog(context, qType, qName);

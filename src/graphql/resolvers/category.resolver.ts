@@ -3,14 +3,20 @@ import {Category} from "../../models/category.model";
 import {config} from "../../../enviroments.dev";
 import {getProjection, transformCategory} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
-import {registerLog} from "../../middleware/logAction";
-
+import {
+  registerGoodLog,
+  registerBadLog,
+  registerErrorLog,
+  registerGenericLog
+} from "../../middleware/logAction"
 
 const categoryQueries = {
   category: async (_, args, context, info) => {
+    const qType = 'Query';
+    const qName = 'category';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerLog(context, 'query category');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -21,15 +27,20 @@ const categoryQueries = {
       if (projections.children) {
         return transformCategory(doc);
       }
+      registerGoodLog(context, qType, qName, 'Multiple categories');
       return doc;
+      registerErrorLog(context, qType, qName);
     } catch (e) {
+
       throw new ApolloError(e);
     }
   },
   categories: async (_, args, context, info) => {
+    const qType = 'Query';
+    const qName = 'categories';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerLog(context, 'query categories');
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -47,9 +58,11 @@ const categoryQueries = {
 
 const categoryMutations = {
   createRootCategory: async (_, {input}, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'createRootCategory';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        registerLog(context, 'mutation createRootCategory');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -68,16 +81,19 @@ const categoryMutations = {
       if (projections.children) {
         return transformCategory(dbdoc);
       }
+      registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
-    return
   },
   createLeafCategory: async (_, {parent, input}, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'createLeafCategory';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        registerLog(context, 'mutation createLeafCategory');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
 
@@ -87,6 +103,9 @@ const categoryMutations = {
       const pdoc = await pquery.exec();
       // Validate if the parent can have children
       if (pdoc.value) {
+        registerGenericLog(
+          context, qType, qName,
+          'User can\'t create a leaft category on a category that have RIPAUAQ\'s score');
         throw new ApolloError('Esta categoria posee puntos RIPAUAQ, no puede contener subcategorias.')
       }
       // Begins the declaration of the document for the model
@@ -107,16 +126,19 @@ const categoryMutations = {
       if (projections.children) {
         return transformCategory(dbdoc);
       }
+      registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
-    return
   },
   updateCategory: async (_, {id, input}, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'updateCategory';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        registerLog(context, 'mutation updateCategory');
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
         throw new ApolloError('Error: S5');
       }
       // Read the fields requested by the client.
@@ -131,6 +153,9 @@ const categoryMutations = {
       */
       if (input.value) {
         if (doc.children) {
+          registerGenericLog(
+            context, qType, qName,
+            'User can\'t assign RIPAUAQ`s score to a category with children');
           throw new ApolloError('No se pueden agregar puntos RIPAUAQ a una categoria con hijos');
         }
       }
@@ -147,21 +172,25 @@ const categoryMutations = {
       if (projections.children) {
         return transformCategory(doc);
       }
+      registerGoodLog(context, qType, qName, doc._id);
       // Return the updated document to the client.
       return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   },
   deleteCategory: async (_, args, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'deleteCategory';
     try {
-      registerLog(context, 'Deleting category is not allowed at the moment');
+      registerGenericLog(
+        context, qType, qName,
+        'User can\'t delete a category at this time.');
       throw new ApolloError('Error: S5');
       // if (!await isAuth(context, [config.permission.docente])) {
       //
       // }
-
-      return
     } catch (e) {
       throw new ApolloError(e);
     }
