@@ -1,6 +1,13 @@
 import { config } from "../../enviroments.dev";
 import {MongoClient} from "mongodb";
 import { Document } from "../models/documents.model";
+import {
+  registerErrorLog,
+  registerGoodLog,
+  registerBadLog, registerGenericLog
+} from '../middleware/logAction';
+import {getUser, isAuth} from '../middleware/is-auth';
+import {ApolloError} from "apollo-server-errors";
 
 const { execFileSync } = require('child_process');
 const express = require('express');
@@ -33,6 +40,18 @@ function getGrid(client) {
 }
 
 router.post('/getFile', async (req, res) => {
+  // define the variables needed to log the request into the system
+  const qType = 'POST';
+  const qName = 'getFile';
+  const user = getUser(req.headers.authorization || '');
+  user['ip'] = req.ip;
+  const context = {
+    user
+  };
+  if (context.user['userId'] === undefined) {
+    context.user['userId'] = 'Unauthenticated';
+  }
+  // commence the request flow
   try {
     const client = await getConnection();
     const grid = getGrid(client);
@@ -54,12 +73,15 @@ router.post('/getFile', async (req, res) => {
     stream.pipe(res)
       .on('error', async (err) => {
         await client.close();
+        registerGenericLog(context, qType, qName, 'Error while streaming the file')
         res.json({error: 'X4'});
       })
       .on('finish', async() => {
+        registerGenericLog(context, qType, qName, 'Download successfully');
         await client.close()
       })
   } catch (e) {
+    registerErrorLog(context, qType, qName);
     throw e;
   }
 });
@@ -73,6 +95,18 @@ router.post('/test', async (req, res) => {
 });
 
 router.post('/joinInZip', async(req, res) => {
+  // define the variables needed to log the request into the system
+  const qType = 'POST';
+  const qName = 'joinInZip';
+  const user = getUser(req.headers.authorization || '');
+  user['ip'] = req.ip;
+  const context = {
+    user
+  };
+  if (context.user['userId'] === undefined) {
+    context.user['userId'] = 'Unauthenticated';
+  }
+  // commence the request flow
   try {
     const body = req.body.files;
     const client = await getConnection();
@@ -88,6 +122,7 @@ router.post('/joinInZip', async(req, res) => {
     let gsf = await grid.find({_id: {$in: ids}}).toArray();
     if (gsf.length !== docs.length) {
       client.close();
+      registerGenericLog(context, qType, qName, 'Files to download not found');
       res.status(400);
       res.json({error: 'S2'});
     }
@@ -111,6 +146,7 @@ router.post('/joinInZip', async(req, res) => {
     });
     archive.on('error', function(err) {
       client.close();
+      registerGenericLog(context, qType, qName, 'Error while compressing the files');
       res.json({error: 'S7'});
       // throw err;
     });
@@ -124,22 +160,38 @@ router.post('/joinInZip', async(req, res) => {
     archive.pipe(res)
       .on('error', async (err) => {
         await client.close();
+        registerGenericLog(context, qType, qName, 'Error while streaming the file');
         res.json({error: 'X4'});
       })
       .on('finish', async() => {
+        registerGenericLog(context, qType, qName, 'Stream of the file successfully');
         await client.close()
       });
     // append every stream into the final zip
     gsf.forEach((e, i) => {
       archive.append(e, {name: docs[i].path});
     });
+    //
     archive.finalize();
   } catch (e) {
+    registerErrorLog(context, qType, qName);
     throw e;
   }
 });
 
 router.post('/joinInPdf', async(req, res) => {
+  // define the variables needed to log the request into the system
+  const qType = 'POST';
+  const qName = 'joinInPdf';
+  const user = getUser(req.headers.authorization || '');
+  user['ip'] = req.ip;
+  const context = {
+    user
+  };
+  if (context.user['userId'] === undefined) {
+    context.user['userId'] = 'Unauthenticated';
+  }
+  // commence the request flow
   try {
     const files = req.body.files;
     let args = [];
@@ -160,12 +212,15 @@ router.post('/joinInPdf', async(req, res) => {
     const sender = fs.createReadStream(path);
     sender.pipe(res)
       .on('finish', () => {
+        registerGenericLog(context, qType, qName, 'Stream of the file successfully');
         fs.unlinkSync(path);
       })
       .on('error', (err) => {
+        registerGenericLog(context, qType, qName, err);
         res.json({error: 'X4'});
       });
   } catch (e) {
+    registerErrorLog(context, qType, qName);
     res.status(500);
     res.send({error: 'Something blew up'});
   }

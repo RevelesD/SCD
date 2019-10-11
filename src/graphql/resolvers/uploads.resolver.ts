@@ -8,6 +8,7 @@ import { Document } from "../../models/documents.model";
 import { config } from '../../../enviroments.dev';
 import { Category } from "../../models/category.model";
 import { ApolloError } from 'apollo-server';
+import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
 const processUpload = async (upload, input) => {
   try {
@@ -73,27 +74,39 @@ const uploadsQueries = {
 
 const uploadsMutations = {
   singleUpload: async(_, {file, input}, context) => {
-    // if (!await isAuth(context, [config.permission.docente]))
-    //   throw new ApolloError('Unauthenticated');
+    const qType = 'Mutation';
+    const qName = 'singleUpload';
     try {
-      const res = await processUpload(file, input);
-      return res;
+      if (!await isAuth(context, [config.permission.docente])) {
+        registerBadLog(context, qType, qName);
+        throw new ApolloError('Error: S5');
+      }
+      const doc = await processUpload(file, input);
+      registerGoodLog(context, qType, qName, doc._id)
+      return doc;
     } catch (e) {
       throw new ApolloError(e);
     }
   },
   multipleUpload: async (_, {files, input}, context) => {
-    // if (!await isAuth(context, [config.permission.docente]))
-    //   throw new ApolloError('Unauthenticated');
+    const qType = 'Mutation';
+    const qName = 'multipleUpload';
     try {
+      if (!await isAuth(context, [config.permission.docente])) {
+        registerBadLog(context, qType, qName);
+        throw new ApolloError('Error: S5');
+      }
+
       const { resolve, reject } = await PromiseAll.all(
         files.map(
           async (x) => await processUpload(x, input)
         )
       );
 
+      registerGoodLog(context, qType, qName, 'Multiple documents')
       return resolve;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e)
     }
   }

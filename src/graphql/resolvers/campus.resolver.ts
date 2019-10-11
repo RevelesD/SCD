@@ -5,8 +5,7 @@ import {Context, isAuth} from "../../middleware/is-auth"
 import {
   registerGoodLog,
   registerBadLog,
-  registerErrorLog,
-  registerGenericLog
+  registerErrorLog
 } from "../../middleware/logAction"
 import {config} from "../../../enviroments.dev";
 
@@ -21,8 +20,11 @@ const campusQueries = {
       }
 
       const projections = getProjection(info);
-      return await Campus.findById(args.id), projections;
+      const doc = await Campus.findById(args.id, projections);
+      registerGoodLog(context, qType, qName, args.id)
+      return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   },
@@ -36,11 +38,14 @@ const campusQueries = {
       }
 
       const projections = getProjection(info);
-      return await Campus
+      const docs = await Campus
         .find({}, projections)
         .skip(page * perPage)
         .limit(perPage).exec();
+      registerGoodLog(context, qType, qName, 'Multiple documents')
+      return docs;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e)
     }
   }
@@ -60,8 +65,11 @@ const campusMutations = {
         name: input.name,
         phone: input.phone
       });
-      return await campus.save();
+      const doc = await campus.save();
+      registerGoodLog(context, qType, qName, doc._id)
+      return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e)
     }
   },
@@ -75,11 +83,13 @@ const campusMutations = {
       }
 
       const projections = getProjection(info);
-      return await Campus
+      const doc = await Campus
         .findById(args.id, projections)
         .update(args.input, {new: true}).exec();
-      //return await Campus.findByIdAndUpdate(args.id, args.input, {new: true}).exec();
+      registerGoodLog(context, qType, qName, doc._id);
+      return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   },
@@ -92,9 +102,11 @@ const campusMutations = {
         throw new ApolloError('Error: S5');
       }
 
-      const res = await Campus.findByIdAndDelete(args.id);
-      return res
+      const doc = await Campus.findByIdAndDelete(args.id);
+      registerGoodLog(context, qType, qName, doc._id)
+      return doc
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   }

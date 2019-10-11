@@ -1,27 +1,40 @@
 import {ApolloError} from "apollo-server";
 import {getProjection, tranformLog} from "./merge";
 import {SystemLog} from "../../models/systemLog.model";
+import {isAuth} from "../../middleware/is-auth";
+import {config} from "../../../enviroments.dev";
+import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
 const systemLogQueries = {
   systemLog: async(_, args, context, info) => {
+    const qType = 'Query';
+    const qName = 'systemLog';
     try {
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
+        throw new ApolloError('Error: S5');
+      }
+
       const projections = getProjection(info);
       let doc = await SystemLog.findById(args.id, projections).exec();
       if (projections.causer) {
         doc = tranformLog(doc);
       }
+      registerGoodLog(context, qType, qName, args.id)
       return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   },
   systemLogs: async(_, args, context, info) => {
-    // from: Float!
-    // to: Float!
-    // page: Int!
-    // perPage: Int!
-    // user: ID
+    const qType = 'Query';
+    const qName = 'systemLogs';
     try {
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
+        throw new ApolloError('Error: S5');
+      }
       const projections = getProjection(info);
       const query = {
         $and: [
@@ -41,8 +54,10 @@ const systemLogQueries = {
       if (projections.causer) {
         docs = docs.map(tranformLog);
       }
+      registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
     } catch (e) {
+      registerErrorLog(context, qType, qName);
       throw new ApolloError(e);
     }
   }
