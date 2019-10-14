@@ -4,6 +4,7 @@ import {getProjection} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
 import {config} from "../../../enviroments.dev";
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
+import {privateKEY} from "../../../enviroment.prod";
 
 const permissionQueries = {
   permission: async(_, args, context, info) => {
@@ -19,11 +20,12 @@ const permissionQueries = {
       registerGoodLog(context, qType, qName, args.id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
   permissions: async(_, {page, perPage}, context, info) => {
+    console.log(context);
     const qType = 'Query';
     const qName = 'permissions';
     try {
@@ -40,7 +42,7 @@ const permissionQueries = {
       registerGoodLog(context, qType, qName, 'Multiple documents')
       return docs;
     }  catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }
@@ -63,7 +65,7 @@ const permissionMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
@@ -83,7 +85,7 @@ const permissionMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -99,7 +101,7 @@ const permissionMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }

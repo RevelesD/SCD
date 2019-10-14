@@ -5,6 +5,7 @@ export const logAction = async (causer: string,
                                 queryName: string,
                                 description: string,
                                 ip: string) => {
+  // console.log(causer);
   try {
     const doc = new SystemLog({
       description: description,
@@ -20,6 +21,7 @@ export const logAction = async (causer: string,
 }
 
 export function registerBadLog(context, qType, qName) {
+  // console.log('Bad Log');
   if (context.user.isAuth === undefined) {
     logAction('Unauthenticated', qType, qName,
       'Access denied due to lack of credentials', context.user.ip);
@@ -30,11 +32,14 @@ export function registerBadLog(context, qType, qName) {
   }
 }
 export function registerGoodLog(context, qType, qName, oid) {
+  // console.log('Good Log');
+  // console.log(context);
   logAction(context.user.userId, qType, qName,
     `Query resolved successfully on ${oid}`, context.user.ip);
 }
 
 export function registerErrorLog(context, qType, qName, err) {
+  // console.log('Error Log');
   logAction(context.user.userId, qType, qName,
     err, context.user.ip);
 }

@@ -6,8 +6,7 @@ import {getProjection, transformUser} from "./merge";
 import {
   registerBadLog,
   registerGoodLog,
-  registerErrorLog,
-  registerGenericLog
+  registerErrorLog
 } from "../../middleware/logAction";
 import {isAuth} from "../../middleware/is-auth";
 
@@ -29,7 +28,7 @@ const userQueries = {
       registerGoodLog(context, qType, qName, doc.id);
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -50,7 +49,7 @@ const userQueries = {
       registerGoodLog(context, qType, qName, docs.id);
       return docs;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }
@@ -82,7 +81,7 @@ const userMutations = {
       registerGoodLog(context, qType, qName, res._id);
       return res;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
@@ -108,7 +107,7 @@ const userMutations = {
       return doc;
       //return await User.findByIdAndUpdate(args.id, args.input, {new:true});
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
@@ -116,10 +115,10 @@ const userMutations = {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
-      }
+      // if (!await isAuth(context, [config.permission.superAdmin])) {
+      //   registerBadLog(context, qType, qName);
+      //   throw new ApolloError('Error: S5');
+      // }
       const projections = getProjection(info);
       const permission = await Permission.findOne({ _id: args.input.permissionId});
       console.log('permisos', permission);
@@ -159,7 +158,7 @@ const userMutations = {
         return doc;
       }
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -174,7 +173,7 @@ const userMutations = {
       registerGoodLog(context, qType, qName, args.id);
 		  return await User.findByIdAndDelete(args.id).exec();
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }

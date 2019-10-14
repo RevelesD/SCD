@@ -27,11 +27,11 @@ const categoryQueries = {
       if (projections.children) {
         return transformCategory(doc);
       }
-      registerGoodLog(context, qType, qName, 'Multiple categories');
+      registerGoodLog(context, qType, qName, args.id);
       return doc;
-      registerErrorLog(context, qType, qName);
-    } catch (e) {
 
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -49,8 +49,10 @@ const categoryQueries = {
       if (projections.children) {
         return docs.map(transformCategory);
       }
+      registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
     } catch (e) {
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }
@@ -84,7 +86,7 @@ const categoryMutations = {
       registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -129,7 +131,7 @@ const categoryMutations = {
       registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -176,7 +178,7 @@ const categoryMutations = {
       // Return the updated document to the client.
       return doc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -192,6 +194,7 @@ const categoryMutations = {
       //
       // }
     } catch (e) {
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }

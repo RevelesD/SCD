@@ -85,6 +85,7 @@ const uploadsMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -106,7 +107,7 @@ const uploadsMutations = {
       registerGoodLog(context, qType, qName, 'Multiple documents')
       return resolve;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }

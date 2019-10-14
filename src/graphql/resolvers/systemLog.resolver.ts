@@ -23,7 +23,7 @@ const systemLogQueries = {
       registerGoodLog(context, qType, qName, args.id)
       return doc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -57,7 +57,7 @@ const systemLogQueries = {
       registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }
