@@ -7,7 +7,6 @@ import {
   registerBadLog, registerGenericLog
 } from '../middleware/logAction';
 import {getUser, isAuth} from '../middleware/is-auth';
-import {ApolloError} from "apollo-server-errors";
 
 const { execFileSync } = require('child_process');
 const express = require('express');
@@ -81,7 +80,7 @@ router.post('/getFile', async (req, res) => {
         await client.close()
       })
   } catch (e) {
-    registerErrorLog(context, qType, qName);
+    registerErrorLog(context, qType, qName, e);
     throw e;
   }
 });
@@ -174,7 +173,7 @@ router.post('/joinInZip', async(req, res) => {
     //
     archive.finalize();
   } catch (e) {
-    registerErrorLog(context, qType, qName);
+    registerErrorLog(context, qType, qName, e);
     throw e;
   }
 });
@@ -220,7 +219,7 @@ router.post('/joinInPdf', async(req, res) => {
         res.json({error: 'X4'});
       });
   } catch (e) {
-    registerErrorLog(context, qType, qName);
+    registerErrorLog(context, qType, qName, e);
     res.status(500);
     res.send({error: 'Something blew up'});
   }

@@ -34,9 +34,9 @@ export function registerGoodLog(context, qType, qName, oid) {
     `Query resolved successfully on ${oid}`, context.user.ip);
 }
 
-export function registerErrorLog(context, qType, qName) {
+export function registerErrorLog(context, qType, qName, err) {
   logAction(context.user.userId, qType, qName,
-    'Internal system error', context.user.ip);
+    err, context.user.ip);
 }
 
 export function registerGenericLog(context, qType, qName, message) {
