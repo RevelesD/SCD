@@ -16,8 +16,8 @@ const documentQueries = {
     const qName = 'document';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -40,8 +40,8 @@ const documentQueries = {
     const qName = 'documents';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -85,8 +85,8 @@ const documentMutations = {
     const qName = 'updateDocument';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -118,8 +118,8 @@ const documentMutations = {
     const qName = 'deleteDocument';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       // check if the document belong to the user trying to modify it
       let doc = await Document.findById(args.id);

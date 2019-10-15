@@ -52,8 +52,8 @@ const permissionMutations = {
     const qName = 'createPermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const permission = new Permission({
@@ -72,8 +72,8 @@ const permissionMutations = {
     const qName = 'updatePermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -92,8 +92,8 @@ const permissionMutations = {
     const qName = 'deletePermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const doc =await Permission.findByIdAndDelete(args.id).exec();
       registerGoodLog(context, qType, qName, doc._id)

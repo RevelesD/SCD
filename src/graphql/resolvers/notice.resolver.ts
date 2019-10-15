@@ -15,8 +15,8 @@ const noticeQueries = {
     const qName = 'notice';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -38,8 +38,8 @@ const noticeQueries = {
 
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -66,8 +66,8 @@ const noticeMutations = {
     const qName = 'createNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const notice = new Notice({
@@ -93,8 +93,8 @@ const noticeMutations = {
     const qName = 'updateNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -117,8 +117,8 @@ const noticeMutations = {
     const qName = 'deleteNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const doc = await Notice.findByIdAndDelete(args.id);

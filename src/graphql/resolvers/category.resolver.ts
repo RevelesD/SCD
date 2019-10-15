@@ -16,8 +16,8 @@ const categoryQueries = {
     const qName = 'category';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -40,8 +40,8 @@ const categoryQueries = {
     const qName = 'categories';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -64,8 +64,8 @@ const categoryMutations = {
     const qName = 'createRootCategory';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -95,8 +95,8 @@ const categoryMutations = {
     const qName = 'createLeafCategory';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -140,8 +140,8 @@ const categoryMutations = {
     const qName = 'updateCategory';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       // Read the fields requested by the client.
       const projections = getProjection(info);
@@ -189,7 +189,7 @@ const categoryMutations = {
       registerGenericLog(
         context, qType, qName,
         'User can\'t delete a category at this time.');
-      throw new ApolloError('Error: S5');
+      throw new ApolloError('S5, User can\'t delete a category at this time.');
       // if (!await isAuth(context, [config.permission.docente])) {
       //
       // }
