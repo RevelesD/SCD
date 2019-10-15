@@ -11,15 +11,15 @@ const permissionQueries = {
     const qName = 'permission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const projections = getProjection(info);
       const doc = await Permission.findById(args.id, projections);
       registerGoodLog(context, qType, qName, args.id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
@@ -28,8 +28,8 @@ const permissionQueries = {
     const qName = 'permissions';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -40,7 +40,7 @@ const permissionQueries = {
       registerGoodLog(context, qType, qName, 'Multiple documents')
       return docs;
     }  catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }
@@ -52,8 +52,8 @@ const permissionMutations = {
     const qName = 'createPermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const permission = new Permission({
@@ -63,7 +63,7 @@ const permissionMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
@@ -72,18 +72,18 @@ const permissionMutations = {
     const qName = 'updatePermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
       const doc = await Permission
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,{new: true, fields: projections});
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -92,14 +92,14 @@ const permissionMutations = {
     const qName = 'deletePermission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const doc =await Permission.findByIdAndDelete(args.id).exec();
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }

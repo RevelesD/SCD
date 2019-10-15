@@ -78,13 +78,14 @@ const uploadsMutations = {
     const qName = 'singleUpload';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const doc = await processUpload(file, input);
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     } catch (e) {
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -93,8 +94,8 @@ const uploadsMutations = {
     const qName = 'multipleUpload';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const { resolve, reject } = await PromiseAll.all(
@@ -106,7 +107,7 @@ const uploadsMutations = {
       registerGoodLog(context, qType, qName, 'Multiple documents')
       return resolve;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   }

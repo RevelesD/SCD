@@ -15,8 +15,8 @@ const campusQueries = {
     const qName = 'campus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -33,8 +33,8 @@ const campusQueries = {
     const qName = 'allCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -57,8 +57,8 @@ const campusMutations = {
     const qName = 'createCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const campus = new Campus({
@@ -78,14 +78,15 @@ const campusMutations = {
     const qName = 'updateCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
       const doc = await Campus
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,
+          {new: true, fields: projections});
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
     } catch (e) {
@@ -98,8 +99,8 @@ const campusMutations = {
     const qName = 'deleteCampus';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const doc = await Campus.findByIdAndDelete(args.id);

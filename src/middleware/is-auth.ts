@@ -1,19 +1,18 @@
-import {decode} from "jsonwebtoken";
 import {User} from "../models/user.model";
-
+import {privateKEY, publicKEY} from '../../enviroment.prod';
 const jwt = require('jsonwebtoken');
 
 export const getUser = (token) => {
   if (token === '') {
-    return {};
+    return {
+      userId: 'Unauthenticated'
+    };
   }
   let decodeToken;
   let req = {};
   try {
-    decodeToken = jwt.verify(token, 'key');
-    console.log(decodeToken);
+    decodeToken = jwt.verify(token, privateKEY);
     if (!decodeToken) {
-      // console.log("e4");
       req['isAuth'] = false;
     } else {
       req['userId'] = decodeToken.userId;
@@ -21,7 +20,9 @@ export const getUser = (token) => {
     }
     return req
   } catch (e) {
-    return {};
+    return {
+      userId: 'Unauthenticated'
+    };
   }
 };
 

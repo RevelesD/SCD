@@ -11,8 +11,8 @@ const systemLogQueries = {
     const qName = 'systemLog';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -23,7 +23,7 @@ const systemLogQueries = {
       registerGoodLog(context, qType, qName, args.id)
       return doc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -32,8 +32,8 @@ const systemLogQueries = {
     const qName = 'systemLogs';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const projections = getProjection(info);
       const query = {
@@ -51,13 +51,14 @@ const systemLogQueries = {
         .skip(args.input.page * args.input.perPage)
         .limit(args.input.perPage).exec();
 
-      if (projections.causer) {
-        docs = docs.map(tranformLog);
-      }
+      // if (projections.causer) {
+      //   docs = docs.map(tranformLog);
+      // }
       registerGoodLog(context, qType, qName, 'Multiple documents');
+      console.log(docs);
       return docs;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }

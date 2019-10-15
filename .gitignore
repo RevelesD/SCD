@@ -48,4 +48,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+private.key
+public.key
 .vscode/settings.json

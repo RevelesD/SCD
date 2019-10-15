@@ -15,8 +15,8 @@ const noticeQueries = {
     const qName = 'notice';
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -28,7 +28,7 @@ const noticeQueries = {
       registerGoodLog(context, qType, qName, args.id);
       return doc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -38,8 +38,8 @@ const noticeQueries = {
 
     try {
       if (!await isAuth(context, [config.permission.docente])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
@@ -54,7 +54,7 @@ const noticeQueries = {
       registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }
@@ -66,8 +66,8 @@ const noticeMutations = {
     const qName = 'createNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const notice = new Notice({
@@ -84,7 +84,7 @@ const noticeMutations = {
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -93,14 +93,15 @@ const noticeMutations = {
     const qName = 'updateNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);
       let doc = await Notice
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,
+          {new: true, fields: projections});
       if (projections.createdBy) {
         // query.populate('createdBy');
         doc = transformNotice(doc);
@@ -108,7 +109,7 @@ const noticeMutations = {
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
     }catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   },
@@ -117,15 +118,15 @@ const noticeMutations = {
     const qName = 'deleteNotice';
     try {
       if (!await isAuth(context, [config.permission.admin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const doc = await Notice.findByIdAndDelete(args.id);
       registerGoodLog(context, qType, qName, doc._id)
       return doc;
     } catch (e) {
-      registerErrorLog(context, qType, qName);
+      registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
   }
