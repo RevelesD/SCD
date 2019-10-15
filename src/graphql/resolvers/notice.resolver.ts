@@ -99,8 +99,9 @@ const noticeMutations = {
 
       const projections = getProjection(info);
       let doc = await Notice
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,
+          {new: true, fields: projections});
       if (projections.createdBy) {
         // query.populate('createdBy');
         doc = transformNotice(doc);

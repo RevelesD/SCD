@@ -97,8 +97,9 @@ const userMutations = {
       const projections = getProjection(info);
       let doc = await
         User
-          .findById(args.id, projections)
-          .update(args.input, {new: true}).exec();
+          .findByIdAndUpdate(
+            args.id, args.input,
+            {new: true, fields: projections});
       if (projections.adscription) {
         // query.populate('adscription');
         doc = transformUser(doc);
@@ -115,10 +116,10 @@ const userMutations = {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin])) {
-      //   const error = registerBadLog(context, qType, qName);
-      //   throw new ApolloError(`S5, Message: ${error}`);
-      // }
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
       const projections = getProjection(info);
       const permission = await Permission.findOne({_id: args.input.permissionId});
       if (args.input.action === 1) {
