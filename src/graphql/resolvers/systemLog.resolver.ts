@@ -51,10 +51,11 @@ const systemLogQueries = {
         .skip(args.input.page * args.input.perPage)
         .limit(args.input.perPage).exec();
 
-      if (projections.causer) {
-        docs = docs.map(tranformLog);
-      }
+      // if (projections.causer) {
+      //   docs = docs.map(tranformLog);
+      // }
       registerGoodLog(context, qType, qName, 'Multiple documents');
+      console.log(docs);
       return docs;
     } catch (e) {
       registerErrorLog(context, qType, qName, e);

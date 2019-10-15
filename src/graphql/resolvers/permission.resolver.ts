@@ -4,7 +4,6 @@ import {getProjection} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
 import {config} from "../../../enviroments.dev";
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
-import {privateKEY} from "../../../enviroment.prod";
 
 const permissionQueries = {
   permission: async(_, args, context, info) => {
@@ -12,8 +11,8 @@ const permissionQueries = {
     const qName = 'permission';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
       const projections = getProjection(info);
       const doc = await Permission.findById(args.id, projections);
@@ -25,13 +24,12 @@ const permissionQueries = {
     }
   },
   permissions: async(_, {page, perPage}, context, info) => {
-    console.log(context);
     const qType = 'Query';
     const qName = 'permissions';
     try {
       if (!await isAuth(context, [config.permission.superAdmin])) {
-        registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
       }
 
       const projections = getProjection(info);

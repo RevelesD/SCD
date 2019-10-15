@@ -20,16 +20,18 @@ export const logAction = async (causer: string,
   }
 }
 
-export function registerBadLog(context, qType, qName) {
+export function registerBadLog(context, qType, qName): string {
   // console.log('Bad Log');
+  let mensaje;
   if (context.user.isAuth === undefined) {
-    logAction('Unauthenticated', qType, qName,
-      'Access denied due to lack of credentials', context.user.ip);
+    mensaje = 'Access denied due to lack of credentials';
+    logAction('Unauthenticated', qType, qName, mensaje, context.user.ip);
+    return mensaje;
   } else {
-    logAction(context.user.userId, qType, qName,
-      `Requested the action without sufficient permissions`,
-      context.user.ip)
+    mensaje = `Requested the action without sufficient permissions`;
+    logAction(context.user.userId, qType, qName, mensaje, context.user.ip)
   }
+  return mensaje;
 }
 export function registerGoodLog(context, qType, qName, oid) {
   // console.log('Good Log');

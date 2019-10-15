@@ -172,6 +172,7 @@ export const types = `
     causer: ID!
     from: String!
     requestType: String!
+    requestName: String!
     createdAt: Float!
   }
   

@@ -17,7 +17,7 @@ const userQueries = {
     try {
       if (!await isAuth(context, [config.permission.admin])) {
         registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        throw new ApolloError('S5');
       }
       const projections = getProjection(info);
       let doc = await User.findOne({_id: args.id}, projections).exec();
@@ -38,7 +38,7 @@ const userQueries = {
     try {
       if (!await isAuth(context, [config.permission.admin])) {
         registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        throw new ApolloError('S5');
       }
       const projections = getProjection(info);
       let docs = await User.find({}, projections).exec();
@@ -46,7 +46,7 @@ const userQueries = {
         // query.populate('adscription');
         docs = docs.map(transformUser);
       }
-      registerGoodLog(context, qType, qName, docs.id);
+      registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
     }catch (e) {
       registerErrorLog(context, qType, qName, e);
@@ -62,7 +62,7 @@ const userMutations = {
     try {
       if (!await isAuth(context, [config.permission.admin])) {
         registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        throw new ApolloError('S5');
       }
 
       const permission = await Permission.findOne({ rank: config.permission.docente});
@@ -91,7 +91,7 @@ const userMutations = {
     try {
       if (!await isAuth(context, [config.permission.admin])) {
         registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        throw new ApolloError('S5');
       }
 
       const projections = getProjection(info);
@@ -115,13 +115,12 @@ const userMutations = {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
     try {
-      // if (!await isAuth(context, [config.permission.superAdmin])) {
-      //   registerBadLog(context, qType, qName);
-      //   throw new ApolloError('Error: S5');
-      // }
+      if (!await isAuth(context, [config.permission.superAdmin])) {
+        registerBadLog(context, qType, qName);
+        throw new ApolloError('S5');
+      }
       const projections = getProjection(info);
       const permission = await Permission.findOne({ _id: args.input.permissionId});
-      console.log('permisos', permission);
       if(args.input.action === 1){
         let doc = await
           User
@@ -142,13 +141,15 @@ const userMutations = {
         registerGoodLog(context, qType, qName, doc._id);
         return doc;
       } else if(args.input.action === 2) {
-        let doc = await User.findOne(
+        let doc = await User.findOneAndUpdate(
           {
             $and: [
               {_id: args.input.userId},
               {permissions: {$in: [permission]}}
             ]
-          }, projections).update({ $pull: {permissions:  permission } }).exec();
+          },
+          { $pull: {permissions:  permission } },
+          {new: true, fields: projections});
 
         if (projections.adscription) {
           // query.populate('adscription');
@@ -168,7 +169,7 @@ const userMutations = {
 		try{
       if (!await isAuth(context, [config.permission.superAdmin])) {
         registerBadLog(context, qType, qName);
-        throw new ApolloError('Error: S5');
+        throw new ApolloError('S5');
       }
       registerGoodLog(context, qType, qName, args.id);
 		  return await User.findByIdAndDelete(args.id).exec();

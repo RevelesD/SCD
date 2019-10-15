@@ -7,7 +7,7 @@ const systemLogSchema = new Schema({
   from: {type: String, required: true},
   requestType: { type: String, required: true },
   requestName: { type: String, required: true },
-  createAt: {type: Number, default: Date.now}
+  createdAt: {type: Number, default: Date.now}
 });
 
 export const SystemLog = mongoose.model('SystemLog', systemLogSchema, 'logs');

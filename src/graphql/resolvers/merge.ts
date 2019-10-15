@@ -1,6 +1,7 @@
 import { Category } from "../../models/category.model";
 import {User} from "../../models/user.model";
 import {Campus} from "../../models/campus.model";
+import { Permission } from "../../models/permission.model";
 
 export function getProjection (fieldASTs) {
   return fieldASTs.fieldNodes[0].selectionSet.selections.reduce((projections, selection) => {
@@ -53,6 +54,15 @@ const user = async userId => {
   }
 }
 
+const permissions = async permissionsIds => {
+  try {
+    const docs = await Permission.find({_id: {$in: permissionsIds}})
+    return docs;
+  } catch (e) {
+    throw e;
+  }
+}
+
 export const transformNotice = async docObj => {
   return {
     ...docObj._doc,
@@ -88,7 +98,15 @@ export const transformUser = async docObj => {
   }
 }
 
+export const transformPermissionsInUser = async docObj => {
+  return {
+    ...docObj._doc,
+    permissions: permissions.bind(this, docObj._doc.permissions)
+  }
+}
+
 export const tranformLog = async docObj => {
+  console.log(docObj);
   return {
     ...docObj._doc,
     causer: user.bind(this, docObj._doc.causer)
