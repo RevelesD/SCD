@@ -11,6 +11,6 @@ const noticeSchema = new Schema({
   toDate: {type: Number, required: true},
   createdBy: {type: Schema.Types.ObjectId, ref: 'User', required: true},
   createdAt: {type: Number, default: Date.now},
-  updatedAt: {type: Number}
+  updatedAt: {type: Number, default: Date.now}
 });
 export const Notice = mongoose.model('Notice', noticeSchema, 'Notices');

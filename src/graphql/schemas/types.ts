@@ -101,8 +101,8 @@ export const types = `
     status: Int
     link: String
     imgLnk: String
-    fromDate: Int
-    toDate: Int
+    fromDate: Float
+    toDate: Float
   }
   """
   Activo
