@@ -84,7 +84,7 @@ export const types = `
     body: String!
     status: Int!
     link: String!
-    imgLnk: String!
+    file: Upload!
     fromDate: Float!
     toDate: Float!
     createdBy: ID!
@@ -100,9 +100,9 @@ export const types = `
     body: String
     status: Int
     link: String
-    imgLnk: String
-    fromDate: Float
-    toDate: Float
+    file: Upload
+    fromDate: Int
+    toDate: Int
   }
   """
   Activo

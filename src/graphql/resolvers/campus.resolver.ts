@@ -84,8 +84,9 @@ const campusMutations = {
 
       const projections = getProjection(info);
       const doc = await Campus
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,
+          {new: true, fields: projections});
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
     } catch (e) {

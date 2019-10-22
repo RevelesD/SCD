@@ -8,6 +8,7 @@ import {
   registerGoodLog,
   registerErrorLog
 } from "../../middleware/logAction";
+const fs = require('fs');
 
 const noticeQueries = {
   notice: async(_, args, context, info) => {
@@ -70,12 +71,14 @@ const noticeMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
 
+      const path = await processPhoto(input.file);
+
       const notice = new Notice({
         title: input.title,
         body: input.body,
         status: input.status,
         link: input.link,
-        imgLnk: input.imgLnk,
+        imgLnk: path,
         fromDate: input.fromDate,
         toDate: input.toDate,
         createdBy: input.createdBy
@@ -97,10 +100,19 @@ const noticeMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
 
+      if (args.input.file !== undefined) {
+        const doc = await Notice.findById(args.id, {imgLnk: true});
+        fs.unlinkSync(doc.imgLnk)
+        const path = await processPhoto(args.input.file);
+        args.input.imgLnk = path;
+        delete args.input.file;
+      }
+
       const projections = getProjection(info);
       let doc = await Notice
-        .findById(args.id, projections)
-        .update(args.input, {new: true}).exec();
+        .findByIdAndUpdate(
+          args.id, args.input,
+          {new: true, fields: projections});
       if (projections.createdBy) {
         // query.populate('createdBy');
         doc = transformNotice(doc);
@@ -130,5 +142,25 @@ const noticeMutations = {
     }
   }
 };
+
+const processPhoto = async(upload) => {
+  try {
+    const { createReadStream, filename, mimetype } = await upload;
+    const stream = createReadStream();
+    const path = __dirname + '\\public\\aviso_' + Date.now()
+    const hddStream = fs.createWriteStream(path);
+    // 2.3 upload the file to mongo
+    await new Promise((resolve, reject) => {
+      stream
+        .pipe(hddStream)
+        .on("error", reject)
+        .on("finish", resolve);
+    });
+
+    return path;
+  } catch (e) {
+    throw new ApolloError(e);
+  }
+}
   
 export { noticeQueries, noticeMutations };

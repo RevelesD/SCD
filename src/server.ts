@@ -3,7 +3,6 @@ import { resolvers } from './graphql/resolvers/index';
 import { config } from "../enviroments.dev";
 import { getUser } from "./middleware/is-auth";
 const mongoose = require('mongoose');
-const { ApolloError } = require('apollo-server');
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -52,6 +51,8 @@ const server = new ApolloServer({
   },
 });
 server.applyMiddleware({ app, path: '/graphql' });
+
+app.use('/public', express.static(__dirname + '/public'));
 app.use('/downloads', router);
 
 app.listen({port}, () => {

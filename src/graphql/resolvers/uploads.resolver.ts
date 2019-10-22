@@ -93,10 +93,10 @@ const uploadsMutations = {
     const qType = 'Mutation';
     const qName = 'multipleUpload';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const { resolve, reject } = await PromiseAll.all(
         files.map(

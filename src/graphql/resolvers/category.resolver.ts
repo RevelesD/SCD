@@ -166,13 +166,13 @@ const categoryMutations = {
       }
       // Update the document in the db.
       doc = await Category
-        .findByIdAndUpdate(id, update, {new: true}).exec();
+        .findByIdAndUpdate(id, update, {new: true, fields: projections});
       /*
         If one of the requested fields by the client is the children array
         populate the array with the objects so client can access the data
       */
       if (projections.children) {
-        return transformCategory(doc);
+        return await transformCategory(doc);
       }
       registerGoodLog(context, qType, qName, doc._id);
       // Return the updated document to the client.
