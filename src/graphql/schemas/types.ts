@@ -101,8 +101,8 @@ export const types = `
     status: Int
     link: String
     file: Upload
-    fromDate: Int
-    toDate: Int
+    fromDate: Float
+    toDate: Float
   }
   """
   Activo
