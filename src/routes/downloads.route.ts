@@ -3,8 +3,7 @@ import {MongoClient} from "mongodb";
 import { Document } from "../models/documents.model";
 import {
   registerErrorLog,
-  registerGoodLog,
-  registerBadLog, registerGenericLog
+  registerGenericLog
 } from '../middleware/logAction';
 import {getUser, isAuth} from '../middleware/is-auth';
 
@@ -112,6 +111,7 @@ router.post('/joinInZip', async(req, res) => {
     const grid = getGrid(client);
     const docs = await Document.find(
       {_id: {$in: body.files_list}},
+      // {},
       {fileId: true, path: true}).exec();
     // convert strings into ObjectsId
     const ids = docs.map((e) => {
@@ -199,20 +199,33 @@ router.post('/joinInPdf', async(req, res) => {
     })
     let path: string = execFileSync(__dirname + '\\..\\main.exe', args, {encoding: 'UTF-8'});
     path = path.trim();
+    if (path.startsWith('Error:')) {
+      res.setHeader("Content-Type", "application/json");
+      res.json({error: path});
+      return;
+    }
     const name = path.split('\\');
     // definition of headers for file transfer
+    if (req.body.mode === 'download') {
+      res.setHeader("Content-Disposition", "attachment; filename=" + name[name.length - 1]);
+    } else if (req.body.mode === 'watch') {
+      res.setHeader("Content-Disposition", "inline; filename=" + name[name.length - 1]);
+    } else {
+      res.setHeader("Content-Type", "application/json");
+      res.json({error: 'C2'});
+      return;
+    }
     res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
     res.setHeader("Content-Description", "File Transfer");
-    res.setHeader("Content-Transfer-Encoding", "binary");
-    res.setHeader("Content-Disposition", "attachment; filename=" + name[name.length - 1]);
     res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Transfer-Encoding", "binary");
     // pipe the streams and get the filenames of the files written on disk
 
     const sender = fs.createReadStream(path);
     sender.pipe(res)
       .on('finish', () => {
         registerGenericLog(context, qType, qName, 'Stream of the file successfully');
-        fs.unlinkSync(path);
+        // fs.unlinkSync(path);
       })
       .on('error', (err) => {
         registerGenericLog(context, qType, qName, err);
