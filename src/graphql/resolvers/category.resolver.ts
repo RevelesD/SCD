@@ -3,6 +3,7 @@ import {Category} from "../../models/category.model";
 import {config} from "../../../enviroments.dev";
 import {getProjection, transformCategory} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
+import { Branch, TreeBuilder } from "../../middleware/TreeBuilder";
 import {
   registerGoodLog,
   registerBadLog,
@@ -53,6 +54,15 @@ const categoryQueries = {
       return docs;
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
+  },
+  getTree: async (_, args, context) => {
+    try {
+      const treeObj = new TreeBuilder(args.user);
+      const tree = await treeObj.buildTree(args.cat);
+      return tree;
+    } catch (e) {
       throw new ApolloError(e);
     }
   }
