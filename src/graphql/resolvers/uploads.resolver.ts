@@ -74,6 +74,7 @@ const uploadsQueries = {
 
 const uploadsMutations = {
   singleUpload: async(_, {file, input}, context) => {
+    console.log(file);
     const qType = 'Mutation';
     const qName = 'singleUpload';
     try {

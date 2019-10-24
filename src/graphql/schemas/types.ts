@@ -84,7 +84,6 @@ export const types = `
     body: String!
     status: Int!
     link: String!
-    file: Upload!
     fromDate: Float!
     toDate: Float!
     createdBy: ID!
@@ -100,7 +99,6 @@ export const types = `
     body: String
     status: Int
     link: String
-    file: Upload
     fromDate: Float
     toDate: Float
   }
