@@ -20,4 +20,6 @@ export const queries = `
   
   systemLog(id: ID!): SystemLog!
   systemLogs(input: SearchLogs!): [SystemLog!]!
+  
+  getTree(cat: ID!, user: ID!): Branch!
 `;

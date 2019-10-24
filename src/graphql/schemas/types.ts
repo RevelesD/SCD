@@ -181,4 +181,11 @@ export const types = `
     perPage: Int!
     user: ID
   }
+  
+  type Branch {
+    _id: ID!
+    children: [Branch!]!
+    label: String!
+    type: String!
+  }
 `;
