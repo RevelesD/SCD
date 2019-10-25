@@ -14,8 +14,12 @@ export const queries = `
   user(id: ID!): User!
   users(page: Int!, perPage: Int!): [User!]!
   login(clave: String!, password: String!): AuthData!
-  
-  category(id: ID!): Category!
+  """
+  type: Int!\n
+    1 - Search by _id\n
+    2 - Search by clave\n
+  """
+  category(type: Int!, uid: ID!): Category!
   """
   Type: Int!\n
     1 - Root categories\n
