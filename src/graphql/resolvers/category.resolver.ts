@@ -100,7 +100,7 @@ const categoryMutations = {
       const doc = {
         root: true,
         clave: input.clave,
-        title: input.clave,
+        title: input.title,
         path: `/${input.clave}`,
         children: []
       };
