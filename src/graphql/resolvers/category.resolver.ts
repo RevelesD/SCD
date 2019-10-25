@@ -46,7 +46,15 @@ const categoryQueries = {
       }
 
       const projections = getProjection(info);
-      const docs = await Category.find({}, projections).exec();
+      let conditions;
+      if (args.type === 1) {
+        conditions = {root: true};
+      } else if (args.type === 2) {
+        conditions = {root: false};
+      } else if (args.type === 3) {
+        conditions = {};
+      }
+      const docs = await Category.find(conditions, projections).exec();
       if (projections.children) {
         return docs.map(transformCategory);
       }
@@ -91,7 +99,7 @@ const categoryMutations = {
       const dbdoc = await Category.create(doc);
       // Returns the saved document to client
       if (projections.children) {
-        return transformCategory(dbdoc);
+        return await transformCategory(dbdoc);
       }
       registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;
@@ -130,13 +138,14 @@ const categoryMutations = {
       // Adds the value if this is going to be a leaf category
       if (input.value) {
         doc['value'] = input.value;
+        doc['children'] = [];
       }
       // Save the document in the db
       const dbdoc = await Category.create(doc);
-      pquery.update({$push: {children: dbdoc._id}}).exec();
+      await pquery.update({$push: {children: dbdoc._id}}).exec();
       // Returns the saved document to the client
       if (projections.children) {
-        return transformCategory(dbdoc);
+        return await transformCategory(dbdoc);
       }
       registerGoodLog(context, qType, qName, dbdoc._id);
       return dbdoc;

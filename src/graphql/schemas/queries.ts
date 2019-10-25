@@ -16,7 +16,13 @@ export const queries = `
   login(clave: String!, password: String!): AuthData!
   
   category(id: ID!): Category!
-  categories(page: Int!, perPage: Int!): [Category!]!
+  """
+  Type: Int!\n
+    1 - Root categories\n
+    2 - Leaf categories\n
+    3 - All categories\n 
+  """
+  categories(page: Int!, perPage: Int!, type: Int!): [Category!]!
   
   systemLog(id: ID!): SystemLog!
   systemLogs(input: SearchLogs!): [SystemLog!]!
