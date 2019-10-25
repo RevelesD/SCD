@@ -23,7 +23,16 @@ const categoryQueries = {
 
       const projections = getProjection(info);
 
-      const doc = await Category.findById(args.id, projections).exec();
+      let condition;
+      if (args.type === 1) {
+        condition = {_id: args.uid};
+      } else if (args.type === 2) {
+        condition = {clave: args.uid};
+      } else {
+        registerErrorLog(context, qType, qName, 'Invalid input for type param');
+        throw new ApolloError('Invalid input for type param');
+      }
+      const doc = await Category.findOne(condition, projections).exec();
 
       if (projections.children) {
         return transformCategory(doc);
