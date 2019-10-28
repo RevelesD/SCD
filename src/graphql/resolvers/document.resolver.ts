@@ -154,11 +154,12 @@ const documentMutations = {
       const cat: Category =
         await CatModel.findById(args.cat, {_id: true, path: true});
       let doc: DocType =
-        await Document.findById(args.doc, {_id: true, path: true, category: true});
+        await Document.findById(args.doc, {_id: true, path: true, category: true, fileName: true});
 
-      const path = doc.path.split('/');
+      // const path = doc.path.split('/');
       const updates = {
-        path: cat.path + '/' + path[path.length - 1],
+        // path: cat.path + '/' + path[path.length - 1],
+        path: cat.path + '/' + doc.fileName,
         category: cat._id
       };
 
