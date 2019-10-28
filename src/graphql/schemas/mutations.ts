@@ -3,6 +3,7 @@ export const mutations = `
   multipleUpload(files: [Upload!]!, input: InputDocument!): [Document!]!
   updateDocument(id: ID!, input: UpdateDocument!): Document!
   deleteDocument(id: ID!): Document!
+  moveDocument(doc: ID!, cat: ID!): Document!
 
   createCampus(input: InputCampus!): Campus!
   updateCampus(id: ID! input: UpdateCampus!): Campus!
