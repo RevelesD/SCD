@@ -153,7 +153,6 @@ const processPhoto = async(upload) => {
     const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
     const path = __dirname + '/../..' + fn;
     const hddStream = fs.createWriteStream(path);
-    console.log(path);
     // 2.3 upload the file to mongo
     await new Promise((resolve, reject) => {
       stream
