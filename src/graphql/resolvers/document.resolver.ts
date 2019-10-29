@@ -1,5 +1,7 @@
 import {getProjection, transCatInDocument, transOwnerInDocument} from "./merge";
 import { Document } from "../../models/documents.model";
+import { Category as CatModel } from "../../models/category.model";
+import { Category, Document as DocType } from "../../generated/graphql.types";
 import { ApolloError } from "apollo-server";
 import { config } from '../../../enviroments.dev'
 import {Context, isAuth} from "../../middleware/is-auth";
@@ -133,6 +135,41 @@ const documentMutations = {
       doc = await Document.deleteOne(args.id);
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
+  },
+  moveDocument: async(_, args, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'moveDocument';
+    try {
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
+
+      const projections = getProjection(info);
+
+      const cat: Category =
+        await CatModel.findById(args.cat, {_id: true, path: true});
+      let doc: DocType =
+        await Document.findById(args.doc, {_id: true, path: true, category: true, fileName: true});
+
+      // const path = doc.path.split('/');
+      const updates = {
+        // path: cat.path + '/' + path[path.length - 1],
+        path: cat.path + '/' + doc.fileName,
+        category: cat._id
+      };
+
+      doc = await Document.findByIdAndUpdate(args.doc, updates, {
+        new: true,
+        fields: projections
+      });
+
+      return doc;
+
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
