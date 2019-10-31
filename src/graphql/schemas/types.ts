@@ -188,4 +188,9 @@ export const types = `
     label: String!
     type: String!
   }
+  
+  type DeletedResponses {
+    deletedCount: Int!
+    errors: [String!]!
+  }
 `;

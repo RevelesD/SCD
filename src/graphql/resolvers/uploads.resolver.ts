@@ -1,12 +1,11 @@
 import {isAuth} from "../../middleware/is-auth";
-const mongoose = require('mongoose');
 
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const PromiseAll = require('promises-all');
 import { Document } from "../../models/documents.model";
-import { config } from '../../../enviroments.dev';
 import { Category } from "../../models/category.model";
+import { config } from '../../../enviroments.dev';
 import { ApolloError } from 'apollo-server';
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
@@ -54,16 +53,18 @@ const processUpload = async (upload, input) => {
 async function createDocument(catId, owner, docData) {
   try {
     const category = await Category.findById(catId);
-    const doc = await Document.create({
+    // console.log(docData);
+    const doc = {
       fileName: docData.filename,
-      fileId: mongoose.Types.ObjectId(docData._id),
+      fileId: docData._id,
       mimetype: docData.mimetype,
       size: docData.length,
       path: `${category.path}/${docData.filename}`,
       category: catId,
       owner: owner
-    });
-    return doc;
+    };
+    const dbdoc = await Document.create(doc);
+    return dbdoc;
   } catch (e) {
     throw new ApolloError(e);
   }

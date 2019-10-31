@@ -1,16 +1,19 @@
-import {getProjection, transCatInDocument, transOwnerInDocument} from "./merge";
+import { getProjection, transCatInDocument, transOwnerInDocument } from "./merge";
 import { Document } from "../../models/documents.model";
 import { Category as CatModel } from "../../models/category.model";
 import { Category, Document as DocType } from "../../generated/graphql.types";
 import { ApolloError } from "apollo-server";
 import { config } from '../../../enviroments.dev'
-import {Context, isAuth} from "../../middleware/is-auth";
+import { Context, isAuth } from "../../middleware/is-auth";
+const mongodb = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
 import {
   registerBadLog,
   registerGoodLog,
   registerErrorLog,
   registerGenericLog
 } from "../../middleware/logAction";
+import { MongoError } from "mongodb";
 
 const documentQueries = {
   document: async(_, args, context, info) => {
@@ -170,6 +173,46 @@ const documentMutations = {
 
       return doc;
 
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
+  },
+  deleteDocuments: async (_, args, context) => {
+    const qType = 'Mutation';
+    const qName = 'deleteDocuments';
+    try {
+      const docs: DocType[] = await Document.find({_id: {$in: args.ids}});
+
+      const con = await MongoClient.connect(
+        config.dbPath,
+        {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        }
+      );
+      const db = con.db(config.dbName);
+      // ===================== GridFS ========================
+      // pending to check uploads of smaller sizes
+      let bucket = new mongodb.GridFSBucket(db, {
+        bucketName: 'archivos',
+      });
+
+      const errors: MongoError[] = [];
+
+      for (const d of docs) {
+        bucket.delete(d.fileId, (err) => {
+          if (err) {
+            errors.push(err);
+          }
+        });
+      }
+
+      const idd = await Document.deleteMany({_id: {$in: args.ids}});
+      return {
+        deletedCount: idd.deletedCount,
+        errors: errors
+      };
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
