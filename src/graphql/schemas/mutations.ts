@@ -4,6 +4,7 @@ export const mutations = `
   updateDocument(id: ID!, input: UpdateDocument!): Document!
   deleteDocument(id: ID!): Document!
   moveDocument(doc: ID!, cat: ID!): Document!
+  deleteDocuments(ids: [ID!]!): DeletedResponses!
 
   createCampus(input: InputCampus!): Campus!
   updateCampus(id: ID! input: UpdateCampus!): Campus!

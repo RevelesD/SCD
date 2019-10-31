@@ -3,7 +3,7 @@ import {Category} from "../../models/category.model";
 import {config} from "../../../enviroments.dev";
 import {getProjection, transformCategory} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
-import { Branch, TreeBuilder } from "../../middleware/TreeBuilder";
+import { TreeBuilder, shakeBranch } from "../../middleware/TreeBuilder";
 import {
   registerGoodLog,
   registerBadLog,
@@ -57,7 +57,7 @@ const categoryQueries = {
       const projections = getProjection(info);
       let conditions;
       if (args.type === 1) {
-        conditions = {root: true};
+        conditions = {$and: [{root: true}, {$and: [{clave: {$ne: '000'}}, {clave: {$ne: '999'}}]}]}
       } else if (args.type === 2) {
         conditions = {root: false};
       } else if (args.type === 3) {
@@ -74,10 +74,11 @@ const categoryQueries = {
       throw new ApolloError(e);
     }
   },
-  getTree: async (_, args, context) => {
+  getTree: async (_, args) => {
     try {
       const treeObj = new TreeBuilder(args.user);
       const tree = await treeObj.buildTree(args.cat);
+      shakeBranch(tree);
       return tree;
     } catch (e) {
       throw new ApolloError(e);
