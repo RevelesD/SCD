@@ -58,7 +58,7 @@ router.post('/getFile', async (req, res) => {
       res.status(400);
       res.json({error: 'S2'});
     }
-    // definition of headers for file transfer
+    // definition of headers for file transfer, the filename is also send by the header content-disposition
     res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
     res.setHeader("Content-Description", "File Transfer");
     res.setHeader("Content-Transfer-Encoding", "binary");
@@ -82,13 +82,13 @@ router.post('/getFile', async (req, res) => {
   }
 });
 
-router.post('/test', async (req, res) => {
-  try {
-
-  } catch (e) {
-    throw e;
-  }
-});
+// router.post('/test', async (req, res) => {
+//   try {
+//     //
+//   } catch (e) {
+//     throw e;
+//   }
+// });
 
 router.post('/joinInZip', async(req, res) => {
   // define the variables needed to log the request into the system
@@ -109,7 +109,6 @@ router.post('/joinInZip', async(req, res) => {
     const grid = getGrid(client);
     const docs = await Document.find(
       {_id: {$in: body.files_list}},
-      // {},
       {fileId: true, path: true}).exec();
     // convert strings into ObjectsId
     const ids = docs.map((e) => {
@@ -203,7 +202,10 @@ router.post('/joinInPdf', async(req, res) => {
       return;
     }
     const name = path.split('\\');
-    // definition of headers for file transfer
+    /*
+      Definition of headers
+      If the file is going to be downloaded, watched or if the was an error retrieving the file
+     */
     if (req.body.mode === 'download') {
       res.setHeader("Content-Disposition", "attachment; filename=" + name[name.length - 1]);
     } else if (req.body.mode === 'watch') {
