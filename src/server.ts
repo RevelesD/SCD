@@ -24,7 +24,6 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log('Connected to the database');
-  // app.listen(port, () => console.log(`Running on localhost:${port}`));
 });
 
 const app = express();
@@ -41,7 +40,6 @@ const server = new ApolloServer({
     // get the user token from the headers
     const token = req.headers.authorization || '';
     // try to retrieve a user with the token
-    // console.log(token);
     const user = getUser(token);
     user['ip'] = req.ip;
     // add the user to the context

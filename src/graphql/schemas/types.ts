@@ -138,7 +138,7 @@ export const types = `
   """
   input UpdateUserRole {
     userId: ID!
-    permissionId: ID!
+    permissionRank: Int!
     action: Int!
   }
  

@@ -121,7 +121,7 @@ const userMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
       const projections = getProjection(info);
-      const permission = await Permission.findOne({_id: args.input.permissionId});
+      const permission = await Permission.findOne({rank: args.input.permissionRank});
       if (args.input.action === 1) {
         let doc = await
           User
