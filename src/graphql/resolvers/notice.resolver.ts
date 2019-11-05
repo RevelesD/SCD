@@ -62,7 +62,9 @@ const noticeQueries = {
 };
 
 const noticeMutations = {
-  createNotice: async(_: any, { input }, context: any, info: any) => {
+  createNotice: async(_: any, { file, input }, context: any, info: any) => {
+    console.log(input);
+    console.log(file);
     const qType = 'Mutation';
     const qName = 'createNotice';
     try {
@@ -71,7 +73,7 @@ const noticeMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
 
-      const path = await processPhoto(input.file);
+      const path = await processPhoto(file);
 
       const notice = new Notice({
         title: input.title,
@@ -84,7 +86,7 @@ const noticeMutations = {
         createdBy: input.createdBy
       });
       const doc = await notice.save();
-      registerGoodLog(context, qType, qName, doc._id)
+      registerGoodLog(context, qType, qName, doc._id);
       return doc;
     }catch (e) {
       registerErrorLog(context, qType, qName, e);
@@ -147,7 +149,9 @@ const processPhoto = async(upload) => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
     const stream = createReadStream();
-    const path = __dirname + '\\public\\aviso_' + Date.now()
+    const extensionFile = filename.split('.');
+    const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
+    const path = __dirname + '/../..' + fn;
     const hddStream = fs.createWriteStream(path);
     // 2.3 upload the file to mongo
     await new Promise((resolve, reject) => {
@@ -157,7 +161,7 @@ const processPhoto = async(upload) => {
         .on("finish", resolve);
     });
 
-    return path;
+    return fn;
   } catch (e) {
     throw new ApolloError(e);
   }

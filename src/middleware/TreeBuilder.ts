@@ -20,10 +20,12 @@ export class TreeBuilder {
       
       const b: Branch = {
         _id: tempCat._id,
-        children: [],
         type: 'cat',
-        label: `${tempCat.clave} - ${tempCat.title}`
-      }
+        label: `${tempCat.clave} - ${tempCat.title}`,
+        children: []
+      };
+
+      // console.log(b);
 
       if (tempCat.children.length > 0) {
         for (const c of tempCat.children) {
@@ -57,7 +59,7 @@ export class TreeBuilder {
           label: d.fileName,
           type: 'file',
           children: []
-        }
+        };
         docBranches.push(db);
       }
 

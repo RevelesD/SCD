@@ -14,8 +14,8 @@ export const mutations = `
   updatePermission(id: ID! input: InputPermission!): Permission!
   deletePermission(id: ID!): Permission!
 
-  createNotice(input: InputNotice!): Notice!
-  updateNotice(id: ID! input: UpdateNotice!): Notice!
+  createNotice(file: Upload!, input: InputNotice!): Notice!
+  updateNotice(id: ID! input: UpdateNotice!, file: Upload): Notice!
   deleteNotice(id: ID!): Notice!
 
   createUser(input: InputUser!): User!
