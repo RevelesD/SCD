@@ -7,7 +7,7 @@ import {
   registerBadLog,
   registerErrorLog
 } from "../../middleware/logAction"
-import {config} from "../../../enviroments.dev";
+import {config} from "../../../config.const";
 
 const campusQueries = {
   campus: async (_, args, context: Context, info) => {

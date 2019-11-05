@@ -3,7 +3,7 @@ import { Document } from "../../models/documents.model";
 import { Category as CatModel } from "../../models/category.model";
 import { Category, Document as DocType } from "../../generated/graphql.types";
 import { ApolloError } from "apollo-server";
-import { config } from '../../../enviroments.dev'
+import { config } from '../../../config.const'
 import { Context, isAuth } from "../../middleware/is-auth";
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
@@ -147,10 +147,10 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'moveDocument';
     try {
-      // if (!await isAuth(context, [config.permission.docente])) {
-      //   const error = registerBadLog(context, qType, qName);
-      //   throw new ApolloError(`S5, Message: ${error}`);
-      // }
+      if (!await isAuth(context, [config.permission.docente])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
 
       const projections = getProjection(info);
 
@@ -185,13 +185,13 @@ const documentMutations = {
       const docs: DocType[] = await Document.find({_id: {$in: args.ids}});
 
       const con = await MongoClient.connect(
-        config.dbPath,
+        process.env.DB_PATH,
         {
           useNewUrlParser: true,
           useUnifiedTopology: true
         }
       );
-      const db = con.db(config.dbName);
+      const db = con.db(process.env.DB_NAME);
       // ===================== GridFS ========================
       // pending to check uploads of smaller sizes
       let bucket = new mongodb.GridFSBucket(db, {

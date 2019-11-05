@@ -1,5 +1,4 @@
 import {User} from "../models/user.model";
-import {privateKEY, publicKEY} from '../../enviroment.prod';
 const jwt = require('jsonwebtoken');
 
 export const getUser = (token) => {
@@ -11,7 +10,7 @@ export const getUser = (token) => {
   let decodeToken;
   let req = {};
   try {
-    decodeToken = jwt.verify(token, privateKEY);
+    decodeToken = jwt.verify(token, process.env.PRIVATE_KEY);
     if (!decodeToken) {
       req['isAuth'] = false;
     } else {

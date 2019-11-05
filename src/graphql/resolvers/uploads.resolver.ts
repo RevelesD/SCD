@@ -5,7 +5,7 @@ const MongoClient = require('mongodb').MongoClient;
 const PromiseAll = require('promises-all');
 import { Document } from "../../models/documents.model";
 import { Category } from "../../models/category.model";
-import { config } from '../../../enviroments.dev';
+import { config } from '../../../config.const';
 import { ApolloError } from 'apollo-server';
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
@@ -18,13 +18,13 @@ const processUpload = async (upload, input) => {
     // }
 
     const con = await MongoClient.connect(
-      config.dbPath,
+      process.env.DB_PATH,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true
       }
     );
-    const db = con.db(config.dbName);
+    const db = con.db(process.env.DB_NAME);
     // ===================== GridFS ========================
     // pending to check uploads of smaller sizes
     let bucket = new mongodb.GridFSBucket(db, {
@@ -95,10 +95,10 @@ const uploadsMutations = {
     const qType = 'Mutation';
     const qName = 'multipleUpload';
     try {
-      // if (!await isAuth(context, [config.permission.docente])) {
-      //   const error = registerBadLog(context, qType, qName);
-      //   throw new ApolloError(`S5, Message: ${error}`);
-      // }
+      if (!await isAuth(context, [config.permission.docente])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
 
       const { resolve, reject } = await PromiseAll.all(
         files.map(

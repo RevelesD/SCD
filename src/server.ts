@@ -1,18 +1,17 @@
 import { typeDefs } from './graphql/schemas/index';
 import { resolvers } from './graphql/resolvers/index';
-import { config } from "../enviroments.dev";
+require('dotenv').config()
 import { getUser } from "./middleware/is-auth";
 const mongoose = require('mongoose');
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const port = 4000;
+const port = process.env.PORT || 4000;
 import { router } from './routes/downloads.route';
-import * as path from "path";
 
 mongoose.connect(
-  config.mongooseURL,
+  process.env.DB_PATH + '/' + process.env.DB_NAME,
   {
     useNewUrlParser: true,
     useFindAndModify: false,
@@ -25,7 +24,6 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log('Connected to the database');
-  // const port = process.env.PORT || '3000';
   // app.listen(port, () => console.log(`Running on localhost:${port}`));
 });
 

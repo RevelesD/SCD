@@ -1,4 +1,3 @@
-import { config } from "../../enviroments.dev";
 import {MongoClient} from "mongodb";
 import { Document } from "../models/documents.model";
 import {getUser} from '../middleware/is-auth';
@@ -19,7 +18,7 @@ export const router = express.Router();
  * @returns {client} - a mongodb client
  */
 function getConnection(): Promise<MongoClient> {
-  return mongo.MongoClient.connect(config.dbPath,
+  return mongo.MongoClient.connect(process.env.DB_PATH,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true
@@ -32,7 +31,7 @@ function getConnection(): Promise<MongoClient> {
  * @returns {gri} - a gridfs bucket with specific name
  */
 function getGrid(client) {
-  const db = client.db(config.dbName);
+  const db = client.db(process.env.DB_NAME);
   return new mongo.GridFSBucket(db, {bucketName: 'archivos'});
 }
 

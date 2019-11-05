@@ -1,7 +1,7 @@
 import {ApolloError} from "apollo-server";
 import {User} from "../../models/user.model"
 import {Permission} from "../../models/permission.model"
-import {config} from "../../../enviroments.dev"
+import {config} from "../../../config.const"
 import {getProjection, transformUser} from "./merge";
 import {
   registerBadLog,

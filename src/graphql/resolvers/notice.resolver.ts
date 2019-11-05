@@ -1,8 +1,8 @@
-import {ApolloError} from "apollo-server";
+import { ApolloError } from "apollo-server";
 import { Notice } from "../../models/notice.model";
-import {getProjection, transformNotice} from "./merge";
-import {isAuth} from "../../middleware/is-auth";
-import {config} from "../../../enviroments.dev";
+import { getProjection, transformNotice } from "./merge";
+import { isAuth } from "../../middleware/is-auth";
+import { config } from "../../../config.const";
 import {
   registerBadLog,
   registerGoodLog,

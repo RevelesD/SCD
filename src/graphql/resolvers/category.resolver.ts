@@ -1,6 +1,6 @@
 import {ApolloError} from 'apollo-server'
 import {Category} from "../../models/category.model";
-import {config} from "../../../enviroments.dev";
+import {config} from "../../../config.const";
 import {getProjection, transformCategory} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
 import {TreeBuilder, shakeTree, Branch} from "../../middleware/TreeBuilder";

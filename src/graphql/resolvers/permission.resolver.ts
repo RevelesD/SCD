@@ -1,9 +1,9 @@
-import {ApolloError} from "apollo-server";
+import { ApolloError } from "apollo-server";
 import { Permission } from "../../models/permission.model"
-import {getProjection} from "./merge";
-import {isAuth} from "../../middleware/is-auth";
-import {config} from "../../../enviroments.dev";
-import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
+import { getProjection } from "./merge";
+import { isAuth } from "../../middleware/is-auth";
+import { config } from "../../../config.const";
+import { registerBadLog, registerErrorLog, registerGoodLog } from "../../middleware/logAction";
 
 const permissionQueries = {
   permission: async(_, args, context, info) => {

@@ -2,7 +2,7 @@ import {ApolloError} from "apollo-server";
 import {getProjection, tranformLog} from "./merge";
 import {SystemLog} from "../../models/systemLog.model";
 import {isAuth} from "../../middleware/is-auth";
-import {config} from "../../../enviroments.dev";
+import {config} from "../../../config.const";
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
 const systemLogQueries = {
@@ -51,9 +51,6 @@ const systemLogQueries = {
         .skip(args.input.page * args.input.perPage)
         .limit(args.input.perPage).exec();
 
-      // if (projections.causer) {
-      //   docs = docs.map(tranformLog);
-      // }
       registerGoodLog(context, qType, qName, 'Multiple documents');
       console.log(docs);
       return docs;

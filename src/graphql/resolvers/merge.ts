@@ -1,6 +1,6 @@
 import { Category } from "../../models/category.model";
-import {User} from "../../models/user.model";
-import {Campus} from "../../models/campus.model";
+import { User } from "../../models/user.model";
+import { Campus } from "../../models/campus.model";
 import { Permission } from "../../models/permission.model";
 
 export function getProjection (fieldASTs) {
