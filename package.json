@@ -1,11 +1,10 @@
 {
   "name": "SCD",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "codegen": "gql-gen"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -13,27 +12,19 @@
   "dependencies": {
     "@types/archiver": "^3.0.0",
     "@types/jsonwebtoken": "^8.3.4",
-    "@types/memorystream": "^0.3.0",
     "@types/mongodb": "^3.3.1",
     "@types/mongoose": "^5.5.17",
     "apollo-server": "^2.8.2",
     "apollo-server-express": "^2.9.3",
     "archiver": "^3.1.1",
-    "axios": "^0.19.0",
     "cors": "^2.8.5",
     "graphql": "^14.4.2",
-    "hummus": "^1.0.107",
     "jsonwebtoken": "^8.5.1",
-    "memorystream": "^0.3.1",
     "mongodb": "^3.3.2",
     "mongoose": "^5.6.13",
     "promises-all": "^1.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
   },
-  "devDependencies": {
-    "@graphql-codegen/cli": "^1.8.1",
-    "@graphql-codegen/typescript": "^1.8.1",
-    "@graphql-codegen/typescript-operations": "^1.8.1"
-  }
+  "devDependencies": {}
 }

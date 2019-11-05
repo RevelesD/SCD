@@ -1,12 +1,11 @@
 import { config } from "../../enviroments.dev";
 import {MongoClient} from "mongodb";
 import { Document } from "../models/documents.model";
+import {getUser} from '../middleware/is-auth';
 import {
   registerErrorLog,
   registerGenericLog
 } from '../middleware/logAction';
-import {getUser, isAuth} from '../middleware/is-auth';
-
 const { execFileSync } = require('child_process');
 const express = require('express');
 const mongo = require('mongodb');
