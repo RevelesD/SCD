@@ -27,7 +27,7 @@ const permissionQueries = {
     const qType = 'Query';
     const qName = 'permissions';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
+      if (!await isAuth(context, [config.permission.superAdmin])) {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
