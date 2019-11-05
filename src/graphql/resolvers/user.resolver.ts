@@ -15,7 +15,7 @@ const userQueries = {
     const qType = 'Query';
     const qName = 'user';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
+      if (!await isAuth(context, [config.permission.docente])) {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
