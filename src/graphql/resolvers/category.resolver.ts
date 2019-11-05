@@ -3,7 +3,7 @@ import {Category} from "../../models/category.model";
 import {config} from "../../../enviroments.dev";
 import {getProjection, transformCategory} from "./merge";
 import {isAuth} from "../../middleware/is-auth";
-import { TreeBuilder, shakeBranch } from "../../middleware/TreeBuilder";
+import {TreeBuilder, shakeTree, Branch} from "../../middleware/TreeBuilder";
 import {
   registerGoodLog,
   registerBadLog,
@@ -77,9 +77,10 @@ const categoryQueries = {
   getTree: async (_, args) => {
     try {
       const treeObj = new TreeBuilder(args.user);
-      const tree = await treeObj.buildTree(args.cat);
-      shakeBranch(tree);
-      return tree;
+      const tree: Branch = await treeObj.buildTree(args.cat);
+
+      const br = shakeTree(tree)
+      return br;
     } catch (e) {
       throw new ApolloError(e);
     }

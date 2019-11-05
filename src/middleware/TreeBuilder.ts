@@ -1,7 +1,6 @@
 import { Category as CatModel } from "../models/category.model";
 import { Document as DocModel } from "../models/documents.model";
 import { Category, Document } from "../generated/graphql.types";
-import has = Reflect.has;
 
 export interface Branch {
   _id: string,
@@ -18,7 +17,7 @@ export class TreeBuilder {
     try {
       const tempCat: Category = await CatModel.findById(
         id,{_id: true, children: true, clave: true, title: true});
-      // console.log('Clave: ' + tempCat.clave + ', Children: ' + tempCat.children.length);
+      
       const b: Branch = {
         _id: tempCat._id,
         children: [],
@@ -69,39 +68,22 @@ export class TreeBuilder {
   }
 }
 
-export function shakeBranch(branch: Branch): boolean {
-
-  if (branch.type === 'file') {
-    return true;
+export function shakeTree(b: Branch): Branch {
+  if (b.type === 'file') {
+    return b;
   }
-  console.log(branch.label);
-  console.log(branch.children.length);
-  let hasFiles = false;
 
-  for (let i = 0; i < branch.children.length; i++) {
-
-    const subChildren = shakeBranch(branch.children[i]);
-
-    if (subChildren === true) {
-      hasFiles = true;
-    } else {
-      branch.children.splice(i, 1);
-      console.log(branch.children.length);
+  const spans: Branch[] = JSON.parse(JSON.stringify(b.children));
+  b.children = [];
+  for (let i = 0; i < spans.length; i++) {
+    const br = shakeTree(spans[i]);
+    if (br != null) {
+      b.children.push(br);
     }
   }
-  // console.log(`Label: ${branch.label}, children: ${branch.children.length} y regreso: ${hasFiles}`);
-  return hasFiles;
-
-  // branch.children.forEach((b, i) => {
-  //   console.log(b.label);
-  //   const subChildren = shakeBranch(b);
-  //
-  //   if (subChildren) {
-  //     hasFiles = true;
-  //   }
-  //
-  //   if (subChildren === false) {
-  //     const del = branch.children.splice(i, 1);
-  //   }
-  // })
+  if (b.children.length === 0) {
+    return null;
+  } else {
+    return b;
+  }
 }
