@@ -58,11 +58,23 @@ router.post('/getFile', async (req, res) => {
       res.status(400);
       res.json({error: 'S2'});
     }
+    /*
+      Definition of headers
+      If the file is going to be downloaded, watched or if the was an error retrieving the file
+     */
+    if (req.body.mode === 'download') {
+      res.setHeader("Content-Disposition", "attachment; filename=" + doc[0].filename);
+    } else if (req.body.mode === 'watch') {
+      res.setHeader("Content-Disposition", "inline; filename=" + doc[0].filename);
+    } else {
+      res.setHeader("Content-Type", "application/json");
+      res.json({error: 'C2'});
+      return;
+    }
     // definition of headers for file transfer, the filename is also send by the header content-disposition
     res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
     res.setHeader("Content-Description", "File Transfer");
     res.setHeader("Content-Transfer-Encoding", "binary");
-    res.setHeader("Content-Disposition", "attachment; filename=" + doc[0].filename);
     res.setHeader("Content-Type", "application/x-zip-compressed");
     // Begging streaming of file
     const stream = grid.openDownloadStream(id);
@@ -81,14 +93,6 @@ router.post('/getFile', async (req, res) => {
     throw e;
   }
 });
-
-// router.post('/test', async (req, res) => {
-//   try {
-//     //
-//   } catch (e) {
-//     throw e;
-//   }
-// });
 
 router.post('/joinInZip', async(req, res) => {
   // define the variables needed to log the request into the system
@@ -237,4 +241,12 @@ router.post('/joinInPdf', async(req, res) => {
     res.send({error: 'Something blew up'});
   }
 });
+
+// router.post('/test', async (req, res) => {
+//   try {
+//     //
+//   } catch (e) {
+//     throw e;
+//   }
+// });
 
