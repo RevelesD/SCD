@@ -14,6 +14,7 @@ import {
   registerGenericLog
 } from "../../middleware/logAction";
 import { MongoError } from "mongodb";
+import { Types } from "mongoose";
 
 const documentQueries = {
   document: async(_, args, context, info) => {
@@ -156,7 +157,7 @@ const documentMutations = {
       }
       // check if the document belong to the user trying to modify it
       let doc = await Document.findById(args.id);
-      if (doc.owner !== context.user.userId) {
+      if (doc.owner !== Types.ObjectId(context.user.userId)) {
         registerGenericLog(
           context, qType, qName,
           'User can\'t update documents that are not his own');
