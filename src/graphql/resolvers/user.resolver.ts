@@ -96,7 +96,7 @@ const userMutations = {
       if (args.status !== 'Activo' && args.status !== 'Inactivo') {
         const error = registerErrorLog(context, qType, qName,
           `Status provided: ${args.status}. Status nos allowed`);
-        throw new ApolloError(`S5, Message: Status provided: ${args.status}. Status nos allowed`);
+        throw new ApolloError(`S5, Message: Status provided: ${args.status}. Status not allowed`);
       }
 
       const projections = getProjection(info);
