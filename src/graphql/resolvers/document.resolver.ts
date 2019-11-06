@@ -83,6 +83,33 @@ const documentQueries = {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
+  },
+  documentsQuantity: async(_, args, context, info) => {
+    const qType = 'Query';
+    const qName = 'documents';
+    try {
+      if (!await isAuth(context, [config.permission.docente])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
+
+      const cat: Category = await CatModel.findOne({clave: args.category}, {_id: true});
+
+      let conditions: any = {
+        owner: args.user
+      };
+      if (args.category !== '000') {
+        conditions.category = cat._id
+      }
+
+      const count = await Document.countDocuments(conditions);
+
+      registerGoodLog(context, qType, qName, 'Multiple documents');
+      return count;
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
   }
 };
 
