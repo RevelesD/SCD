@@ -21,12 +21,16 @@ export const types = `
     fileName: String
     category: ID
   }
-  
+  """
+  SearchDocument\n
+  user: userId\n
+  category: category clave\n 
+  """
   input SearchDocument {
     user: ID!
     page: Int!
     perPage: Int!
-    category: ID
+    category: String
     fileName: String
   }
   

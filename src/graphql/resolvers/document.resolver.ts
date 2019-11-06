@@ -56,8 +56,9 @@ const documentQueries = {
         ]
       }
       if (args.search.category) {
+        const auxCat = await CatModel.findOne({clave: args.search.category}, {_id: true});
         // @ts-ignore
-        conditions.$and.push({category: args.search.category});
+        conditions.$and.push({category: auxCat._id});
       }
       if (args.search.fileName) {
         // @ts-ignore
