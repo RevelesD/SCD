@@ -1,6 +1,12 @@
 export const queries = `
   document(id: ID!): Document!
   documents(search: SearchDocument!): [Document!]!
+  """
+  Category is the 'clave' of the category\n
+  '999' for pending documents
+  '000' for all categories 
+  """
+  documentsQuantity(user: ID!, category: String!): Int!
   
   campus(id: ID!): Campus!
   allCampus(page: Int!, perPage: Int!): [Campus!]!
