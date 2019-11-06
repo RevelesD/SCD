@@ -93,12 +93,17 @@ const userMutations = {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
+      if (args.status !== 'Activo' && args.status !== 'Inactivo') {
+        const error = registerErrorLog(context, qType, qName,
+          `Status provided: ${args.status}. Status nos allowed`);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
 
       const projections = getProjection(info);
       let doc = await
         User
           .findByIdAndUpdate(
-            args.id, args.input,
+            args.id, {status: args.status},
             {new: true, fields: projections});
       if (projections.adscription) {
         // query.populate('adscription');

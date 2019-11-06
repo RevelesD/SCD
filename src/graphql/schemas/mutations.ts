@@ -2,6 +2,9 @@ export const mutations = `
   singleUpload(file: Upload!, input: InputDocument!): Document!
   multipleUpload(files: [Upload!]!, input: InputDocument!): [Document!]!
   updateDocument(id: ID!, input: UpdateDocument!): Document!
+  """
+  Pending of approval for delete
+  """
   deleteDocument(id: ID!): Document!
   moveDocument(doc: ID!, cat: ID!): Document!
   deleteDocuments(ids: [ID!]!): DeletedResponses!
@@ -19,7 +22,11 @@ export const mutations = `
   deleteNotice(id: ID!): Notice!
 
   createUser(input: InputUser!): User!
-  updateUser(id: ID! input: UpdateUser!): User!
+  """
+  UpdateUser:
+  status: "Activo" || "Inactivo"
+  """
+  updateUser(id: ID! status: String!): User!
   updateUserRole(input: UpdateUserRole!): User!
   deleteUser(id: ID!): User!
 
