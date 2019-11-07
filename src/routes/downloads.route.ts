@@ -55,9 +55,15 @@ router.post('/getFile', async (req, res) => {
     const id = mongo.ObjectID(req.body.id);
     const doc = await grid.find({_id: id}).toArray();
     if (doc.length != 1) {
+      console.log('Error encotrando el archivos');
       res.status(400);
       res.json({error: 'S2'});
     }
+    // definition of headers for file transfer, the filename is also send by the header content-disposition
+    res.setHeader("Content-Description", "File Transfer");
+    res.setHeader("Content-Transfer-Encoding", "binary");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
     /*
       Definition of headers
       If the file is going to be downloaded, watched or if the was an error retrieving the file
@@ -67,15 +73,10 @@ router.post('/getFile', async (req, res) => {
     } else if (req.body.mode === 'watch') {
       res.setHeader("Content-Disposition", "inline; filename=" + doc[0].filename);
     } else {
-      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Type", "application/pdf");
       res.json({error: 'C2'});
       return;
     }
-    // definition of headers for file transfer, the filename is also send by the header content-disposition
-    res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-    res.setHeader("Content-Description", "File Transfer");
-    res.setHeader("Content-Transfer-Encoding", "binary");
-    res.setHeader("Content-Type", "application/x-zip-compressed");
     // Begging streaming of file
     const stream = grid.openDownloadStream(id);
     stream.pipe(res)
@@ -200,7 +201,8 @@ router.post('/joinInPdf', async(req, res) => {
     })
     let path: string = execFileSync(__dirname + '\\..\\main.exe', args, {encoding: 'UTF-8'});
     path = path.trim();
-    if (path.startsWith('Error:')) {
+    if (path.startsWith('Error:') || path.startsWith('panic:')) {
+      console.log('Fallo go');
       res.setHeader("Content-Type", "application/json");
       res.json({error: path});
       return;
