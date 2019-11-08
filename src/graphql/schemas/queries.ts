@@ -15,7 +15,14 @@ export const queries = `
   permissions(page: Int!, perPage: Int!): [Permission!]!
   
   notice(id: ID!): Notice!
-  notices(page: Int!, perPage: Int!): [Notice!]!
+  """
+  status: 
+    0.-Oculto
+    1.-Vigente
+    2.-Vencido
+    3.-Todos
+  """
+  notices(page: Int!, perPage: Int!, status: Int!): [Notice!]!
   
   user(id: ID!): User!
   users(page: Int!, perPage: Int!): [User!]!

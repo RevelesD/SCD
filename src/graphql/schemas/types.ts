@@ -82,6 +82,7 @@ export const types = `
   0.- "Oculto"
   1.- "Vigente"
   2.- "Vencido"
+  3.- "Todos"
   """
   input InputNotice {
     title: String!
