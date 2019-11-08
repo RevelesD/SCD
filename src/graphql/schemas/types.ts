@@ -116,6 +116,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
+    lastName: String!
     adscription: Campus!
     permissions: [Permission!]!
   }
@@ -130,6 +131,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
+    lastName: String!
     adscription: ID!
   }
 
