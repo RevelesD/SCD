@@ -121,7 +121,7 @@ const userMutations = {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
+      if (!await isAuth(context, [config.permission.admin])) {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
