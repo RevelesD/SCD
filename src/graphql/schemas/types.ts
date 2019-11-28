@@ -82,6 +82,7 @@ export const types = `
   0.- "Oculto"
   1.- "Vigente"
   2.- "Vencido"
+  3.- "Todos"
   """
   input InputNotice {
     title: String!
@@ -115,6 +116,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
+    lastName: String!
     adscription: Campus!
     permissions: [Permission!]!
   }
@@ -129,6 +131,7 @@ export const types = `
     clave: String!
     status: String!
     name: String!
+    lastName: String!
     adscription: ID!
   }
 

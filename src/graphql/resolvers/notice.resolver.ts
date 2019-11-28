@@ -33,7 +33,7 @@ const noticeQueries = {
       throw new ApolloError(e);
     }
   },
-  notices: async(_, {page, perPage}, context, info) => {
+  notices: async(_, {page, perPage, status}, context, info) => {
     const qType = 'Query';
     const qName = 'notices';
 
@@ -44,8 +44,14 @@ const noticeQueries = {
       }
 
       const projections = getProjection(info);
+
+      let conditions: any = {};
+      if (status !== 3){
+        conditions.status = status;
+      }
+
       let docs = await Notice
-        .find({}, projections)
+        .find(conditions, projections)
         .skip(page*perPage)
         .limit(perPage).exec();
 

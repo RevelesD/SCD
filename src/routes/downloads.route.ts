@@ -23,7 +23,7 @@ function getConnection(): Promise<MongoClient> {
       useNewUrlParser: true,
       useUnifiedTopology: true
     }
-  );
+  )
 }
 /**
  * Creates a GridFS bucket

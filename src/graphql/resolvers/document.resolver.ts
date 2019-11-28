@@ -157,15 +157,15 @@ const documentMutations = {
       }
       // check if the document belong to the user trying to modify it
       let doc = await Document.findById(args.id);
-      if (doc.owner !== Types.ObjectId(context.user.userId)) {
+      if (doc.owner.toString() !== context.user.userId) {
         registerGenericLog(
           context, qType, qName,
           'User can\'t update documents that are not his own');
         throw new ApolloError('User can\'t update documents that are not his own')
       }
       // delete the document
-      doc = await Document.deleteOne(args.id);
-      registerGoodLog(context, qType, qName, doc._id);
+      doc = await Document.deleteOne({_id: args.id});
+      registerGoodLog(context, qType, qName, args.id);
       return doc;
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
