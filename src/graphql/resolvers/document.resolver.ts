@@ -163,10 +163,21 @@ const documentMutations = {
           'User can\'t update documents that are not his own');
         throw new ApolloError('User can\'t update documents that are not his own')
       }
+      const errors: MongoError[] = [];
       // delete the document
-      doc = await Document.deleteOne({_id: args.id});
+      doc = await Document.deleteOne({_id: args.id}, (err)=>{
+        if (err) {
+          errors.push(err);
+        }
+      });
+
+      console.log(doc);
+
       registerGoodLog(context, qType, qName, args.id);
-      return doc;
+      return {
+        deletedCount: doc.deletedCount,
+        errors: errors
+      };
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);

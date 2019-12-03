@@ -5,7 +5,7 @@ export const mutations = `
   """
   Pending of approval for delete
   """
-  deleteDocument(id: ID!): Document!
+  deleteDocument(id: ID!): DeletedResponses!
   moveDocument(doc: ID!, cat: ID!): Document!
   deleteDocuments(ids: [ID!]!): DeletedResponses!
 
