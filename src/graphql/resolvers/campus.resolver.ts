@@ -10,6 +10,11 @@ import {
 import {config} from "../../../config.const";
 
 const campusQueries = {
+  /**
+   * get an specific campus
+   * @args campusId
+   * @return { Campus } - a mongodb document
+   */
   campus: async (_, args, context: Context, info) => {
     const qType = 'Query';
     const qName = 'campus';
@@ -28,6 +33,12 @@ const campusQueries = {
       throw new ApolloError(e);
     }
   },
+  /**
+   * get all campus
+   * @page first
+   * @perPage offset
+   * @return { [Campus] } - a mongodb document
+   */
   allCampus: async (_, {page, perPage}, context, info) => {
     const qType = 'Query';
     const qName = 'allCampus';
@@ -52,6 +63,11 @@ const campusQueries = {
 };
 
 const campusMutations = {
+  /**
+   * Campus creation
+   * @input InputCampus{ name, phone }
+   * @return { Campus } - a mongodb document
+   */
   createCampus: async (_, {input}, context, info) => {
     const qType = 'Mutation';
     const qName = 'createCampus';
@@ -73,6 +89,12 @@ const campusMutations = {
       throw new ApolloError(e)
     }
   },
+  /**
+   * update campus
+   * @args idCampus
+   * @args UpdateCampus{ name, phone }
+   * @return { Campus } - a mongodb document
+   */
   updateCampus: async (_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateCampus';
@@ -94,6 +116,11 @@ const campusMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   * Delete campus
+   * @args campusId
+   * @return { Campus } - a mongodb document
+   */
   deleteCampus: async (_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteCampus';

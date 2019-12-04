@@ -17,6 +17,11 @@ import { MongoError } from "mongodb";
 import { Types } from "mongoose";
 
 const documentQueries = {
+  /**
+   *
+   * @args documentId
+   * @return { Document } - a mongodb document
+   */
   document: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'document';
@@ -41,6 +46,11 @@ const documentQueries = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args SearchDocument{ user, page, perPage, category, filename }
+   * @return { [Document] } - a mongodb document
+   */
   documents: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'documents';
@@ -114,6 +124,12 @@ const documentQueries = {
 };
 
 const documentMutations = {
+  /**
+   *
+   * @args categoryId
+   * @args UpdateDocument{ fileName, category }
+   * @return { Document } - a mongodb document
+   */
   updateDocument: async(_, args, context: Context, info) => {
     const qType = 'Mutation';
     const qName = 'updateDocument';
@@ -147,6 +163,11 @@ const documentMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args documentId
+   * @return { Document } - a mongodb document
+   */
   deleteDocument: async(_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteDocument';
@@ -183,6 +204,12 @@ const documentMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args documentId
+   * @args ( categoryID ) - receiver categoryId
+   * @return { Document } - a mongodb document
+   */
   moveDocument: async(_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'moveDocument';
@@ -218,6 +245,11 @@ const documentMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args [documentId]
+   * @return DeletedResponses{ deletedCount, errors }
+   */
   deleteDocuments: async (_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteDocuments';
