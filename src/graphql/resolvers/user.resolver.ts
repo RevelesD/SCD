@@ -11,6 +11,11 @@ import {
 import {isAuth} from "../../middleware/is-auth";
 
 const userQueries = {
+  /**
+   *
+   * @args userId
+   * @return { User } - a mongodb document
+   */
   user: async (_, args, context, info) => {
     const qType = 'Query';
     const qName = 'user';
@@ -32,6 +37,12 @@ const userQueries = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args page
+   * @args perPage
+   * @return { [User] } - mongodb documents
+   */
   users: async (_, args, context, info) => {
     const qType = 'Query';
     const qName = 'users';
@@ -56,6 +67,11 @@ const userQueries = {
 };
 
 const userMutations = {
+  /**
+   *
+   * @args InputUser{...}
+   * @return { User } - a mongodb document
+   */
   createUser: async (_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'createUser';
@@ -85,6 +101,12 @@ const userMutations = {
       throw new ApolloError(e)
     }
   },
+  /**
+   *
+   * @args userId
+   * @args status
+   * @return { User } - a mongodb document
+   */
   updateUser: async (_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateUser';
@@ -117,6 +139,11 @@ const userMutations = {
       throw new ApolloError(e)
     }
   },
+  /**
+   *
+   * @args UpdateUserRole{...}
+   * @return { User } - a mongodb document
+   */
   updateUserRole: async (_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
@@ -171,6 +198,11 @@ const userMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args userId
+   * @return { User } - a mongodb document
+   */
   deleteUser: async (_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteUser';

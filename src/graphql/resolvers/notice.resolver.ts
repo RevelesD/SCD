@@ -11,6 +11,11 @@ import {
 const fs = require('fs');
 
 const noticeQueries = {
+  /**
+   *
+   * @args noticeId
+   * @return { Notice } - a mongodb document
+   */
   notice: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'notice';
@@ -33,7 +38,15 @@ const noticeQueries = {
       throw new ApolloError(e);
     }
   },
-  notices: async(_, {page, perPage, status}, context, info) => {
+  /**
+   *
+   * @args page
+   * @args perPage
+   * @args status
+   * @return { [Notice] } - mongodb documents
+   */
+  notices: async(_, args, context, info) => {
+
     const qType = 'Query';
     const qName = 'notices';
 
@@ -46,14 +59,14 @@ const noticeQueries = {
       const projections = getProjection(info);
 
       let conditions: any = {};
-      if (status !== 3){
-        conditions.status = status;
+      if (args.status !== 3){
+        conditions.status = args.status;
       }
 
       let docs = await Notice
         .find(conditions, projections)
-        .skip(page*perPage)
-        .limit(perPage).exec();
+        .skip(args.page*args.perPage)
+        .limit(args.perPage).exec();
 
       if (projections.createdBy) {
         docs = docs.map(transformNotice);
@@ -68,9 +81,13 @@ const noticeQueries = {
 };
 
 const noticeMutations = {
+  /**
+   *
+   * @file Upload
+   * @input InputNotice{...}
+   * @return { Notice } - a mongodb document
+   */
   createNotice: async(_: any, { file, input }, context: any, info: any) => {
-    console.log(input);
-    console.log(file);
     const qType = 'Mutation';
     const qName = 'createNotice';
     try {
@@ -99,6 +116,12 @@ const noticeMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args noticeId
+   * @args UpdateNotice{...}
+   * @return { Notice } - a mongodb document
+   */
   updateNotice: async(_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateNotice';
@@ -132,6 +155,11 @@ const noticeMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args noticeId
+   * @return { Notice } - a mongodb document
+   */
   deleteNotice: async(_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteNotice';
@@ -150,7 +178,11 @@ const noticeMutations = {
     }
   }
 };
-
+/**
+ *
+ * @param upload
+ * @return fileName
+ */
 const processPhoto = async(upload) => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
