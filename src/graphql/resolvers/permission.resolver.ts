@@ -6,6 +6,11 @@ import { config } from "../../../config.const";
 import { registerBadLog, registerErrorLog, registerGoodLog } from "../../middleware/logAction";
 
 const permissionQueries = {
+  /**
+   *
+   * @args permissionId
+   * @return { Permission } - a mongodb document
+   */
   permission: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'permission';
@@ -23,6 +28,12 @@ const permissionQueries = {
       throw new ApolloError(e)
     }
   },
+  /**
+   *
+   * @page
+   * @perPage
+   * @return { [Permission] } - mongodb documents
+   */
   permissions: async(_, {page, perPage}, context, info) => {
     const qType = 'Query';
     const qName = 'permissions';
@@ -47,6 +58,11 @@ const permissionQueries = {
 };
 
 const permissionMutations = {
+  /**
+   *
+   * @args InputPermission{ rank }
+   * @return { Permission } - a mongodb document
+   */
   createPermission: async(_, args , context, info) => {
     const qType = 'Mutation';
     const qName = 'createPermission';
@@ -67,6 +83,12 @@ const permissionMutations = {
       throw new ApolloError(e)
     }
   },
+  /**
+   *
+   * @args permissionId
+   * @args InputPermission{ rank }
+   * @return { Permission } - a mongodb document
+   */
   updatePermission: async(_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'updatePermission';
@@ -87,6 +109,11 @@ const permissionMutations = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args permissionId
+   * @return { Permission } - a mongodb document
+   */
   deletePermission: async(_, args, context, info) => {
     const qType = 'Mutation';
     const qName = 'deletePermission';

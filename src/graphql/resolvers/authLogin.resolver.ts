@@ -8,6 +8,12 @@ const jwt = require('jsonwebtoken');
 const rp = require('request-promise');
 
 export const loginQueries = {
+  /**
+   * LogIn process
+   * @args clave
+   * @args password
+   * @return AuthData{ userId, token, tokenExpiration }
+   */
   login: async (_, args, context, info) => {
     const qType = 'Query';
     const qName = 'login';
@@ -83,7 +89,7 @@ export const loginQueries = {
 
       //The user was found
       //Token creation, We add the userId and the token's data
-      // in order to used as authentication
+      // in order to use it as authentication
       const token = jwt.sign(
         {userId: userFound._id, clave: userFound.clave},
         process.env.PRIVATE_KEY,

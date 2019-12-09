@@ -6,6 +6,11 @@ import {config} from "../../../config.const";
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
 
 const systemLogQueries = {
+  /**
+   *
+   * @args logId
+   * @return { Log } - a mongodb document
+   */
   systemLog: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'systemLog';
@@ -27,6 +32,11 @@ const systemLogQueries = {
       throw new ApolloError(e);
     }
   },
+  /**
+   *
+   * @args SearchLogs{...}
+   * @return { [SystemLog] } - mongodb documents
+   */
   systemLogs: async(_, args, context, info) => {
     const qType = 'Query';
     const qName = 'systemLogs';
