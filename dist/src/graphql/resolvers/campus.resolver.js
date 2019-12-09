@@ -7,6 +7,11 @@ const is_auth_1 = require("../../middleware/is-auth");
 const logAction_1 = require("../../middleware/logAction");
 const config_const_1 = require("../../../config.const");
 const campusQueries = {
+    /**
+     * get an specific campus
+     * @args campusId
+     * @return { Campus } - a mongodb document
+     */
     campus: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'campus';
@@ -25,6 +30,12 @@ const campusQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     * get all campus
+     * @page first
+     * @perPage offset
+     * @return { [Campus] } - a mongodb document
+     */
     allCampus: async (_, { page, perPage }, context, info) => {
         const qType = 'Query';
         const qName = 'allCampus';
@@ -49,6 +60,11 @@ const campusQueries = {
 };
 exports.campusQueries = campusQueries;
 const campusMutations = {
+    /**
+     * Campus creation
+     * @input InputCampus{ name, phone }
+     * @return { Campus } - a mongodb document
+     */
     createCampus: async (_, { input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'createCampus';
@@ -70,6 +86,12 @@ const campusMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     * update campus
+     * @args idCampus
+     * @args UpdateCampus{ name, phone }
+     * @return { Campus } - a mongodb document
+     */
     updateCampus: async (_, args, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateCampus';
@@ -89,6 +111,11 @@ const campusMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     * Delete campus
+     * @args campusId
+     * @return { Campus } - a mongodb document
+     */
     deleteCampus: async (_, args, context) => {
         const qType = 'Mutation';
         const qName = 'deleteCampus';

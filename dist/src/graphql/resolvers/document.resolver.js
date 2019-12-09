@@ -10,6 +10,11 @@ const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const logAction_1 = require("../../middleware/logAction");
 const documentQueries = {
+    /**
+     *
+     * @args documentId
+     * @return { Document } - a mongodb document
+     */
     document: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'document';
@@ -34,6 +39,11 @@ const documentQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args SearchDocument{ user, page, perPage, category, filename }
+     * @return { [Document] } - a mongodb document
+     */
     documents: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'documents';
@@ -104,6 +114,12 @@ const documentQueries = {
 };
 exports.documentQueries = documentQueries;
 const documentMutations = {
+    /**
+     *
+     * @args categoryId
+     * @args UpdateDocument{ fileName, category }
+     * @return { Document } - a mongodb document
+     */
     updateDocument: async (_, args, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateDocument';
@@ -134,6 +150,11 @@ const documentMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args documentId
+     * @return { Document } - a mongodb document
+     */
     deleteDocument: async (_, args, context) => {
         const qType = 'Mutation';
         const qName = 'deleteDocument';
@@ -148,16 +169,31 @@ const documentMutations = {
                 logAction_1.registerGenericLog(context, qType, qName, 'User can\'t update documents that are not his own');
                 throw new apollo_server_1.ApolloError('User can\'t update documents that are not his own');
             }
+            const errors = [];
             // delete the document
-            doc = await documents_model_1.Document.deleteOne({ _id: args.id });
+            doc = await documents_model_1.Document.deleteOne({ _id: args.id }, (err) => {
+                if (err) {
+                    errors.push(err);
+                }
+            });
+            console.log(doc);
             logAction_1.registerGoodLog(context, qType, qName, args.id);
-            return doc;
+            return {
+                deletedCount: doc.deletedCount,
+                errors: errors
+            };
         }
         catch (e) {
             logAction_1.registerErrorLog(context, qType, qName, e);
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args documentId
+     * @args ( categoryID ) - receiver categoryId
+     * @return { Document } - a mongodb document
+     */
     moveDocument: async (_, args, context, info) => {
         const qType = 'Mutation';
         const qName = 'moveDocument';
@@ -186,6 +222,11 @@ const documentMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args [documentId]
+     * @return DeletedResponses{ deletedCount, errors }
+     */
     deleteDocuments: async (_, args, context) => {
         const qType = 'Mutation';
         const qName = 'deleteDocuments';

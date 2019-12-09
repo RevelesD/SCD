@@ -8,6 +8,11 @@ const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../middleware/logAction");
 const fs = require('fs');
 const noticeQueries = {
+    /**
+     *
+     * @args noticeId
+     * @return { Notice } - a mongodb document
+     */
     notice: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'notice';
@@ -30,7 +35,14 @@ const noticeQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
-    notices: async (_, { page, perPage, status }, context, info) => {
+    /**
+     *
+     * @args page
+     * @args perPage
+     * @args status
+     * @return { [Notice] } - mongodb documents
+     */
+    notices: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'notices';
         try {
@@ -40,13 +52,13 @@ const noticeQueries = {
             }
             const projections = merge_1.getProjection(info);
             let conditions = {};
-            if (status !== 3) {
-                conditions.status = status;
+            if (args.status !== 3) {
+                conditions.status = args.status;
             }
             let docs = await notice_model_1.Notice
                 .find(conditions, projections)
-                .skip(page * perPage)
-                .limit(perPage).exec();
+                .skip(args.page * args.perPage)
+                .limit(args.perPage).exec();
             if (projections.createdBy) {
                 docs = docs.map(merge_1.transformNotice);
             }
@@ -61,9 +73,13 @@ const noticeQueries = {
 };
 exports.noticeQueries = noticeQueries;
 const noticeMutations = {
+    /**
+     *
+     * @file Upload
+     * @input InputNotice{...}
+     * @return { Notice } - a mongodb document
+     */
     createNotice: async (_, { file, input }, context, info) => {
-        console.log(input);
-        console.log(file);
         const qType = 'Mutation';
         const qName = 'createNotice';
         try {
@@ -91,6 +107,12 @@ const noticeMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args noticeId
+     * @args UpdateNotice{...}
+     * @return { Notice } - a mongodb document
+     */
     updateNotice: async (_, args, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateNotice';
@@ -121,6 +143,11 @@ const noticeMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args noticeId
+     * @return { Notice } - a mongodb document
+     */
     deleteNotice: async (_, args, context) => {
         const qType = 'Mutation';
         const qName = 'deleteNotice';
@@ -140,6 +167,11 @@ const noticeMutations = {
     }
 };
 exports.noticeMutations = noticeMutations;
+/**
+ *
+ * @param upload
+ * @return fileName
+ */
 const processPhoto = async (upload) => {
     try {
         const { createReadStream, filename, mimetype } = await upload;

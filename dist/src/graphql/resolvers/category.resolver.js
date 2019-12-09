@@ -8,6 +8,12 @@ const is_auth_1 = require("../../middleware/is-auth");
 const TreeBuilder_1 = require("../../middleware/TreeBuilder");
 const logAction_1 = require("../../middleware/logAction");
 const categoryQueries = {
+    /**
+     * get an specific category
+     * @args type (type of search)
+     * @args categoryId
+     * @return { Category } - a mongodb document
+     */
     category: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'category';
@@ -40,6 +46,13 @@ const categoryQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     * get all categories
+     * @args page
+     * @args perPage
+     * @args type (type of search)
+     * @return { [Category] } - a mongodb document
+     */
     categories: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'categories';
@@ -71,6 +84,13 @@ const categoryQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @param _
+     * @args categoryId
+     * @args userId
+     * @return Branch{ _id, children, label, type }
+     */
     getTree: async (_, args) => {
         try {
             const treeObj = new TreeBuilder_1.TreeBuilder(args.user);
@@ -85,6 +105,11 @@ const categoryQueries = {
 };
 exports.categoryQueries = categoryQueries;
 const categoryMutations = {
+    /**
+     *
+     * @input InputCategory{ clave, title, value }
+     * @return { Category } - a mongodb document
+     */
     createRootCategory: async (_, { input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'createRootCategory';
@@ -116,6 +141,12 @@ const categoryMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @parent parentId
+     * @input InputCategory{ clave, title, value }
+     * @return { Category } - a mongodb document
+     */
     createLeafCategory: async (_, { parent, input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'createLeafCategory';
@@ -160,6 +191,12 @@ const categoryMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @id categoryId
+     * @input UpdateCategory{ clave, title, value  }
+     * @return { Category } - a mongodb document
+     */
     updateCategory: async (_, { id, input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateCategory';
@@ -205,15 +242,17 @@ const categoryMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args categoryId
+     * @return { Category } - a mongodb document
+     */
     deleteCategory: async (_, args, context, info) => {
         const qType = 'Mutation';
         const qName = 'deleteCategory';
         try {
             logAction_1.registerGenericLog(context, qType, qName, 'User can\'t delete a category at this time.');
             throw new apollo_server_1.ApolloError('S5, User can\'t delete a category at this time.');
-            // if (!await isAuth(context, [config.permission.docente])) {
-            //
-            // }
         }
         catch (e) {
             logAction_1.registerErrorLog(context, qType, qName, e);

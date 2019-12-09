@@ -7,6 +7,11 @@ const is_auth_1 = require("../../middleware/is-auth");
 const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../middleware/logAction");
 const systemLogQueries = {
+    /**
+     *
+     * @args logId
+     * @return { Log } - a mongodb document
+     */
     systemLog: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'systemLog';
@@ -28,6 +33,11 @@ const systemLogQueries = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     *
+     * @args SearchLogs{...}
+     * @return { [SystemLog] } - mongodb documents
+     */
     systemLogs: async (_, args, context, info) => {
         const qType = 'Query';
         const qName = 'systemLogs';

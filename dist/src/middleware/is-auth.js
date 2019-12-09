@@ -29,7 +29,6 @@ exports.getUser = (token) => {
 };
 exports.isAuth = async (contex, permissions) => {
     try {
-        // console.log(permissions);
         const conditions = {
             _id: contex.user.userId,
             'permissions.rank': { $all: permissions }
