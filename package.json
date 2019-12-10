@@ -1,6 +1,6 @@
 {
   "name": "SCD",
-  "version": "1.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,6 +18,7 @@
     "apollo-server": "^2.8.2",
     "apollo-server-express": "^2.9.3",
     "archiver": "^3.1.1",
+    "aws-sdk": "^2.586.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "graphql": "^14.4.2",

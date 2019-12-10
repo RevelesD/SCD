@@ -7,6 +7,8 @@ const is_auth_1 = require("../../middleware/is-auth");
 const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../middleware/logAction");
 const fs = require('fs');
+// S3 Bucket imports
+const AWS = require("aws-sdk");
 const noticeQueries = {
     /**
      *
@@ -175,19 +177,40 @@ exports.noticeMutations = noticeMutations;
 const processPhoto = async (upload) => {
     try {
         const { createReadStream, filename, mimetype } = await upload;
-        const stream = createReadStream();
+        const streamImg = createReadStream();
         const extensionFile = filename.split('.');
-        const fn = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
+        const fileName = 'aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
+        /** Uploads to S3 */
+        const s3 = new AWS.S3({
+            accessKeyId: process.env.IAM_USER_KEY,
+            secretAccessKey: process.env.IAM_USER_SECRET,
+        });
+        let location = 'Hola no deberias estar aqui';
+        const params = { Bucket: process.env.BUCKET_NAME, Key: fileName,
+            Body: streamImg, ACL: 'public-read' };
+        await new Promise((resolve, reject) => {
+            s3.upload(params, function (err, data) {
+                if (err === null) {
+                    location = data.Location;
+                    resolve();
+                }
+                else {
+                    reject();
+                }
+            });
+        });
+        return location;
+        /** Uploads to local file system */
+        /* const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
         const path = __dirname + '/../..' + fn;
         const hddStream = fs.createWriteStream(path);
-        // 2.3 upload the file to mongo
+    
         await new Promise((resolve, reject) => {
-            stream
-                .pipe(hddStream)
-                .on("error", reject)
-                .on("finish", resolve);
-        });
-        return fn;
+          stream
+            .pipe(hddStream)
+            .on("error", reject)
+            .on("finish", resolve);
+        });*/
     }
     catch (e) {
         throw new apollo_server_1.ApolloError(e);

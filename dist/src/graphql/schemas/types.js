@@ -172,9 +172,16 @@ exports.types = `
     title: String
     value: Int
   }
-
+  """
+  Types:\n
+    Authentication\n
+    Success\n
+    Error\n
+    Generic\n
+  """
   type SystemLog {
     _id: ID!
+    type: String!
     description: String!
     causer: ID!
     from: String!
@@ -182,13 +189,20 @@ exports.types = `
     requestName: String!
     createdAt: Float!
   }
-  
+  """
+  Search by type:\n
+    Authentication\n
+    Success\n
+    Error\n
+    Generic\n
+  """
   input SearchLogs {
     from: Float!
     to: Float!
     page: Int!
     perPage: Int!
     user: ID
+    type: String
   }
   
   type Branch {

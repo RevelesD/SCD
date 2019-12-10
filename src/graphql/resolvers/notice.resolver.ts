@@ -9,6 +9,8 @@ import {
   registerErrorLog
 } from "../../middleware/logAction";
 const fs = require('fs');
+// S3 Bucket imports
+import * as AWS from 'aws-sdk';
 
 const noticeQueries = {
   /**
@@ -183,23 +185,44 @@ const noticeMutations = {
  * @param upload
  * @return fileName
  */
-const processPhoto = async(upload) => {
+const processPhoto = async(upload): Promise<string> => {
   try {
     const { createReadStream, filename, mimetype } = await upload;
-    const stream = createReadStream();
+    const streamImg = createReadStream();
     const extensionFile = filename.split('.');
-    const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
+    const fileName = 'aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
+    /** Uploads to S3 */
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.IAM_USER_KEY,
+      secretAccessKey: process.env.IAM_USER_SECRET,
+    })
+    let location = 'Hola no deberias estar aqui';
+
+    const params = {Bucket: process.env.BUCKET_NAME, Key: fileName,
+                    Body: streamImg, ACL: 'public-read'};
+
+    await new Promise((resolve, reject) => {
+      s3.upload(params,  function(err, data) {
+        if (err === null) {
+          location = data.Location;
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    });
+    return location;
+    /** Uploads to local file system */
+    /* const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
     const path = __dirname + '/../..' + fn;
     const hddStream = fs.createWriteStream(path);
-    // 2.3 upload the file to mongo
+
     await new Promise((resolve, reject) => {
       stream
         .pipe(hddStream)
         .on("error", reject)
         .on("finish", resolve);
-    });
-
-    return fn;
+    });*/
   } catch (e) {
     throw new ApolloError(e);
   }
