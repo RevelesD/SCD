@@ -199,7 +199,7 @@ router.post('/joinInPdf', async(req, res) => {
     files.forEach((s) => {
       args.push(s)
     })
-    let path: string = execFileSync(__dirname + '\\..\\main.exe', args, {encoding: 'UTF-8'});
+    let path: string = execFileSync(__dirname + '\\main.exe', args, {encoding: 'UTF-8'});
     path = path.trim();
     if (path.startsWith('Error:') || path.startsWith('panic:')) {
       console.log('Fallo go');
