@@ -6,14 +6,14 @@ import { ApolloError } from "apollo-server";
 import { config } from '../../../config.const'
 import { Context, isAuth } from "../../middleware/is-auth";
 const mongodb = require('mongodb');
-const MongoClient = require('mongodb').MongoClient;
+// const MongoClient = require('mongodb').MongoClient;
 import {
   registerBadLog,
   registerGoodLog,
   registerErrorLog,
   registerGenericLog
 } from "../../middleware/logAction";
-import { MongoError } from "mongodb";
+import { MongoError, MongoClient, GridFSBucket, ObjectId } from "mongodb";
 import { Types } from "mongoose";
 
 const documentQueries = {
@@ -125,7 +125,7 @@ const documentQueries = {
 
 const documentMutations = {
   /**
-   *
+   * Update the data of a single document
    * @args categoryId
    * @args UpdateDocument{ fileName, category }
    * @return { Document } - a mongodb document
@@ -164,7 +164,7 @@ const documentMutations = {
     }
   },
   /**
-   *
+   * Delete a single document
    * @args documentId
    * @return { Document } - a mongodb document
    */
@@ -178,21 +178,22 @@ const documentMutations = {
       }
       // check if the document belong to the user trying to modify it
       let doc = await Document.findById(args.id);
+      // check if the documents belong to the user trying to delete them
       if (doc.owner.toString() !== context.user.userId) {
-        registerGenericLog(
-          context, qType, qName,
-          'User can\'t update documents that are not his own');
-        throw new ApolloError('User can\'t update documents that are not his own')
+        logDenyDeleteOfDocuments(context, qType, qName);
       }
+
+      const bucket = await CreateGFSBucketConnection();
       const errors: MongoError[] = [];
-      // delete the document
-      doc = await Document.deleteOne({_id: args.id}, (err)=>{
+      // Delete de files and chunks from the gridfs bucket
+      bucket.delete(new ObjectId(doc.fileId), (err) => {
         if (err) {
+          // If there are any error push them into the errors array for further use.
           errors.push(err);
         }
       });
-
-      console.log(doc);
+      // Delete the document
+      doc = await Document.deleteOne({_id: args.id});
 
       registerGoodLog(context, qType, qName, args.id);
       return {
@@ -205,7 +206,7 @@ const documentMutations = {
     }
   },
   /**
-   *
+   * Move a document to another category
    * @args documentId
    * @args ( categoryID ) - receiver categoryId
    * @return { Document } - a mongodb document
@@ -246,7 +247,7 @@ const documentMutations = {
     }
   },
   /**
-   *
+   * Delete multiple documents
    * @args [documentId]
    * @return DeletedResponses{ deletedCount, errors }
    */
@@ -255,32 +256,34 @@ const documentMutations = {
     const qName = 'deleteDocuments';
     try {
       const docs: DocType[] = await Document.find({_id: {$in: args.ids}});
-
-      const con = await MongoClient.connect(
-        process.env.DB_PATH,
-        {
-          useNewUrlParser: true,
-          useUnifiedTopology: true
+      // check if there are documents in the search
+      if (docs.length === 0) {
+        return {
+          deletedCount: 0,
+          errors: []
         }
-      );
-      const db = con.db(process.env.DB_NAME);
-      // ===================== GridFS ========================
-      // pending to check uploads of smaller sizes
-      let bucket = new mongodb.GridFSBucket(db, {
-        bucketName: 'archivos',
-      });
+      }
+      // check if the documents belong to the user trying to delete them
+      if (docs[0].owner.toString() !== context.user.userId) {
+        logDenyDeleteOfDocuments(context, qType, qName);
+      }
+
+      const bucket = await CreateGFSBucketConnection();
 
       const errors: MongoError[] = [];
 
       for (const d of docs) {
-        bucket.delete(d.fileId, (err) => {
+        // cast the string stored to oid and delete the files and his respective chunks from the bucket.
+        bucket.delete(new ObjectId(d.fileId), (err) => {
           if (err) {
+            // if there are any error push them into the errors array for further use.
             errors.push(err);
           }
         });
       }
-
+      // Delete the documents
       const idd = await Document.deleteMany({_id: {$in: args.ids}});
+      registerGoodLog(context, qType, qName, 'Multiple documents');
       return {
         deletedCount: idd.deletedCount,
         errors: errors
@@ -291,5 +294,30 @@ const documentMutations = {
     }
   }
 };
+
+async function CreateGFSBucketConnection(): Promise<GridFSBucket> {
+  // Create a mongodb client connection
+  const con = await MongoClient.connect(
+    process.env.DB_PATH,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  );
+  // Connect to a database using the previous mongo client
+  const db = con.db(process.env.DB_NAME);
+  // GridFS
+  const bucket = new mongodb.GridFSBucket(db, {
+    bucketName: 'archivos',
+  });
+  return bucket;
+}
+
+function logDenyDeleteOfDocuments(context, qT, qN) {
+  registerGenericLog(
+    context, qT, qN,
+    'User can\'t delete documents that are not his own');
+  throw new ApolloError('User can\'t delete documents that are not his own')
+}
 
 export { documentQueries, documentMutations };
