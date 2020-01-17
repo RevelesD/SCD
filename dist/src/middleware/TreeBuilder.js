@@ -15,7 +15,6 @@ class TreeBuilder {
                 label: `${tempCat.clave} - ${tempCat.title}`,
                 children: []
             };
-            // console.log(b);
             if (tempCat.children.length > 0) {
                 for (const c of tempCat.children) {
                     const inCat = await this.buildTree(c._id);

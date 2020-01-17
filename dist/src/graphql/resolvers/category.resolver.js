@@ -72,7 +72,7 @@ const categoryQueries = {
             else if (args.type === 3) {
                 conditions = {};
             }
-            const docs = await category_model_1.Category.find(conditions, projections).exec();
+            const docs = await category_model_1.Category.find(conditions, projections, { sort: { clave: 1 } }).exec();
             if (projections.children) {
                 return docs.map(merge_1.transformCategory);
             }
@@ -86,7 +86,6 @@ const categoryQueries = {
     },
     /**
      *
-     * @param _
      * @args categoryId
      * @args userId
      * @return Branch{ _id, children, label, type }

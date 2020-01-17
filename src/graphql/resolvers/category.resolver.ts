@@ -75,7 +75,7 @@ const categoryQueries = {
       } else if (args.type === 3) {
         conditions = {};
       }
-      const docs = await Category.find(conditions, projections).exec();
+      const docs = await Category.find(conditions, projections, {sort: {clave: 1}}).exec();
       if (projections.children) {
         return docs.map(transformCategory);
       }
@@ -88,7 +88,6 @@ const categoryQueries = {
   },
   /**
    *
-   * @param _
    * @args categoryId
    * @args userId
    * @return Branch{ _id, children, label, type }
