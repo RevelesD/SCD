@@ -9,7 +9,7 @@ exports.mutations = `
   """
   deleteDocument(id: ID!): DeletedResponses!
   moveDocument(doc: ID!, cat: ID!): Document!
-  moveMultipleDocuments(cat: ID!, iods: [ID!]!): UpdatedFiles!
+  moveMultipleDocuments(cat: ID!, oids: [ID!]!): UpdatedFiles!
   deleteDocuments(ids: [ID!]!): DeletedResponses!
 
   createCampus(input: InputCampus!): Campus!

@@ -311,11 +311,11 @@ const documentMutations = {
       const cat: Category =
         await CatModel.findById(args.cat, {_id: true, path: true});
 
-      let docs: DocType[] =
+      const docs: DocType[] =
         await Document.find({_id: {$in: args.oids}},
           {_id: true, path: true, category: true, fileName: true});
 
-      let updatedFiles = await moveDocument(cat, docs);
+      const updatedFiles = await moveDocument(cat, docs);
 
       return updatedFiles;
 
@@ -334,13 +334,15 @@ const documentMutations = {
  * a list of ids of updated documents and a list of errors found during the execution
  */
 async function moveDocument(cat: Category, docs: DocType[]) {
-  const updatedFiles = {
+  let updatedFiles = {
     qty: 0,
     files: [],
     errors: []
   }
   for (let i = 0; i < docs.length; i++) {
     try {
+      console.log(`Doc ${i}`, docs[i]);
+
       await Document.findByIdAndUpdate(docs[i]._id,
         {
           path: cat.path + '/' + docs[i].fileName,

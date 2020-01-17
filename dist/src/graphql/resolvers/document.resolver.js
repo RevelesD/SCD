@@ -286,8 +286,8 @@ const documentMutations = {
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
             const cat = await category_model_1.Category.findById(args.cat, { _id: true, path: true });
-            let docs = await documents_model_1.Document.find({ _id: { $in: args.oids } }, { _id: true, path: true, category: true, fileName: true });
-            let updatedFiles = await moveDocument(cat, docs);
+            const docs = await documents_model_1.Document.find({ _id: { $in: args.oids } }, { _id: true, path: true, category: true, fileName: true });
+            const updatedFiles = await moveDocument(cat, docs);
             return updatedFiles;
         }
         catch (e) {
@@ -305,13 +305,14 @@ exports.documentMutations = documentMutations;
  * a list of ids of updated documents and a list of errors found during the execution
  */
 async function moveDocument(cat, docs) {
-    const updatedFiles = {
+    let updatedFiles = {
         qty: 0,
         files: [],
         errors: []
     };
     for (let i = 0; i < docs.length; i++) {
         try {
+            console.log(`Doc ${i}`, docs[i]);
             await documents_model_1.Document.findByIdAndUpdate(docs[i]._id, {
                 path: cat.path + '/' + docs[i].fileName,
                 category: cat._id
