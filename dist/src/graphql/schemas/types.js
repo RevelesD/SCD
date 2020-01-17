@@ -216,5 +216,11 @@ exports.types = `
     deletedCount: Int!
     errors: [String!]!
   }
+  
+  type UpdatedFiles {
+    qty: Int!
+    files: [String!]!
+    errors: [String!]!
+  }
 `;
 //# sourceMappingURL=types.js.map

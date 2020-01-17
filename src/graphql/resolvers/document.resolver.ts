@@ -126,8 +126,8 @@ const documentQueries = {
 const documentMutations = {
   /**
    * Update the data of a single document
-   * @args categoryId
-   * @args UpdateDocument{ fileName, category }
+   * @args {id}
+   * @args {UpdateDocument { fileName, category } }
    * @return { Document } - a mongodb document
    */
   updateDocument: async(_, args, context: Context, info) => {
@@ -165,7 +165,7 @@ const documentMutations = {
   },
   /**
    * Delete a single document
-   * @args documentId
+   * @param {string} args.documentId - Id of the document for delete
    * @return { Document } - a mongodb document
    */
   deleteDocument: async(_, args, context) => {
@@ -206,7 +206,7 @@ const documentMutations = {
     }
   },
   /**
-   * Move a document to another category
+   * Move a single document to another category
    * @args documentId
    * @args ( categoryID ) - receiver categoryId
    * @return { Document } - a mongodb document
@@ -292,8 +292,71 @@ const documentMutations = {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);
     }
+  },
+  /**
+   * Move multiple documents to another category
+   * @param { String } cat - id as string of the target category
+   * @param { String[] } oids - array of id as strings of the documents that are going to be moved
+   * @return { DeletedResponses }
+   */
+  moveMultipleDocuments: async(_, args, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'moveMultipleDocuments';
+    try {
+      if (!await isAuth(context, [config.permission.docente])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
+
+      const cat: Category =
+        await CatModel.findById(args.cat, {_id: true, path: true});
+
+      let docs: DocType[] =
+        await Document.find({_id: {$in: args.oids}},
+          {_id: true, path: true, category: true, fileName: true});
+
+      let updatedFiles = await moveDocument(cat, docs);
+
+      return updatedFiles;
+
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
   }
 };
+
+/**
+ * Change the category of a group of documents
+ * @param cat - Category mongodb document
+ * @param docs - Group of documents mongodb documents
+ * @return updatedFiles - object that contains the amount of files updated,
+ * a list of ids of updated documents and a list of errors found during the execution
+ */
+async function moveDocument(cat: Category, docs: DocType[]) {
+  const updatedFiles = {
+    qty: 0,
+    files: [],
+    errors: []
+  }
+  for (let i = 0; i < docs.length; i++) {
+    try {
+      await Document.findByIdAndUpdate(docs[i]._id,
+        {
+          path: cat.path + '/' + docs[i].fileName,
+          category: cat._id
+        },
+        {new: true, fields: {_id: true}}
+      );
+
+      updatedFiles.qty++;
+      updatedFiles.files.push(docs[i].fileId);
+    } catch (e) {
+      updatedFiles.errors.push(e.toString());
+    }
+  }
+  return updatedFiles;
+}
 
 async function CreateGFSBucketConnection(): Promise<GridFSBucket> {
   // Create a mongodb client connection

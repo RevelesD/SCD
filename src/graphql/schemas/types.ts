@@ -214,4 +214,10 @@ export const types = `
     deletedCount: Int!
     errors: [String!]!
   }
+  
+  type UpdatedFiles {
+    qty: Int!
+    files: [String!]!
+    errors: [String!]!
+  }
 `;

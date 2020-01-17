@@ -90,6 +90,10 @@ const noticeMutations = {
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
             const path = await processPhoto(file);
+            if (path === 'FORMAT_ERROR') {
+                logAction_1.registerErrorLog(context, qType, qName, 'File format not supported. Only images are allowed');
+                throw new apollo_server_1.ApolloError(`S5, Message: File format not supported. Only images are allowed`);
+            }
             const notice = new notice_model_1.Notice({
                 title: input.title,
                 body: input.body,
@@ -177,6 +181,12 @@ exports.noticeMutations = noticeMutations;
 const processPhoto = async (upload) => {
     try {
         const { createReadStream, filename, mimetype } = await upload;
+        if (mimetype !== 'image/jpeg' &&
+            mimetype !== 'image/jpg' &&
+            mimetype !== 'image/png' &&
+            mimetype !== 'image/*') {
+            return 'FORMAT_ERROR';
+        }
         const streamImg = createReadStream();
         const extensionFile = filename.split('.');
         const fileName = 'aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
@@ -186,8 +196,10 @@ const processPhoto = async (upload) => {
             secretAccessKey: process.env.IAM_USER_SECRET,
         });
         let location = 'Hola no deberias estar aqui';
-        const params = { Bucket: process.env.BUCKET_NAME, Key: fileName,
-            Body: streamImg, ACL: 'public-read' };
+        const params = { Bucket: process.env.BUCKET_NAME,
+            Key: fileName,
+            Body: streamImg,
+            ACL: 'public-read' };
         await new Promise((resolve, reject) => {
             s3.upload(params, function (err, data) {
                 if (err === null) {
