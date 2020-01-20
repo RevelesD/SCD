@@ -40,8 +40,17 @@ export const queries = `
     3 - All categories\n 
   """
   categories(page: Int!, perPage: Int!, type: Int!): [Category!]!
-  inspectCategory(user: ID!, category: String!): CategoryInspected!
-  summarizeCategory(user: ID!, category: String!): CategoryResume!
+  """
+  This query start from a parent category and recursively inspect all the sub categories, counting and summing the amount and documents that contains and the amount of RIPAUAQ points in total.\n
+  Returns the complete tree, NOT only the root category.\n
+  Depending on the hierarchy of the root, this can be a heavy query, feedback is recommended for the user waiting time. 
+  """
+  inspectCategory(user: ID!, category: ID!): CategoryInspected!
+  """
+  Returns the most relevant information of a category regarding a user
+  the user parameter can be a userID or the code '000' for ALL users
+  """
+  summarizeCategory(user: ID!, category: ID!): CategoryResume!
   
   systemLog(id: ID!): SystemLog!
   systemLogs(input: SearchLogs!): [SystemLog!]!
