@@ -1,9 +1,9 @@
 import {ApolloError} from "apollo-server";
 import {getProjection, tranformLog} from "./merge";
 import {SystemLog} from "../../models/systemLog.model";
-import {isAuth} from "../../middleware/is-auth";
+import {isAuth} from "../../utils/is-auth";
 import {config} from "../../../config.const";
-import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
+import {registerBadLog, registerErrorLog, registerGoodLog} from "../../utils/logAction";
 
 const systemLogQueries = {
   /**

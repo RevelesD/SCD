@@ -42,6 +42,8 @@ exports.queries = `
     3 - All categories\n 
   """
   categories(page: Int!, perPage: Int!, type: Int!): [Category!]!
+  inspectCategory(user: ID!, category: String!): CategoryInspected!
+  summarizeCategory(user: ID!, category: String!): CategoryResume!
   
   systemLog(id: ID!): SystemLog!
   systemLogs(input: SearchLogs!): [SystemLog!]!

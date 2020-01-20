@@ -5,10 +5,10 @@ const documents_model_1 = require("../../models/documents.model");
 const category_model_1 = require("../../models/category.model");
 const apollo_server_1 = require("apollo-server");
 const config_const_1 = require("../../../config.const");
-const is_auth_1 = require("../../middleware/is-auth");
+const is_auth_1 = require("../../utils/is-auth");
 const mongodb = require('mongodb');
 // const MongoClient = require('mongodb').MongoClient;
-const logAction_1 = require("../../middleware/logAction");
+const logAction_1 = require("../../utils/logAction");
 const mongodb_1 = require("mongodb");
 const documentQueries = {
     /**

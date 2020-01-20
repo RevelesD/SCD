@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./graphql/schemas/index");
 const index_2 = require("./graphql/resolvers/index");
 require('dotenv').config();
-const is_auth_1 = require("./middleware/is-auth");
+const is_auth_1 = require("./utils/is-auth");
 const mongoose = require('mongoose');
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');

@@ -1,13 +1,13 @@
 import { ApolloError } from "apollo-server";
 import { Notice } from "../../models/notice.model";
 import { getProjection, transformNotice } from "./merge";
-import { isAuth } from "../../middleware/is-auth";
+import { isAuth } from "../../utils/is-auth";
 import { config } from "../../../config.const";
 import {
   registerBadLog,
   registerGoodLog,
   registerErrorLog
-} from "../../middleware/logAction";
+} from "../../utils/logAction";
 const fs = require('fs');
 // S3 Bucket imports
 import * as AWS from 'aws-sdk';

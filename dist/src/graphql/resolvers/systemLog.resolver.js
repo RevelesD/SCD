@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const merge_1 = require("./merge");
 const systemLog_model_1 = require("../../models/systemLog.model");
-const is_auth_1 = require("../../middleware/is-auth");
+const is_auth_1 = require("../../utils/is-auth");
 const config_const_1 = require("../../../config.const");
-const logAction_1 = require("../../middleware/logAction");
+const logAction_1 = require("../../utils/logAction");
 const systemLogQueries = {
     /**
      *

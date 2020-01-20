@@ -1,12 +1,12 @@
 import {ApolloError} from "apollo-server";
 import {Campus} from "../../models/campus.model";
 import {getProjection} from "./merge";
-import {Context, isAuth} from "../../middleware/is-auth"
+import {Context, isAuth} from "../../utils/is-auth"
 import {
   registerGoodLog,
   registerBadLog,
   registerErrorLog
-} from "../../middleware/logAction"
+} from "../../utils/logAction"
 import {config} from "../../../config.const";
 
 const campusQueries = {

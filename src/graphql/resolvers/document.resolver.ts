@@ -4,7 +4,7 @@ import { Category as CatModel } from "../../models/category.model";
 import { Category, Document as DocType } from "../../generated/graphql.types";
 import { ApolloError } from "apollo-server";
 import { config } from '../../../config.const'
-import { Context, isAuth } from "../../middleware/is-auth";
+import { Context, isAuth } from "../../utils/is-auth";
 const mongodb = require('mongodb');
 // const MongoClient = require('mongodb').MongoClient;
 import {
@@ -12,7 +12,7 @@ import {
   registerGoodLog,
   registerErrorLog,
   registerGenericLog
-} from "../../middleware/logAction";
+} from "../../utils/logAction";
 import { MongoError, MongoClient, GridFSBucket, ObjectId } from "mongodb";
 import { Types } from "mongoose";
 

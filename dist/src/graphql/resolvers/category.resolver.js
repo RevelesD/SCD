@@ -4,9 +4,9 @@ const apollo_server_1 = require("apollo-server");
 const category_model_1 = require("../../models/category.model");
 const config_const_1 = require("../../../config.const");
 const merge_1 = require("./merge");
-const is_auth_1 = require("../../middleware/is-auth");
-const TreeBuilder_1 = require("../../middleware/TreeBuilder");
-const logAction_1 = require("../../middleware/logAction");
+const is_auth_1 = require("../../utils/is-auth");
+const TreeBuilder_1 = require("../../utils/TreeBuilder");
+const logAction_1 = require("../../utils/logAction");
 const categoryQueries = {
     /**
      * get an specific category
@@ -90,7 +90,9 @@ const categoryQueries = {
      * @args userId
      * @return Branch{ _id, children, label, type }
      */
-    getTree: async (_, args) => {
+    getTree: async (_, args, context) => {
+        const qType = 'Query';
+        const qName = 'getTree';
         try {
             const treeObj = new TreeBuilder_1.TreeBuilder(args.user);
             const tree = await treeObj.buildTree(args.cat);
@@ -98,6 +100,43 @@ const categoryQueries = {
             return br;
         }
         catch (e) {
+            logAction_1.registerErrorLog(context, qType, qName, e);
+            throw new apollo_server_1.ApolloError(e);
+        }
+    },
+    /**
+     * Get a resume of the sum of all documents and values of a category
+     * @param {string} user - userID of the owner of the documents
+     * @param {string} category - category id of the root category
+     * @return {CategoryInspection} a recursive object summing up the document's info of the root category
+     */
+    inspectCategory: async (_, { user, category }, context) => {
+        const qType = 'Query';
+        const qName = 'inspectCategory';
+        try {
+            const catInspected = await TreeBuilder_1.categoryInspection(user, category);
+            return catInspected;
+        }
+        catch (e) {
+            logAction_1.registerErrorLog(context, qType, qName, e);
+            throw new apollo_server_1.ApolloError(e);
+        }
+    },
+    /**
+     * Sum up the main data of a category and the amount of documents it has.
+     * @param {string} user - user id, use the code 000 to know the total amount of documents among all users
+     * @param {string} category - category id
+     * @return {CategoryResume}
+     */
+    summarizeCategory: async (_, { user, category }, context) => {
+        const qType = 'Query';
+        const qName = 'inspectCategory';
+        try {
+            const cs = await TreeBuilder_1.summarizeCategory(user, category);
+            return cs;
+        }
+        catch (e) {
+            logAction_1.registerErrorLog(context, qType, qName, e);
             throw new apollo_server_1.ApolloError(e);
         }
     }

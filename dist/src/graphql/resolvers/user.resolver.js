@@ -5,8 +5,8 @@ const user_model_1 = require("../../models/user.model");
 const permission_model_1 = require("../../models/permission.model");
 const config_const_1 = require("../../../config.const");
 const merge_1 = require("./merge");
-const logAction_1 = require("../../middleware/logAction");
-const is_auth_1 = require("../../middleware/is-auth");
+const logAction_1 = require("../../utils/logAction");
+const is_auth_1 = require("../../utils/is-auth");
 const userQueries = {
     /**
      *

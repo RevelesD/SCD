@@ -1,4 +1,4 @@
-import {isAuth} from "../../middleware/is-auth";
+import {isAuth} from "../../utils/is-auth";
 
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
@@ -7,7 +7,7 @@ import { Document } from "../../models/documents.model";
 import { Category } from "../../models/category.model";
 import { config } from '../../../config.const';
 import { ApolloError } from 'apollo-server';
-import {registerBadLog, registerErrorLog, registerGoodLog} from "../../middleware/logAction";
+import {registerBadLog, registerErrorLog, registerGoodLog} from "../../utils/logAction";
 
 const processUpload = async (upload, input) => {
   try {

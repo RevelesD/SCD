@@ -7,8 +7,8 @@ import {
   registerBadLog,
   registerGoodLog,
   registerErrorLog
-} from "../../middleware/logAction";
-import {isAuth} from "../../middleware/is-auth";
+} from "../../utils/logAction";
+import {isAuth} from "../../utils/is-auth";
 
 const userQueries = {
   /**

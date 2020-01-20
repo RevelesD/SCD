@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const documents_model_1 = require("../models/documents.model");
-const is_auth_1 = require("../middleware/is-auth");
-const logAction_1 = require("../middleware/logAction");
+const is_auth_1 = require("../utils/is-auth");
+const logAction_1 = require("../utils/logAction");
 const { execFileSync } = require('child_process');
 const express = require('express');
 const mongo = require('mongodb');

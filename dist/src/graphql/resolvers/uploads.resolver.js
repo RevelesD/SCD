@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const is_auth_1 = require("../../middleware/is-auth");
+const is_auth_1 = require("../../utils/is-auth");
 const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const PromiseAll = require('promises-all');
@@ -8,7 +8,7 @@ const documents_model_1 = require("../../models/documents.model");
 const category_model_1 = require("../../models/category.model");
 const config_const_1 = require("../../../config.const");
 const apollo_server_1 = require("apollo-server");
-const logAction_1 = require("../../middleware/logAction");
+const logAction_1 = require("../../utils/logAction");
 const processUpload = async (upload, input) => {
     try {
         const { createReadStream, filename, mimetype } = await upload;

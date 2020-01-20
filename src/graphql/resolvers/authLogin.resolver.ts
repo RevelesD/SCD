@@ -2,7 +2,7 @@ import {ApolloError, AuthenticationError} from "apollo-server";
 import { User } from "../../models/user.model";
 import { Permission } from "../../models/permission.model";
 import { config } from "../../../config.const";
-import {registerGenericLog, registerGoodLog} from "../../middleware/logAction";
+import {registerGenericLog, registerGoodLog} from "../../utils/logAction";
 
 const jwt = require('jsonwebtoken');
 const rp = require('request-promise');

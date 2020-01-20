@@ -1,7 +1,7 @@
 import { typeDefs } from './graphql/schemas/index';
 import { resolvers } from './graphql/resolvers/index';
 require('dotenv').config()
-import { getUser } from "./middleware/is-auth";
+import { getUser } from "./utils/is-auth";
 const mongoose = require('mongoose');
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');

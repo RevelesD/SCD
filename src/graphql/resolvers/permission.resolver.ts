@@ -1,9 +1,9 @@
 import { ApolloError } from "apollo-server";
 import { Permission } from "../../models/permission.model"
 import { getProjection } from "./merge";
-import { isAuth } from "../../middleware/is-auth";
+import { isAuth } from "../../utils/is-auth";
 import { config } from "../../../config.const";
-import { registerBadLog, registerErrorLog, registerGoodLog } from "../../middleware/logAction";
+import { registerBadLog, registerErrorLog, registerGoodLog } from "../../utils/logAction";
 
 const permissionQueries = {
   /**

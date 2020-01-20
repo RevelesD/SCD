@@ -220,4 +220,20 @@ export const types = `
     files: [String!]!
     errors: [String!]!
   }
+  
+  type CategoryInspected {
+    _id: ID!
+    clave: String!
+    title: String!
+    totalDocs: Int!
+    totalValue: Int!
+    childrenInspected: [CategoryInspected!]!
+  }
+  
+  type CategoryResume {
+    _id: ID!
+    title: String!
+    value: Int
+    docsQty: Int!
+  }
 `;
