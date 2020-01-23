@@ -23,7 +23,7 @@ function getConnection() {
 /**
  * Creates a GridFS bucket
  * @param {client} - a MongoClient instance
- * @returns {gri} - a gridfs bucket with specific name
+ * @returns {gridfs bucket} - a gridfs bucket with a specific name
  */
 function getGrid(client) {
     const db = client.db(process.env.DB_NAME);

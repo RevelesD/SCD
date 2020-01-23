@@ -5,7 +5,7 @@ const category_model_1 = require("../../models/category.model");
 const config_const_1 = require("../../../config.const");
 const merge_1 = require("./merge");
 const is_auth_1 = require("../../utils/is-auth");
-const TreeBuilder_1 = require("../../utils/TreeBuilder");
+const CategoriesHelper_1 = require("../../utils/CategoriesHelper");
 const logAction_1 = require("../../utils/logAction");
 const categoryQueries = {
     /**
@@ -94,9 +94,9 @@ const categoryQueries = {
         const qType = 'Query';
         const qName = 'getTree';
         try {
-            const treeObj = new TreeBuilder_1.TreeBuilder(args.user);
+            const treeObj = new CategoriesHelper_1.TreeBuilder(args.user);
             const tree = await treeObj.buildTree(args.cat);
-            const br = TreeBuilder_1.shakeTree(tree);
+            const br = CategoriesHelper_1.shakeTree(tree);
             return br;
         }
         catch (e) {
@@ -114,7 +114,7 @@ const categoryQueries = {
         const qType = 'Query';
         const qName = 'inspectCategory';
         try {
-            const catInspected = await TreeBuilder_1.categoryInspection(user, category);
+            const catInspected = await CategoriesHelper_1.categoryInspection(user, category);
             return catInspected;
         }
         catch (e) {
@@ -132,7 +132,7 @@ const categoryQueries = {
         const qType = 'Query';
         const qName = 'inspectCategory';
         try {
-            const cs = await TreeBuilder_1.summarizeCategory(user, category);
+            const cs = await CategoriesHelper_1.summarizeCategory(user, category);
             return cs;
         }
         catch (e) {

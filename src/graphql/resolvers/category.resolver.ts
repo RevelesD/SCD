@@ -9,7 +9,7 @@ import {
   Branch,
   categoryInspection,
   summarizeCategory as fsm
-} from "../../utils/TreeBuilder";
+} from "../../utils/CategoriesHelper";
 import {
   registerGoodLog,
   registerBadLog,

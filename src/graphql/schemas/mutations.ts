@@ -29,6 +29,7 @@ export const mutations = `
   """
   updateUser(id: ID! status: String!): User!
   updateUserRole(input: UpdateUserRole!): User!
+  updateProfilePic(id: ID!, photo: Upload!): User!
   deleteUser(id: ID!): User!
 
   createRootCategory(input: InputCategory!): Category!

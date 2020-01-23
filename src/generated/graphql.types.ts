@@ -97,7 +97,7 @@ export type InputUser = {
   clave: Scalars['String'],
   status: Scalars['String'],
   name: Scalars['String'],
-  adscription: Scalars['ID'],
+  adscription: Scalars['ID']
 };
 
 export type Mutation = {
@@ -450,6 +450,7 @@ export type User = {
   status: Scalars['String'],
   name: Scalars['String'],
   adscription: Campus,
+  photoURL: Scalars['String'],
   permissions: Array<Permission>,
 };
 

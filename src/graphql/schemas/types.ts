@@ -118,6 +118,7 @@ export const types = `
     name: String!
     lastName: String!
     adscription: Campus!
+    photoURL: String! 
     permissions: [Permission!]!
   }
   

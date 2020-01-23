@@ -9,8 +9,7 @@ import {
   registerErrorLog
 } from "../../utils/logAction";
 const fs = require('fs');
-// S3 Bucket imports
-import * as AWS from 'aws-sdk';
+import { storeOnS3 } from "../../utils/imageUploader";
 
 const noticeQueries = {
   /**
@@ -30,7 +29,6 @@ const noticeQueries = {
       const projections = getProjection(info);
       let doc = await Notice.findById(args.id, projections).exec();
       if (projections.createdBy) {
-        // query.populate('createdBy');
         doc = transformNotice(doc);
       }
       registerGoodLog(context, qType, qName, args.id);
@@ -48,10 +46,8 @@ const noticeQueries = {
    * @return { [Notice] } - mongodb documents
    */
   notices: async(_, args, context, info) => {
-
     const qType = 'Query';
     const qName = 'notices';
-
     try {
       if (!await isAuth(context, [config.permission.docente])) {
         const error = registerBadLog(context, qType, qName);
@@ -98,7 +94,7 @@ const noticeMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
 
-      const path = await processPhoto(file);
+      const path = await storeOnS3(file, 'notices');
       if (path === 'FORMAT_ERROR') {
         registerErrorLog(context, qType, qName,
           'File format not supported. Only images are allowed');
@@ -141,7 +137,7 @@ const noticeMutations = {
       if (args.input.file !== undefined) {
         const doc = await Notice.findById(args.id, {imgLnk: true});
         fs.unlinkSync(doc.imgLnk)
-        const path = await processPhoto(args.input.file);
+        const path = await storeOnS3(args.input.file, 'notices');
         args.input.imgLnk = path;
         delete args.input.file;
       }
@@ -185,62 +181,5 @@ const noticeMutations = {
     }
   }
 };
-/**
- *
- * @param upload
- * @return fileName
- */
-const processPhoto = async(upload): Promise<string> => {
-  try {
-    const { createReadStream, filename, mimetype } = await upload;
-    if (mimetype !== 'image/jpeg' &&
-        mimetype !== 'image/jpg' &&
-        mimetype !== 'image/png' &&
-        mimetype !== 'image/*') {
-      return 'FORMAT_ERROR';
-    }
-    const streamImg = createReadStream();
-    const extensionFile = filename.split('.');
-    const fileName = 'aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
-    /** Uploads to S3 */
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.IAM_USER_KEY,
-      secretAccessKey: process.env.IAM_USER_SECRET,
-
-    })
-    let location = 'Hola no deberias estar aqui';
-
-
-    const params = {Bucket: process.env.BUCKET_NAME,
-                    Key: fileName,
-                    Body: streamImg,
-                    ACL: 'public-read'};
-
-    await new Promise((resolve, reject) => {
-      s3.upload(params,  function(err, data) {
-        if (err === null) {
-          location = data.Location;
-          resolve();
-        } else {
-          reject();
-        }
-      });
-    });
-    return location;
-    /** Uploads to local file system */
-    /* const fn  = '/public/aviso_' + Date.now() + '.' + extensionFile[extensionFile.length - 1];
-    const path = __dirname + '/../..' + fn;
-    const hddStream = fs.createWriteStream(path);
-
-    await new Promise((resolve, reject) => {
-      stream
-        .pipe(hddStream)
-        .on("error", reject)
-        .on("finish", resolve);
-    });*/
-  } catch (e) {
-    throw new ApolloError(e);
-  }
-}
   
 export { noticeQueries, noticeMutations };

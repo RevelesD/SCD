@@ -8,6 +8,7 @@ const userSchema = new Schema({
     name: {type: String, require: true},
     lastName: {type: String, required: true},
     adscription: {type: Schema.Types.ObjectId, ref: 'Campus', require: true},
+    photoURL: {type: String, required: true},
     permissions: [
       permissionSchema
     ]

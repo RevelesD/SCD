@@ -9,6 +9,7 @@ import {
   registerErrorLog
 } from "../../utils/logAction";
 import {isAuth} from "../../utils/is-auth";
+import { storeOnS3 } from "../../utils/imageUploader";
 
 const userQueries = {
   /**
@@ -88,6 +89,7 @@ const userMutations = {
         status: args.input.status,
         name: args.input.name,
         adscription: args.input.adscription,
+        photoURL: process.env.ANONYMOUS_URL,
         permissions: [permission]
       });
 
@@ -199,11 +201,40 @@ const userMutations = {
     }
   },
   /**
-   *
-   * @args userId
+   * Change the profile picture of a user
+   * @param {string} id - user id of the user that is updating his picture
+   * @param {Upload} photo - new photo ready to be stored
+   * @return {User} user document with updated photo path
+   */
+  updateProfilePic: async (_, {id, photo}, context, info) => {
+    const qType = 'Mutation';
+    const qName = 'updateProfilePic';
+    try {
+      if (!await isAuth(context, [config.permission.docente])) {
+        const error = registerBadLog(context, qType, qName);
+        throw new ApolloError(`S5, Message: ${error}`);
+      }
+
+      const projections = getProjection(info);
+      const path = await storeOnS3(photo, 'photo');
+
+      const user = await User.findOneAndUpdate(
+        {_id: id}, {photoURL: path},
+        {new: true, fields: projections}
+      );
+      registerGoodLog(context, qType, qName, user._id);
+      return user;
+    } catch (e) {
+      registerErrorLog(context, qType, qName, e);
+      throw new ApolloError(e);
+    }
+  },
+  /**
+   * Remove the user from the db
+   * @param {string} id - user id
    * @return { User } - a mongodb document
    */
-  deleteUser: async (_, args, context) => {
+  deleteUser: async (_, {id}, context) => {
     const qType = 'Mutation';
     const qName = 'deleteUser';
     try {
@@ -211,8 +242,8 @@ const userMutations = {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
-      registerGoodLog(context, qType, qName, args.id);
-      return await User.findByIdAndDelete(args.id).exec();
+      registerGoodLog(context, qType, qName, id);
+      return await User.findByIdAndDelete(id).exec();
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)

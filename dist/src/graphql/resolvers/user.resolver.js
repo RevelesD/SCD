@@ -7,6 +7,7 @@ const config_const_1 = require("../../../config.const");
 const merge_1 = require("./merge");
 const logAction_1 = require("../../utils/logAction");
 const is_auth_1 = require("../../utils/is-auth");
+const imageUploader_1 = require("../../utils/imageUploader");
 const userQueries = {
     /**
      *
@@ -85,6 +86,7 @@ const userMutations = {
                 status: args.input.status,
                 name: args.input.name,
                 adscription: args.input.adscription,
+                photoURL: process.env.ANONYMOUS_URL,
                 permissions: [permission]
             });
             const res = await user_model_1.User
@@ -185,11 +187,36 @@ const userMutations = {
         }
     },
     /**
-     *
-     * @args userId
+     * Change the profile picture of a user
+     * @param {string} id - user id of the user that is updating his picture
+     * @param {Upload} photo - new photo ready to be stored
+     * @return {User} user document with updated photo path
+     */
+    updateProfilePic: async (_, { id, photo }, context, info) => {
+        const qType = 'Mutation';
+        const qName = 'updateProfilePic';
+        try {
+            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
+                const error = logAction_1.registerBadLog(context, qType, qName);
+                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            }
+            const projections = merge_1.getProjection(info);
+            const path = await imageUploader_1.storeOnS3(photo, 'photo');
+            const user = await user_model_1.User.findOneAndUpdate({ _id: id }, { photoURL: path }, { new: true, fields: projections });
+            logAction_1.registerGoodLog(context, qType, qName, user._id);
+            return user;
+        }
+        catch (e) {
+            logAction_1.registerErrorLog(context, qType, qName, e);
+            throw new apollo_server_1.ApolloError(e);
+        }
+    },
+    /**
+     * Remove the user from the db
+     * @param {string} id - user id
      * @return { User } - a mongodb document
      */
-    deleteUser: async (_, args, context) => {
+    deleteUser: async (_, { id }, context) => {
         const qType = 'Mutation';
         const qName = 'deleteUser';
         try {
@@ -197,8 +224,8 @@ const userMutations = {
                 const error = logAction_1.registerBadLog(context, qType, qName);
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
-            logAction_1.registerGoodLog(context, qType, qName, args.id);
-            return await user_model_1.User.findByIdAndDelete(args.id).exec();
+            logAction_1.registerGoodLog(context, qType, qName, id);
+            return await user_model_1.User.findByIdAndDelete(id).exec();
         }
         catch (e) {
             logAction_1.registerErrorLog(context, qType, qName, e);
