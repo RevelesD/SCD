@@ -8,11 +8,11 @@ const logAction_1 = require("../../utils/logAction");
 const config_const_1 = require("../../../config.const");
 const campusQueries = {
     /**
-     * get an specific campus
-     * @args campusId
+     * Get an specific campus
+     * @param {string} id - campus Id
      * @return { Campus } - a mongodb document
      */
-    campus: async (_, args, context, info) => {
+    campus: async (_, { id }, context, info) => {
         const qType = 'Query';
         const qName = 'campus';
         try {
@@ -21,8 +21,8 @@ const campusQueries = {
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
             const projections = merge_1.getProjection(info);
-            const doc = await campus_model_1.Campus.findById(args.id, projections);
-            logAction_1.registerGoodLog(context, qType, qName, args.id);
+            const doc = await campus_model_1.Campus.findById(id, projections);
+            logAction_1.registerGoodLog(context, qType, qName, id);
             return doc;
         }
         catch (e) {
@@ -31,10 +31,10 @@ const campusQueries = {
         }
     },
     /**
-     * get all campus
-     * @page first
-     * @perPage offset
-     * @return { [Campus] } - a mongodb document
+     * Get multiple campus
+     * @param {number} page - page selection for pagination
+     * @param {number} perPage - amount of items per page
+     * @return { [Campus] } - a list of mongodb documents
      */
     allCampus: async (_, { page, perPage }, context, info) => {
         const qType = 'Query';
@@ -62,7 +62,7 @@ exports.campusQueries = campusQueries;
 const campusMutations = {
     /**
      * Campus creation
-     * @input InputCampus{ name, phone }
+     * @param { InputCampus{ name, phone }} input
      * @return { Campus } - a mongodb document
      */
     createCampus: async (_, { input }, context, info) => {
@@ -87,12 +87,12 @@ const campusMutations = {
         }
     },
     /**
-     * update campus
-     * @args idCampus
-     * @args UpdateCampus{ name, phone }
+     * Update campus
+     * @param {string} id - Campus id
+     * @param {UpdateCampus{ name, phone }} input
      * @return { Campus } - a mongodb document
      */
-    updateCampus: async (_, args, context, info) => {
+    updateCampus: async (_, { id, input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateCampus';
         try {
@@ -102,7 +102,7 @@ const campusMutations = {
             }
             const projections = merge_1.getProjection(info);
             const doc = await campus_model_1.Campus
-                .findByIdAndUpdate(args.id, args.input, { new: true, fields: projections });
+                .findByIdAndUpdate(id, input, { new: true, fields: projections });
             logAction_1.registerGoodLog(context, qType, qName, doc._id);
             return doc;
         }
@@ -113,10 +113,10 @@ const campusMutations = {
     },
     /**
      * Delete campus
-     * @args campusId
+     * @param {string} id - campus id
      * @return { Campus } - a mongodb document
      */
-    deleteCampus: async (_, args, context) => {
+    deleteCampus: async (_, { id }, context) => {
         const qType = 'Mutation';
         const qName = 'deleteCampus';
         try {
@@ -124,7 +124,7 @@ const campusMutations = {
                 const error = logAction_1.registerBadLog(context, qType, qName);
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
-            const doc = await campus_model_1.Campus.findByIdAndDelete(args.id);
+            const doc = await campus_model_1.Campus.findByIdAndDelete(id);
             logAction_1.registerGoodLog(context, qType, qName, doc._id);
             return doc;
         }

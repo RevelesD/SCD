@@ -6,7 +6,6 @@ import { ApolloError } from "apollo-server";
 import { config } from '../../../config.const'
 import { Context, isAuth } from "../../utils/is-auth";
 const mongodb = require('mongodb');
-// const MongoClient = require('mongodb').MongoClient;
 import {
   registerBadLog,
   registerGoodLog,
@@ -14,12 +13,11 @@ import {
   registerGenericLog
 } from "../../utils/logAction";
 import { MongoError, MongoClient, GridFSBucket, ObjectId } from "mongodb";
-import { Types } from "mongoose";
 
 const documentQueries = {
   /**
-   *
-   * @args documentId
+   * Get a single document
+   * @param {string} id - document id
    * @return { Document } - a mongodb document
    */
   document: async(_, args, context, info) => {
@@ -47,8 +45,8 @@ const documentQueries = {
     }
   },
   /**
-   *
-   * @args SearchDocument{ user, page, perPage, category, filename }
+   * Get multiple documents
+   * @param {SearchDocument{ user, page, perPage, category, filename }} search
    * @return { [Document] } - a mongodb document
    */
   documents: async(_, args, context, info) => {
@@ -81,11 +79,9 @@ const documentQueries = {
         .limit(args.search.perPage).exec();
       if (projections.category) {
         docs = docs.map(transCatInDocument);
-        // doc = transCatInDocument(doc);
       }
       if (projections.owner) {
         docs = docs.map(transOwnerInDocument);
-        // doc = transOwnerInDocument(doc);
       }
       registerGoodLog(context, qType, qName, 'Multiple documents');
       return docs;
@@ -94,7 +90,14 @@ const documentQueries = {
       throw new ApolloError(e);
     }
   },
-  documentsQuantity: async(_, args, context, info) => {
+  /**
+   * Get the amount of documents a user has in certain category
+   * @deprecated use summarizeCategory instead
+   * @param {string} user - user id
+   * @param {string} category - category's clave
+   * @return {number} the amount of documents
+   */
+  documentsQuantity: async(_, args, context) => {
     const qType = 'Query';
     const qName = 'documents';
     try {
@@ -126,8 +129,8 @@ const documentQueries = {
 const documentMutations = {
   /**
    * Update the data of a single document
-   * @args {id}
-   * @args {UpdateDocument { fileName, category } }
+   * @param {string} id - document id
+   * @param {UpdateDocument { fileName, category } } input
    * @return { Document } - a mongodb document
    */
   updateDocument: async(_, args, context: Context, info) => {
@@ -165,8 +168,8 @@ const documentMutations = {
   },
   /**
    * Delete a single document
-   * @param {string} args.documentId - Id of the document for delete
-   * @return { Document } - a mongodb document
+   * @param {string} id - Id of the document for delete
+   * @return { DeletedResponses } - confirmation that the file was successfully deleted, both the document and the binaries
    */
   deleteDocument: async(_, args, context) => {
     const qType = 'Mutation';
@@ -207,8 +210,8 @@ const documentMutations = {
   },
   /**
    * Move a single document to another category
-   * @args documentId
-   * @args ( categoryID ) - receiver categoryId
+   * @param {string} doc - document id
+   * @param {string} cat - receiver category id
    * @return { Document } - a mongodb document
    */
   moveDocument: async(_, args, context, info) => {
@@ -248,8 +251,8 @@ const documentMutations = {
   },
   /**
    * Delete multiple documents
-   * @args [documentId]
-   * @return DeletedResponses{ deletedCount, errors }
+   * @param {string[]} ids - list of document's id that want to be deleted
+   * @return {DeletedResponses{ deletedCount, errors }}
    */
   deleteDocuments: async (_, args, context) => {
     const qType = 'Mutation';

@@ -20,8 +20,8 @@ import {
 const categoryQueries = {
   /**
    * get an specific category
-   * @args type (type of search)
-   * @args categoryId
+   * @param {number} type - search by clave or by id
+   * @param {string} uid - category id or clave depending of the search type
    * @return { Category } - a mongodb document
    */
   category: async (_, args, context, info) => {
@@ -57,10 +57,10 @@ const categoryQueries = {
     }
   },
   /**
-   * get all categories
-   * @args page
-   * @args perPage
-   * @args type (type of search)
+   * get multiple categories
+   * @param {number} page - page selection for pagination
+   * @param {number} perPage - amount of items per page
+   * @param {number} type - search root, leaf or all categories
    * @return { [Category] } - a mongodb document
    */
   categories: async (_, args, context, info) => {
@@ -93,9 +93,10 @@ const categoryQueries = {
     }
   },
   /**
-   *
-   * @args categoryId
-   * @args userId
+   * Get the categories tree for moving and downloading documents
+   * removes empty node based on the user documents
+   * @param {string} cat - category id to use as root for the tree
+   * @param {string} user - user id
    * @return Branch{ _id, children, label, type }
    */
   getTree: async (_, args, context) => {
@@ -150,8 +151,8 @@ const categoryQueries = {
 
 const categoryMutations = {
   /**
-   *
-   * @input InputCategory{ clave, title, value }
+   * Creates a category that has no parent and acts as a "Rubro" in the business model
+   * @param {InputCategory{ clave, title, value }} input
    * @return { Category } - a mongodb document
    */
   createRootCategory: async (_, {input}, context, info) => {
@@ -186,9 +187,9 @@ const categoryMutations = {
     }
   },
   /**
-   *
-   * @parent parentId
-   * @input InputCategory{ clave, title, value }
+   * creates a sub category (or leaf category), can or not have RIPAUAQ values
+   * @param {string} parent - parent category id
+   * @param {InputCategory{ clave, title, value }} input
    * @return { Category } - a mongodb document
    */
   createLeafCategory: async (_, {parent, input}, context, info) => {
@@ -238,9 +239,9 @@ const categoryMutations = {
     }
   },
   /**
-   *
-   * @id categoryId
-   * @input UpdateCategory{ clave, title, value  }
+   * Update a category info
+   * @param {string} id - category id
+   * @param {UpdateCategory{ clave, title, value }} input
    * @return { Category } - a mongodb document
    */
   updateCategory: async (_, {id, input}, context, info) => {
@@ -291,11 +292,11 @@ const categoryMutations = {
     }
   },
   /**
-   *
-   * @args categoryId
+   * Delete a category
+   * @param {string} id category id
    * @return { Category } - a mongodb document
    */
-  deleteCategory: async (_, args, context, info) => {
+  deleteCategory: async (_, args, context) => {
     const qType = 'Mutation';
     const qName = 'deleteCategory';
     try {

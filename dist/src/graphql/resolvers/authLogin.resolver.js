@@ -10,73 +10,39 @@ const rp = require('request-promise');
 exports.loginQueries = {
     /**
      * LogIn process
-     * @args clave
-     * @args password
+     * @param {string} clave
+     * @param {string} password
      * @return AuthData{ userId, token, tokenExpiration }
      */
-    login: async (_, args, context, info) => {
+    login: async (_, { clave, password }, context) => {
         const qType = 'Query';
         const qName = 'login';
         try {
-            let res = await rp({
-                uri: process.env.API_LOGIN,
-                method: "POST",
-                form: {
-                    expediente: args.clave,
-                    password: args.password
-                }
-            });
-            //login end
-            //Parse to res from API
-            const user = JSON.parse(res);
-            if (user.response === 401) {
+            const userAPI = await consumeExternalAPI(clave, password);
+            // Error log when the authentication attempt failed
+            if (userAPI.response === 401) {
                 context.user.userId = 'Unauthenticated';
                 logAction_1.registerGenericLog(context, qType, qName, 'Access denied');
                 throw new apollo_server_1.AuthenticationError("Acceso denegado!");
             }
             //search the user in our DB
-            const userFound = await user_model_1.User
-                .findOne({
-                clave: user.alumno['expediente'] // change to docent's key
-            }).exec();
-            //User not found
-            if (!userFound) {
+            /* **********
+      
+              change the property "Alumno" for whatever come with workers
+      
+             ******* */
+            let userDB = await user_model_1.User
+                .findOne({ clave: userAPI.alumno['expediente'] }).exec();
+            if (!userDB) {
                 context.user.userId = 'Unauthenticated';
                 logAction_1.registerGenericLog(context, qType, qName, 'Creating a user with no previous login');
-                //Creation of user in DB
-                //set default permissions of "docente" for every user just created
-                const permission = await permission_model_1.Permission.findOne({ rank: config_const_1.config.permission.docente });
-                //User Creation
-                const newUser = await user_model_1.User.create({
-                    clave: user.alumno['expediente'],
-                    status: "Activo",
-                    name: `${concat(user.alumno.nombre)}`,
-                    lastName: `${concat(user.alumno.apellidoPaterno + ' ' + user.alumno.apellidoMaterno)}`,
-                    adscription: "5d9672d6e068fa0a76f96d15",
-                    permissions: [permission] //set 'docente' by default
-                });
-                //Find the user just created and connect their adscription filed
-                // with the objectID from Campus(adscription).
-                const res = await user_model_1.User
-                    .findOne({ _id: newUser._id })
-                    .populate({ path: 'adscription' }).exec();
-                //Token creation, We add the userId to token's data
-                // in order to used as the authentication
-                const token = jwt.sign({ userId: newUser._id, clave: newUser.clave }, process.env.PRIVATE_KEY, { expiresIn: '1h', algorithm: 'HS256' });
-                logAction_1.registerGoodLog(context, 'Mutation', 'Usuario creado', res._id);
-                return {
-                    userId: newUser._id,
-                    token: token,
-                    tokenExpiration: 1
-                };
+                userDB = userNotFound(userAPI);
+                logAction_1.registerGoodLog(context, 'Mutation', 'Usuario creado', userDB._id);
             }
-            //The user was found
-            //Token creation, We add the userId and the token's data
-            // in order to use it as authentication
-            const token = jwt.sign({ userId: userFound._id, clave: userFound.clave }, process.env.PRIVATE_KEY, { expiresIn: '1h', algorithm: 'HS256' });
-            logAction_1.registerGoodLog(context, qType, qName, userFound._id);
+            const token = createAuthToken(userDB);
+            logAction_1.registerGoodLog(context, qType, qName, userDB._id);
             return {
-                userId: userFound._id,
+                userId: userDB._id,
                 token: token,
                 tokenExpiration: 1
             };
@@ -86,6 +52,58 @@ exports.loginQueries = {
         }
     }
 };
+/**
+ * send the necessary fields to login.
+ * Modify this method if the login API changes
+ * @param clave
+ * @param password
+ * @return user - user information retrieved from a successful login
+ */
+async function consumeExternalAPI(clave, password) {
+    try {
+        let res = await rp({
+            uri: process.env.API_LOGIN,
+            method: "POST",
+            form: {
+                expediente: clave,
+                password: password
+            }
+        });
+        const user = JSON.parse(res);
+        return user;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+/**
+ * flow of action for new users
+ * @param user - user retrieved from the login API
+ * @return
+ */
+async function userNotFound(userAPI) {
+    try {
+        //set default permissions of "docente" for every user just created
+        const permission = await permission_model_1.Permission.findOne({ rank: config_const_1.config.permission.docente });
+        //Creation of user in DB
+        const newUser = await user_model_1.User.create({
+            clave: userAPI.alumno['expediente'],
+            status: "Activo",
+            name: concat(userAPI.alumno.nombre),
+            lastName: concat(userAPI.alumno.apellidoPaterno + ' ' + userAPI.alumno.apellidoMaterno),
+            adscription: "5d9672d6e068fa0a76f96d15",
+            permissions: [permission]
+        });
+        return newUser;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+function createAuthToken(user) {
+    const token = jwt.sign({ userId: user._id, clave: user.clave }, process.env.PRIVATE_KEY, { expiresIn: '1h', algorithm: 'HS256' });
+    return token;
+}
 //Reformat name
 function concat(str) {
     let arrayName = str.split(' ');

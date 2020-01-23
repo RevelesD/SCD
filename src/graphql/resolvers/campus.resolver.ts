@@ -11,11 +11,11 @@ import {config} from "../../../config.const";
 
 const campusQueries = {
   /**
-   * get an specific campus
-   * @args campusId
+   * Get an specific campus
+   * @param {string} id - campus Id
    * @return { Campus } - a mongodb document
    */
-  campus: async (_, args, context: Context, info) => {
+  campus: async (_, {id}, context: Context, info) => {
     const qType = 'Query';
     const qName = 'campus';
     try {
@@ -25,8 +25,8 @@ const campusQueries = {
       }
 
       const projections = getProjection(info);
-      const doc = await Campus.findById(args.id, projections);
-      registerGoodLog(context, qType, qName, args.id)
+      const doc = await Campus.findById(id, projections);
+      registerGoodLog(context, qType, qName, id)
       return doc;
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
@@ -34,10 +34,10 @@ const campusQueries = {
     }
   },
   /**
-   * get all campus
-   * @page first
-   * @perPage offset
-   * @return { [Campus] } - a mongodb document
+   * Get multiple campus
+   * @param {number} page - page selection for pagination
+   * @param {number} perPage - amount of items per page
+   * @return { [Campus] } - a list of mongodb documents
    */
   allCampus: async (_, {page, perPage}, context, info) => {
     const qType = 'Query';
@@ -65,7 +65,7 @@ const campusQueries = {
 const campusMutations = {
   /**
    * Campus creation
-   * @input InputCampus{ name, phone }
+   * @param { InputCampus{ name, phone }} input
    * @return { Campus } - a mongodb document
    */
   createCampus: async (_, {input}, context, info) => {
@@ -90,12 +90,12 @@ const campusMutations = {
     }
   },
   /**
-   * update campus
-   * @args idCampus
-   * @args UpdateCampus{ name, phone }
+   * Update campus
+   * @param {string} id - Campus id
+   * @param {UpdateCampus{ name, phone }} input
    * @return { Campus } - a mongodb document
    */
-  updateCampus: async (_, args, context, info) => {
+  updateCampus: async (_, {id, input}, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateCampus';
     try {
@@ -106,9 +106,7 @@ const campusMutations = {
 
       const projections = getProjection(info);
       const doc = await Campus
-        .findByIdAndUpdate(
-          args.id, args.input,
-          {new: true, fields: projections});
+        .findByIdAndUpdate(id, input, {new: true, fields: projections});
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
     } catch (e) {
@@ -118,10 +116,10 @@ const campusMutations = {
   },
   /**
    * Delete campus
-   * @args campusId
+   * @param {string} id - campus id
    * @return { Campus } - a mongodb document
    */
-  deleteCampus: async (_, args, context) => {
+  deleteCampus: async (_, {id}, context) => {
     const qType = 'Mutation';
     const qName = 'deleteCampus';
     try {
@@ -130,7 +128,7 @@ const campusMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
 
-      const doc = await Campus.findByIdAndDelete(args.id);
+      const doc = await Campus.findByIdAndDelete(id);
       registerGoodLog(context, qType, qName, doc._id)
       return doc
     } catch (e) {
