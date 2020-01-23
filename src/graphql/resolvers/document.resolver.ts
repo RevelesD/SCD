@@ -26,10 +26,10 @@ const documentQueries = {
     const qType = 'Query';
     const qName = 'document';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const projections = getProjection(info);
       let doc = await Document.findById(args.id, projections);
@@ -55,10 +55,10 @@ const documentQueries = {
     const qType = 'Query';
     const qName = 'documents';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const projections = getProjection(info);
       const conditions = {

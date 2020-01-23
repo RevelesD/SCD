@@ -18,10 +18,10 @@ const categoryQueries = {
         const qType = 'Query';
         const qName = 'category';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
-            }
+            // if (!await isAuth(context, [config.permission.docente])) {
+            //   const error = registerBadLog(context, qType, qName);
+            //   throw new ApolloError(`S5, Message: ${error}`);
+            // }
             const projections = merge_1.getProjection(info);
             let condition;
             if (args.type === 1) {
@@ -57,10 +57,10 @@ const categoryQueries = {
         const qType = 'Query';
         const qName = 'categories';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
-            }
+            // if (!await isAuth(context, [config.permission.docente])) {
+            //   const error = registerBadLog(context, qType, qName);
+            //   throw new ApolloError(`S5, Message: ${error}`);
+            // }
             const projections = merge_1.getProjection(info);
             let conditions;
             if (args.type === 1) {

@@ -28,10 +28,10 @@ const categoryQueries = {
     const qType = 'Query';
     const qName = 'category';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const projections = getProjection(info);
 
@@ -67,10 +67,10 @@ const categoryQueries = {
     const qType = 'Query';
     const qName = 'categories';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const projections = getProjection(info);
       let conditions;
