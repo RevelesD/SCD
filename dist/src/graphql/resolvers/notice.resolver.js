@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const notice_model_1 = require("../../models/notice.model");
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const is_auth_1 = require("../../utils/is-auth");
 const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../utils/logAction");
@@ -10,8 +10,8 @@ const fs = require('fs');
 const imageUploader_1 = require("../../utils/imageUploader");
 const noticeQueries = {
     /**
-     *
-     * @args noticeId
+     * Get a single document
+     * @param {string} id - notice id
      * @return { Notice } - a mongodb document
      */
     notice: async (_, args, context, info) => {
@@ -36,11 +36,11 @@ const noticeQueries = {
         }
     },
     /**
-     *
-     * @args page
-     * @args perPage
-     * @args status
-     * @return { [Notice] } - mongodb documents
+     * Get multiple notices
+     * @param {number} page - page selection for pagination
+     * @param {number} perPage - amount of items per page
+     * @param {number} status - the kind of notices you want to retrieve based in it's status
+     * @return { [Notice] } - a mongodb documents list
      */
     notices: async (_, args, context, info) => {
         const qType = 'Query';
@@ -74,9 +74,9 @@ const noticeQueries = {
 exports.noticeQueries = noticeQueries;
 const noticeMutations = {
     /**
-     *
-     * @file Upload
-     * @input InputNotice{...}
+     * Creates a new notice and store it's attachments
+     * @param {Upload} file - file attached to the notice
+     * @param {InputNotice{...}} input - all the information of the notice
      * @return { Notice } - a mongodb document
      */
     createNotice: async (_, { file, input }, context, info) => {
@@ -113,8 +113,9 @@ const noticeMutations = {
     },
     /**
      *
-     * @args noticeId
-     * @args UpdateNotice{...}
+     * @param {string} id - id of the notice to update
+     * @param {UpdateNotice} input - New data to replace in the notice, all parameter inside are optional
+     * @param {Upload} file - Optional parameter, contains a new file to attach to the notice
      * @return { Notice } - a mongodb document
      */
     updateNotice: async (_, args, context, info) => {
@@ -148,9 +149,9 @@ const noticeMutations = {
         }
     },
     /**
-     *
-     * @args noticeId
-     * @return { Notice } - a mongodb document
+     * Delete one notice and removes the attachments from the storage
+     * @param {string} id - id of the notice to delete
+     * @return {Notice} - The deleted document
      */
     deleteNotice: async (_, args, context) => {
         const qType = 'Mutation';

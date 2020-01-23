@@ -1,5 +1,5 @@
 import {ApolloError} from "apollo-server";
-import {getProjection, tranformLog} from "./merge";
+import {getProjection, tranformLog} from "../../utils/merge";
 import {SystemLog} from "../../models/systemLog.model";
 import {isAuth} from "../../utils/is-auth";
 import {config} from "../../../config.const";
@@ -7,8 +7,8 @@ import {registerBadLog, registerErrorLog, registerGoodLog} from "../../utils/log
 
 const systemLogQueries = {
   /**
-   *
-   * @args logId
+   * Get a single log
+   * @param {string} id - log id
    * @return { Log } - a mongodb document
    */
   systemLog: async(_, args, context, info) => {
@@ -34,10 +34,15 @@ const systemLogQueries = {
   },
   /**
    *
-   * @args SearchLogs{...}
-   * @return { [SystemLog] } - mongodb documents
+   * @param {number} from - Start of the range of dates to consider in the search
+   * @param {number} to - End of the range of dates to consider in the search
+   * @param {number} page - page selection for pagination
+   * @param {number} perPage - amount of items per page
+   * @param {string} user - Optional parameter if want to look at the logs of a specific user
+   * @param {string} type - the kind of logs you want to look up, Authentication, Success, Error, Generic
+   * @return { [SystemLog] } - a logs list
    */
-  systemLogs: async(_, args, context, info) => {
+  systemLogs: async(_, {input}, context, info) => {
     const qType = 'Query';
     const qName = 'systemLogs';
     try {
@@ -48,18 +53,18 @@ const systemLogQueries = {
       const projections = getProjection(info);
       const query = {
         $and: [
-          {createdAt: {$gte: args.input.from}},
-          {createdAt: {$lte: args.input.to}},
+          {createdAt: {$gte: input.from}},
+          {createdAt: {$lte: input.to}},
         ]
       };
-      if (args.input.user) {
+      if (input.user) {
         // @ts-ignore
         query.$and.push({causer: args.input.user});
       }
       let docs = await SystemLog
         .find(query, projections)
-        .skip(args.input.page * args.input.perPage)
-        .limit(args.input.perPage).exec();
+        .skip(input.page * input.perPage)
+        .limit(input.perPage).exec();
 
       registerGoodLog(context, qType, qName, 'Multiple documents');
       console.log(docs);

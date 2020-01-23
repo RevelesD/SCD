@@ -98,7 +98,8 @@ async function userNotFound(userAPI) {
       status: "Activo", //set active by default, REVISAR
       name: concat(userAPI.alumno.nombre),
       lastName: concat(userAPI.alumno.apellidoPaterno + ' ' + userAPI.alumno.apellidoMaterno),
-      adscription: "5d9672d6e068fa0a76f96d15", //change to adcription (ID of the Campus) that need to be find in our DB
+      adscription: process.env.INFO_CAMPUS_ID, //change to adcription (ID of the Campus) that need to be find in our DB
+      photoURL: process.env.ANONYMOUS_URL,
       permissions: [permission]
     });
     return newUser;

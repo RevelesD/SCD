@@ -1,6 +1,6 @@
 import {ApolloError} from "apollo-server";
 import {Campus} from "../../models/campus.model";
-import {getProjection} from "./merge";
+import {getProjection} from "../../utils/merge";
 import {Context, isAuth} from "../../utils/is-auth"
 import {
   registerGoodLog,

@@ -4,15 +4,15 @@ const apollo_server_1 = require("apollo-server");
 const user_model_1 = require("../../models/user.model");
 const permission_model_1 = require("../../models/permission.model");
 const config_const_1 = require("../../../config.const");
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const logAction_1 = require("../../utils/logAction");
 const is_auth_1 = require("../../utils/is-auth");
 const imageUploader_1 = require("../../utils/imageUploader");
 const userQueries = {
     /**
-     *
-     * @args userId
-     * @return { User } - a mongodb document
+     * Get a single user
+     * @param {string} id - user id
+     * @return {User} - a mongodb document
      */
     user: async (_, args, context, info) => {
         const qType = 'Query';
@@ -37,10 +37,10 @@ const userQueries = {
         }
     },
     /**
-     *
-     * @args page
-     * @args perPage
-     * @return { [User] } - mongodb documents
+     * Get multiple users
+     * @param {number} page - page selection for pagination
+     * @param {number} perPage - amount of items per page
+     * @return { [User] } - a list of users
      */
     users: async (_, args, context, info) => {
         const qType = 'Query';
@@ -53,7 +53,6 @@ const userQueries = {
             const projections = merge_1.getProjection(info);
             let docs = await user_model_1.User.find({}, projections).exec();
             if (projections.adscription) {
-                // query.populate('adscription');
                 docs = docs.map(merge_1.transformUser);
             }
             logAction_1.registerGoodLog(context, qType, qName, 'Multiple documents');
@@ -68,24 +67,29 @@ const userQueries = {
 exports.userQueries = userQueries;
 const userMutations = {
     /**
-     *
-     * @args InputUser{...}
+     * Create a new user, this mutations should not be used as the users are automatically created on login
+     * @param {string} clave - Personal identifier, provided by the login PI
+     * @param {string} status - Status of activity "Activo" || "Inactivo"
+     * @param {string} name
+     * @param {string} lastName
+     * @param {string} adscription - id of the campus where the user belongs
      * @return { User } - a mongodb document
      */
-    createUser: async (_, args, context, info) => {
+    createUser: async (_, { input }, context) => {
         const qType = 'Mutation';
         const qName = 'createUser';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
+            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
                 const error = logAction_1.registerBadLog(context, qType, qName);
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
             const permission = await permission_model_1.Permission.findOne({ rank: config_const_1.config.permission.docente });
             const user = await user_model_1.User.create({
-                clave: args.input.clave,
-                status: args.input.status,
-                name: args.input.name,
-                adscription: args.input.adscription,
+                clave: input.clave,
+                status: input.status,
+                name: input.name,
+                lastName: input.lastName,
+                adscription: input.adscription,
                 photoURL: process.env.ANONYMOUS_URL,
                 permissions: [permission]
             });
@@ -101,9 +105,9 @@ const userMutations = {
         }
     },
     /**
-     *
-     * @args userId
-     * @args status
+     * Update the status of the user, the rest of the fields should not be updated.
+     * @args {string} id - user id
+     * @args {string} status - "Activo" || "Inactivo"
      * @return { User } - a mongodb document
      */
     updateUser: async (_, args, context, info) => {
@@ -122,12 +126,10 @@ const userMutations = {
             let doc = await user_model_1.User
                 .findByIdAndUpdate(args.id, { status: args.status }, { new: true, fields: projections });
             if (projections.adscription) {
-                // query.populate('adscription');
                 doc = merge_1.transformUser(doc);
             }
             logAction_1.registerGoodLog(context, qType, qName, doc._id);
             return doc;
-            //return await User.findByIdAndUpdate(args.id, args.input, {new:true});
         }
         catch (e) {
             logAction_1.registerErrorLog(context, qType, qName, e);
@@ -135,11 +137,13 @@ const userMutations = {
         }
     },
     /**
-     *
-     * @args UpdateUserRole{...}
+     * Updates the permissions of one user
+     * @param {string} userId - user id
+     * @param {number} permissionRank - rank of the permission that wants to be manipulated
+     * @param {number} action - 1.- Add, 2.- Remove
      * @return { User } - a mongodb document
      */
-    updateUserRole: async (_, args, context, info) => {
+    updateUserRole: async (_, { input }, context, info) => {
         const qType = 'Mutation';
         const qName = 'updateUserRole';
         try {
@@ -148,33 +152,29 @@ const userMutations = {
                 throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
             }
             const projections = merge_1.getProjection(info);
-            const permission = await permission_model_1.Permission.findOne({ rank: args.input.permissionRank });
-            if (args.input.action === 1) {
+            const permission = await permission_model_1.Permission.findOne({ rank: input.permissionRank });
+            if (input.action === 1) {
                 let doc = await user_model_1.User
                     .findOneAndUpdate({
                     $and: [
-                        { _id: args.input.userId },
+                        { _id: input.userId },
                         { permissions: { $nin: [permission] } }
                     ]
                 }, { $push: { permissions: permission } }, { new: true, fields: projections });
-                //.update().exec();
                 if (projections.adscription) {
-                    // query.populate('adscription');
                     doc = merge_1.transformUser(doc);
                 }
-                //Revisar context
                 logAction_1.registerGoodLog(context, qType, qName, doc._id);
                 return doc;
             }
-            else if (args.input.action === 2) {
+            else if (input.action === 2) {
                 let doc = await user_model_1.User.findOneAndUpdate({
                     $and: [
-                        { _id: args.input.userId },
+                        { _id: input.userId },
                         { permissions: { $in: [permission] } }
                     ]
                 }, { $pull: { permissions: permission } }, { new: true, fields: projections });
                 if (projections.adscription) {
-                    // query.populate('adscription');
                     doc = merge_1.transformUser(doc);
                 }
                 logAction_1.registerGoodLog(context, qType, qName, doc._id);

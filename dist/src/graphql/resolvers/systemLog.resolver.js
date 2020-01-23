@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const systemLog_model_1 = require("../../models/systemLog.model");
 const is_auth_1 = require("../../utils/is-auth");
 const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../utils/logAction");
 const systemLogQueries = {
     /**
-     *
-     * @args logId
+     * Get a single log
+     * @param {string} id - log id
      * @return { Log } - a mongodb document
      */
     systemLog: async (_, args, context, info) => {
@@ -35,10 +35,15 @@ const systemLogQueries = {
     },
     /**
      *
-     * @args SearchLogs{...}
-     * @return { [SystemLog] } - mongodb documents
+     * @param {number} from - Start of the range of dates to consider in the search
+     * @param {number} to - End of the range of dates to consider in the search
+     * @param {number} page - page selection for pagination
+     * @param {number} perPage - amount of items per page
+     * @param {string} user - Optional parameter if want to look at the logs of a specific user
+     * @param {string} type - the kind of logs you want to look up, Authentication, Success, Error, Generic
+     * @return { [SystemLog] } - a logs list
      */
-    systemLogs: async (_, args, context, info) => {
+    systemLogs: async (_, { input }, context, info) => {
         const qType = 'Query';
         const qName = 'systemLogs';
         try {
@@ -49,18 +54,18 @@ const systemLogQueries = {
             const projections = merge_1.getProjection(info);
             const query = {
                 $and: [
-                    { createdAt: { $gte: args.input.from } },
-                    { createdAt: { $lte: args.input.to } },
+                    { createdAt: { $gte: input.from } },
+                    { createdAt: { $lte: input.to } },
                 ]
             };
-            if (args.input.user) {
+            if (input.user) {
                 // @ts-ignore
                 query.$and.push({ causer: args.input.user });
             }
             let docs = await systemLog_model_1.SystemLog
                 .find(query, projections)
-                .skip(args.input.page * args.input.perPage)
-                .limit(args.input.perPage).exec();
+                .skip(input.page * input.perPage)
+                .limit(input.perPage).exec();
             logAction_1.registerGoodLog(context, qType, qName, 'Multiple documents');
             console.log(docs);
             return docs;

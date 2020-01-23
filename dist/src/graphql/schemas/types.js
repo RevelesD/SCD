@@ -131,11 +131,11 @@ exports.types = `
   }
 
   input InputUser {
-    clave: String!
-    status: String!
-    name: String!
-    lastName: String!
-    adscription: ID!
+    clave: String
+    status: String
+    name: String
+    lastName: String
+    adscription: ID
   }
 
   input UpdateUser {

@@ -29,6 +29,11 @@ function getGrid(client) {
     const db = client.db(process.env.DB_NAME);
     return new mongo.GridFSBucket(db, { bucketName: 'archivos' });
 }
+/**
+ * Obtain a single file
+ * @param {string} id - id of the document
+ * @param {string} mode - view or download
+ */
 exports.router.post('/getFile', async (req, res) => {
     // define the variables needed to log the request into the system
     const qType = 'POST';
@@ -90,6 +95,12 @@ exports.router.post('/getFile', async (req, res) => {
         throw e;
     }
 });
+/**
+ * Compress in a zip file all the files asked by the user
+ * @param {string} file_name - Desired name for the zip file
+ * @param {string[}]} files_list - list of documents ids
+ * @return Stream of the zip file
+ */
 exports.router.post('/joinInZip', async (req, res) => {
     // define the variables needed to log the request into the system
     const qType = 'POST';
@@ -104,10 +115,9 @@ exports.router.post('/joinInZip', async (req, res) => {
     }
     // commence the request flow
     try {
-        const body = req.body.files;
         const client = await getConnection();
         const grid = getGrid(client);
-        const docs = await documents_model_1.Document.find({ _id: { $in: body.files_list } }, { fileId: true, path: true }).exec();
+        const docs = await documents_model_1.Document.find({ _id: { $in: req.body.files_list } }, { fileId: true, path: true }).exec();
         // convert strings into ObjectsId
         const ids = docs.map((e) => {
             return mongo.ObjectID(e.fileId);
@@ -148,7 +158,7 @@ exports.router.post('/joinInZip', async (req, res) => {
         res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         res.setHeader("Content-Description", "File Transfer");
         res.setHeader("Content-Transfer-Encoding", "binary");
-        res.setHeader("Content-Disposition", "attachment; filename=" + body.file_name);
+        res.setHeader("Content-Disposition", "attachment; filename=" + req.body.file_name);
         res.setHeader("Content-Type", "application/x-zip-compressed");
         // pipe archive data to the client
         archive.pipe(res)
@@ -173,6 +183,12 @@ exports.router.post('/joinInZip', async (req, res) => {
         throw e;
     }
 });
+/**
+ * Join multiple pdf documents into a single one
+ * @param {string[}]} files - list of documents ids
+ * @param {string} mode - if the file needs to be downloaded or viewed online
+ * @return Stream of the zip file
+ */
 exports.router.post('/joinInPdf', async (req, res) => {
     // define the variables needed to log the request into the system
     const qType = 'POST';
@@ -192,10 +208,11 @@ exports.router.post('/joinInPdf', async (req, res) => {
         files.forEach((s) => {
             args.push(s);
         });
+        // Use the go compiled tool to process the retrieving and joining of pdfs
         let path = execFileSync(__dirname + '\\main.exe', args, { encoding: 'UTF-8' });
         path = path.trim();
         if (path.startsWith('Error:') || path.startsWith('panic:')) {
-            console.log('Fallo go');
+            console.log('Golang binary failed');
             res.setHeader("Content-Type", "application/json");
             res.json({ error: path });
             return;

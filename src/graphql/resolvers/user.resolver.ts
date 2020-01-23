@@ -2,7 +2,7 @@ import {ApolloError} from "apollo-server";
 import {User} from "../../models/user.model"
 import {Permission} from "../../models/permission.model"
 import {config} from "../../../config.const"
-import {getProjection, transformUser} from "./merge";
+import {getProjection, transformUser} from "../../utils/merge";
 import {
   registerBadLog,
   registerGoodLog,
@@ -13,9 +13,9 @@ import { storeOnS3 } from "../../utils/imageUploader";
 
 const userQueries = {
   /**
-   *
-   * @args userId
-   * @return { User } - a mongodb document
+   * Get a single user
+   * @param {string} id - user id
+   * @return {User} - a mongodb document
    */
   user: async (_, args, context, info) => {
     const qType = 'Query';
@@ -39,10 +39,10 @@ const userQueries = {
     }
   },
   /**
-   *
-   * @args page
-   * @args perPage
-   * @return { [User] } - mongodb documents
+   * Get multiple users
+   * @param {number} page - page selection for pagination
+   * @param {number} perPage - amount of items per page
+   * @return { [User] } - a list of users
    */
   users: async (_, args, context, info) => {
     const qType = 'Query';
@@ -55,7 +55,6 @@ const userQueries = {
       const projections = getProjection(info);
       let docs = await User.find({}, projections).exec();
       if (projections.adscription) {
-        // query.populate('adscription');
         docs = docs.map(transformUser);
       }
       registerGoodLog(context, qType, qName, 'Multiple documents');
@@ -69,15 +68,19 @@ const userQueries = {
 
 const userMutations = {
   /**
-   *
-   * @args InputUser{...}
+   * Create a new user, this mutations should not be used as the users are automatically created on login
+   * @param {string} clave - Personal identifier, provided by the login PI
+   * @param {string} status - Status of activity "Activo" || "Inactivo"
+   * @param {string} name
+   * @param {string} lastName
+   * @param {string} adscription - id of the campus where the user belongs
    * @return { User } - a mongodb document
    */
-  createUser: async (_, args, context, info) => {
+  createUser: async (_, {input}, context) => {
     const qType = 'Mutation';
     const qName = 'createUser';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
+      if (!await isAuth(context, [config.permission.superAdmin])) {
         const error = registerBadLog(context, qType, qName);
         throw new ApolloError(`S5, Message: ${error}`);
       }
@@ -85,10 +88,11 @@ const userMutations = {
       const permission = await Permission.findOne({rank: config.permission.docente});
 
       const user = await User.create({
-        clave: args.input.clave,
-        status: args.input.status,
-        name: args.input.name,
-        adscription: args.input.adscription,
+        clave: input.clave,
+        status: input.status,
+        name: input.name,
+        lastName: input.lastName,
+        adscription: input.adscription,
         photoURL: process.env.ANONYMOUS_URL,
         permissions: [permission]
       });
@@ -104,9 +108,9 @@ const userMutations = {
     }
   },
   /**
-   *
-   * @args userId
-   * @args status
+   * Update the status of the user, the rest of the fields should not be updated.
+   * @args {string} id - user id
+   * @args {string} status - "Activo" || "Inactivo"
    * @return { User } - a mongodb document
    */
   updateUser: async (_, args, context, info) => {
@@ -130,23 +134,23 @@ const userMutations = {
             args.id, {status: args.status},
             {new: true, fields: projections});
       if (projections.adscription) {
-        // query.populate('adscription');
         doc = transformUser(doc);
       }
       registerGoodLog(context, qType, qName, doc._id);
       return doc;
-      //return await User.findByIdAndUpdate(args.id, args.input, {new:true});
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e)
     }
   },
   /**
-   *
-   * @args UpdateUserRole{...}
+   * Updates the permissions of one user
+   * @param {string} userId - user id
+   * @param {number} permissionRank - rank of the permission that wants to be manipulated
+   * @param {number} action - 1.- Add, 2.- Remove
    * @return { User } - a mongodb document
    */
-  updateUserRole: async (_, args, context, info) => {
+  updateUserRole: async (_, {input}, context, info) => {
     const qType = 'Mutation';
     const qName = 'updateUserRole';
     try {
@@ -155,33 +159,31 @@ const userMutations = {
         throw new ApolloError(`S5, Message: ${error}`);
       }
       const projections = getProjection(info);
-      const permission = await Permission.findOne({rank: args.input.permissionRank});
-      if (args.input.action === 1) {
+      const permission = await Permission.findOne({rank: input.permissionRank});
+      if (input.action === 1) {
         let doc = await
           User
             .findOneAndUpdate(
               {
                 $and: [
-                  {_id: args.input.userId},
+                  {_id: input.userId},
                   {permissions: {$nin: [permission]}}
                 ]
               },
               {$push: {permissions: permission}},
               {new: true, fields: projections});
-        //.update().exec();
 
         if (projections.adscription) {
-          // query.populate('adscription');
           doc = transformUser(doc);
         }
-        //Revisar context
+
         registerGoodLog(context, qType, qName, doc._id);
         return doc;
-      } else if (args.input.action === 2) {
+      } else if (input.action === 2) {
         let doc = await User.findOneAndUpdate(
           {
             $and: [
-              {_id: args.input.userId},
+              {_id: input.userId},
               {permissions: {$in: [permission]}}
             ]
           },
@@ -189,7 +191,6 @@ const userMutations = {
           {new: true, fields: projections});
 
         if (projections.adscription) {
-          // query.populate('adscription');
           doc = transformUser(doc);
         }
         registerGoodLog(context, qType, qName, doc._id);

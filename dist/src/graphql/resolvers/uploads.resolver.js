@@ -9,6 +9,12 @@ const category_model_1 = require("../../models/category.model");
 const config_const_1 = require("../../../config.const");
 const apollo_server_1 = require("apollo-server");
 const logAction_1 = require("../../utils/logAction");
+/**
+ * Saves one file as binary in the database
+ * @param {Upload} upload - The file as received from the front end
+ * @param {InputDocument} input - The ownership information of the document
+ * @return Mongodb document
+ */
 const processUpload = async (upload, input) => {
     try {
         const { createReadStream, filename, mimetype } = await upload;
@@ -46,10 +52,16 @@ const processUpload = async (upload, input) => {
         throw new apollo_server_1.ApolloError(e);
     }
 };
+/**
+ * Store the information of the file as a document in mongodb
+ * @param {string} catId - category id
+ * @param {string} owner - owner id
+ * @param {Object} docData - metadata of the docuemnt retrieved from the db
+ * @return mongodb document
+ */
 async function createDocument(catId, owner, docData) {
     try {
         const category = await category_model_1.Category.findById(catId);
-        // console.log(docData);
         const doc = {
             fileName: docData.filename,
             fileId: docData._id,
@@ -69,8 +81,13 @@ async function createDocument(catId, owner, docData) {
 const uploadsQueries = {};
 exports.uploadsQueries = uploadsQueries;
 const uploadsMutations = {
+    /**
+     * Handles the upload of a single document
+     * @param {Upload} file - The document to be stored
+     * @param {InputDocument{category, owner}} input - The ownership information of the document
+     * @return {Document} document as stored on the db
+     */
     singleUpload: async (_, { file, input }, context) => {
-        console.log(file);
         const qType = 'Mutation';
         const qName = 'singleUpload';
         try {
@@ -87,6 +104,12 @@ const uploadsMutations = {
             throw new apollo_server_1.ApolloError(e);
         }
     },
+    /**
+     * Handles the upload of multiple documents at the same time
+     * @param {Upload[]} files - The documents to be stored
+     * @param {InputDocument{category, owner}} input - The ownership information of the documents
+     * @return {Document[]} list of documents as stored on the db
+     */
     multipleUpload: async (_, { files, input }, context) => {
         const qType = 'Mutation';
         const qName = 'multipleUpload';

@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const permission_model_1 = require("../../models/permission.model");
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const is_auth_1 = require("../../utils/is-auth");
 const config_const_1 = require("../../../config.const");
 const logAction_1 = require("../../utils/logAction");
 const permissionQueries = {
     /**
-     *
-     * @args permissionId
+     * Get a single permission
+     * @param {string} id - permission id
      * @return { Permission } - a mongodb document
      */
     permission: async (_, args, context, info) => {
@@ -31,10 +31,10 @@ const permissionQueries = {
         }
     },
     /**
-     *
-     * @page
-     * @perPage
-     * @return { [Permission] } - mongodb documents
+     * Get multiple permissions
+     * @param {number} page - page selection for pagination
+     * @param {number} perPage - amount of items per page
+     * @return { [Permission] } - mongodb permissions documents list
      */
     permissions: async (_, { page, perPage }, context, info) => {
         const qType = 'Query';
@@ -61,8 +61,8 @@ const permissionQueries = {
 exports.permissionQueries = permissionQueries;
 const permissionMutations = {
     /**
-     *
-     * @args InputPermission{ rank }
+     * Creates a new permission
+     * @param {InputPermission{rank}} input - Info of the new permission-
      * @return { Permission } - a mongodb document
      */
     createPermission: async (_, args, context, info) => {
@@ -86,9 +86,9 @@ const permissionMutations = {
         }
     },
     /**
-     *
-     * @args permissionId
-     * @args InputPermission{ rank }
+     * Updates one document
+     * @param {string} id - permission id
+     * @param {InputPermission{ rank }} input - new info to update the document
      * @return { Permission } - a mongodb document
      */
     updatePermission: async (_, args, context, info) => {
@@ -111,9 +111,9 @@ const permissionMutations = {
         }
     },
     /**
-     *
-     * @args permissionId
-     * @return { Permission } - a mongodb document
+     * Deletes one permission
+     * @param {string} id - permission id
+     * @return { Permission } - the document deleted
      */
     deletePermission: async (_, args, context, info) => {
         const qType = 'Mutation';

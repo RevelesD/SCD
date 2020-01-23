@@ -1,7 +1,7 @@
 import {ApolloError} from 'apollo-server'
 import {Category} from "../../models/category.model";
 import {config} from "../../../config.const";
-import {getProjection, transformCategory} from "./merge";
+import {getProjection, transformCategory} from "../../utils/merge";
 import {isAuth} from "../../utils/is-auth";
 import {
   TreeBuilder,

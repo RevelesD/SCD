@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const category_model_1 = require("../../models/category.model");
 const config_const_1 = require("../../../config.const");
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const is_auth_1 = require("../../utils/is-auth");
 const CategoriesHelper_1 = require("../../utils/CategoriesHelper");
 const logAction_1 = require("../../utils/logAction");

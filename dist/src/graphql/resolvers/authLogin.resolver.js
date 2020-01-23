@@ -91,7 +91,8 @@ async function userNotFound(userAPI) {
             status: "Activo",
             name: concat(userAPI.alumno.nombre),
             lastName: concat(userAPI.alumno.apellidoPaterno + ' ' + userAPI.alumno.apellidoMaterno),
-            adscription: "5d9672d6e068fa0a76f96d15",
+            adscription: process.env.INFO_CAMPUS_ID,
+            photoURL: process.env.ANONYMOUS_URL,
             permissions: [permission]
         });
         return newUser;

@@ -1,4 +1,4 @@
-import { getProjection, transCatInDocument, transOwnerInDocument } from "./merge";
+import { getProjection, transCatInDocument, transOwnerInDocument } from "../../utils/merge";
 import { Document } from "../../models/documents.model";
 import { Category as CatModel } from "../../models/category.model";
 import { Category, Document as DocType } from "../../generated/graphql.types";

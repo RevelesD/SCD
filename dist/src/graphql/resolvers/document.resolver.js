@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const merge_1 = require("./merge");
+const merge_1 = require("../../utils/merge");
 const documents_model_1 = require("../../models/documents.model");
 const category_model_1 = require("../../models/category.model");
 const apollo_server_1 = require("apollo-server");
