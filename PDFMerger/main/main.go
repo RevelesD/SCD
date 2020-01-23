@@ -22,10 +22,10 @@ func main() {
 	con, err := mongogo.GetConnection(uri)
 	mongogo.CheckError(err)
 	defer con.Disconnect(context.Background())
-	// Find the files in the db
+	// Find the files in the db, "SCD" and "documents" can be replaced by arguments provided by the system call
 	results, err := mongogo.FindFiles("SCD", "documents", con, &oids)
 	mongogo.CheckError(err)
-	// Obtain a bucket.
+	// Obtain a bucket. "SCD" and "archivos" can be replaced by arguments provided by the system call
 	bucket := mongogo.GetBucket("SCD", "archivos", con)
 	// Channel used to wait for the download of the files
 	cPath := make(chan string)
