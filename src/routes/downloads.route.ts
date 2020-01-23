@@ -211,11 +211,12 @@ router.post('/joinInPdf', async(req, res) => {
   try {
     const files = req.body.files;
     let args = [];
+    args.push(process.env.DB_PATH);
     files.forEach((s) => {
       args.push(s)
     })
     // Use the go compiled tool to process the retrieving and joining of pdfs
-    let path: string = execFileSync(__dirname + '\\main.exe', args, {encoding: 'UTF-8'});
+    let path: string = execFileSync(__dirname + '\\PDFMerger.exe', args, {encoding: 'UTF-8'});
     path = path.trim();
     if (path.startsWith('Error:') || path.startsWith('panic:')) {
       console.log('Golang binary failed');
@@ -247,7 +248,7 @@ router.post('/joinInPdf', async(req, res) => {
     sender.pipe(res)
       .on('finish', () => {
         registerGenericLog(context, qType, qName, 'Stream of the file successfully');
-        // fs.unlinkSync(path);
+        fs.unlinkSync(path);
       })
       .on('error', (err) => {
         registerGenericLog(context, qType, qName, err);
