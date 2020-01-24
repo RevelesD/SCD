@@ -36,7 +36,7 @@ exports.loginQueries = {
             if (!userDB) {
                 context.user.userId = 'Unauthenticated';
                 logAction_1.registerGenericLog(context, qType, qName, 'Creating a user with no previous login');
-                userDB = userNotFound(userAPI);
+                userDB = await userNotFound(userAPI);
                 logAction_1.registerGoodLog(context, 'Mutation', 'Usuario creado', userDB._id);
             }
             const token = createAuthToken(userDB);

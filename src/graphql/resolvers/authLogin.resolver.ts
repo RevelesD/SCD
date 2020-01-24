@@ -40,7 +40,7 @@ export const loginQueries = {
         context.user.userId = 'Unauthenticated';
         registerGenericLog(context, qType, qName, 'Creating a user with no previous login');
 
-        userDB = userNotFound(userAPI);
+        userDB = await userNotFound(userAPI);
         registerGoodLog(context, 'Mutation', 'Usuario creado', userDB._id);
       }
 
