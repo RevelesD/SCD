@@ -18,10 +18,10 @@ const userQueries = {
         const qType = 'Query';
         const qName = 'user';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
-            }
+            // if (!await isAuth(context, [config.permission.docente])) {
+            //   const error = registerBadLog(context, qType, qName);
+            //   throw new ApolloError(`S5, Message: ${error}`);
+            // }
             const projections = merge_1.getProjection(info);
             let doc = await user_model_1.User.findOne({ _id: args.id }, projections).exec();
             if (projections.adscription) {
@@ -46,10 +46,10 @@ const userQueries = {
         const qType = 'Query';
         const qName = 'users';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
-            }
+            // if (!await isAuth(context, [config.permission.admin])) {
+            //   const error = registerBadLog(context, qType, qName);
+            //   throw new ApolloError(`S5, Message: ${error}`);
+            // }
             const projections = merge_1.getProjection(info);
             let docs = await user_model_1.User.find({}, projections).exec();
             if (projections.adscription) {
