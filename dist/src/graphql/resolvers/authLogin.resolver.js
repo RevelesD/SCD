@@ -18,7 +18,13 @@ exports.loginQueries = {
         const qType = 'Query';
         const qName = 'login';
         try {
-            const userAPI = await consumeExternalAPI(clave, password);
+            // const userAPI = await consumeExternalAPI(clave, password);
+            const userAPI = {
+                alumno: {
+                    expediente: "232551"
+                },
+                response: 400
+            };
             // Error log when the authentication attempt failed
             if (userAPI.response === 401) {
                 context.user.userId = 'Unauthenticated';
