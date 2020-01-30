@@ -18,13 +18,13 @@ exports.loginQueries = {
         const qType = 'Query';
         const qName = 'login';
         try {
-            // const userAPI = await consumeExternalAPI(clave, password);
-            const userAPI = {
-                alumno: {
-                    expediente: "232551"
-                },
-                response: 400
-            };
+            const userAPI = await consumeExternalAPI(clave, password);
+            // const userAPI = {
+            //   alumno: {
+            //     expediente: "232551"
+            //   },
+            //   response: 400
+            // }
             // Error log when the authentication attempt failed
             if (userAPI.response === 401) {
                 context.user.userId = 'Unauthenticated';
@@ -39,6 +39,9 @@ exports.loginQueries = {
              ******* */
             let userDB = await user_model_1.User
                 .findOne({ clave: userAPI.alumno['expediente'] }).exec();
+            /**
+             *
+             */
             if (!userDB) {
                 context.user.userId = 'Unauthenticated';
                 logAction_1.registerGenericLog(context, qType, qName, 'Creating a user with no previous login');
