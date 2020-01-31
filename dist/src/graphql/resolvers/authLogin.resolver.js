@@ -34,7 +34,7 @@ exports.loginQueries = {
             //search the user in our DB
             /* **********
       
-              change the property "Alumno" for whatever come with workers
+              change the property "Alumno" for whatever comes with workers
       
              ******* */
             let userDB = await user_model_1.User
@@ -47,6 +47,9 @@ exports.loginQueries = {
                 logAction_1.registerGenericLog(context, qType, qName, 'Creating a user with no previous login');
                 userDB = await userNotFound(userAPI);
                 logAction_1.registerGoodLog(context, 'Mutation', 'Usuario creado', userDB._id);
+            }
+            if (userDB.status === 'Inactivo') {
+                throw new apollo_server_1.ForbiddenError('Tu usuario se encuentra desactivado, consulta con un administrador.');
             }
             const token = createAuthToken(userDB);
             logAction_1.registerGoodLog(context, qType, qName, userDB._id);

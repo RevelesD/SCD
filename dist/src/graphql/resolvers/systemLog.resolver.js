@@ -16,9 +16,9 @@ const systemLogQueries = {
         const qType = 'Query';
         const qName = 'systemLog';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             let doc = await systemLog_model_1.SystemLog.findById(args.id, projections).exec();
@@ -47,9 +47,9 @@ const systemLogQueries = {
         const qType = 'Query';
         const qName = 'systemLogs';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const query = {

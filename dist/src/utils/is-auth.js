@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const apollo_server_1 = require("apollo-server");
 const user_model_1 = require("../models/user.model");
+const logAction_1 = require("./logAction");
 const jwt = require('jsonwebtoken');
 exports.getUser = (token) => {
     if (token === '') {
@@ -27,17 +29,31 @@ exports.getUser = (token) => {
         };
     }
 };
-exports.isAuth = async (contex, permissions) => {
+/**
+ *
+ * @param contex
+ * @param permissions
+ * @return {number} - 0=unauthenticated, 1= authenticated, 2=insufficient permissions
+ */
+exports.isAuth = async (context, qType, qName, permissions) => {
     try {
+        if (context.user.userId == 'Unauthenticated') {
+            const error = logAction_1.registerBadLog(context, qType, qName);
+            return new apollo_server_1.AuthenticationError(`S5, Message: ${error}`);
+        }
         const conditions = {
-            _id: contex.user.userId,
+            _id: context.user.userId,
             'permissions.rank': { $all: permissions }
         };
-        const found = await user_model_1.User.find(conditions);
-        return found.length > 0;
+        const found = await user_model_1.User.countDocuments(conditions);
+        if (found === 0) {
+            const error = logAction_1.registerBadLog(context, qType, qName);
+            return new apollo_server_1.ForbiddenError(`S5, Message: ${error}`);
+        }
+        return null;
     }
     catch (e) {
-        return false;
+        return new apollo_server_1.ApolloError('Internal Server Error 5000000000');
     }
 };
 //# sourceMappingURL=is-auth.js.map

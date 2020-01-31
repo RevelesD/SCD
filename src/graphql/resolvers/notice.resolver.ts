@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server";
+import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import { Notice } from "../../models/notice.model";
 import { getProjection, transformNotice } from "../../utils/merge";
 import { isAuth } from "../../utils/is-auth";
@@ -21,9 +21,9 @@ const noticeQueries = {
     const qType = 'Query';
     const qName = 'notice';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -49,9 +49,9 @@ const noticeQueries = {
     const qType = 'Query';
     const qName = 'notices';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -89,16 +89,16 @@ const noticeMutations = {
     const qType = 'Mutation';
     const qName = 'createNotice';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.admin]);
+      if (err !== null){
+        throw err;
       }
 
       const path = await storeOnS3(file, 'notices');
       if (path === 'FORMAT_ERROR') {
         registerErrorLog(context, qType, qName,
           'File format not supported. Only images are allowed');
-        throw new ApolloError(`S5, Message: File format not supported. Only images are allowed`);
+        throw new UserInputError(`S5, Message: File format not supported. Only images are allowed`);
       }
 
       const notice = new Notice({
@@ -130,9 +130,9 @@ const noticeMutations = {
     const qType = 'Mutation';
     const qName = 'updateNotice';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.admin]);
+      if (err !== null){
+        throw err;
       }
 
       if (args.input.file !== undefined) {
@@ -168,9 +168,9 @@ const noticeMutations = {
     const qType = 'Mutation';
     const qName = 'deleteNotice';
     try {
-      if (!await isAuth(context, [config.permission.admin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.admin]);
+      if (err !== null){
+        throw err;
       }
 
       const doc = await Notice.findByIdAndDelete(args.id);

@@ -2,7 +2,7 @@ import { getProjection, transCatInDocument, transOwnerInDocument } from "../../u
 import { Document } from "../../models/documents.model";
 import { Category as CatModel } from "../../models/category.model";
 import { Category, Document as DocType } from "../../generated/graphql.types";
-import { ApolloError } from "apollo-server";
+import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import { config } from '../../../config.const'
 import { Context, isAuth } from "../../utils/is-auth";
 const mongodb = require('mongodb');
@@ -101,10 +101,10 @@ const documentQueries = {
     const qType = 'Query';
     const qName = 'documents';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
-      }
+      // if (!await isAuth(context, [config.permission.docente])) {
+      //   const error = registerBadLog(context, qType, qName);
+      //   throw new ApolloError(`S5, Message: ${error}`);
+      // }
 
       const cat: Category = await CatModel.findOne({clave: args.category}, {_id: true});
 
@@ -137,9 +137,9 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'updateDocument';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -149,7 +149,7 @@ const documentMutations = {
         registerGenericLog(
           context, qType, qName,
           'User can\'t update documents that are not his own');
-        throw new ApolloError('User can\'t update documents that are not his own')
+        throw new UserInputError('User can\'t update documents that are not his own')
       }
 
       doc = await Document.updateOne(doc._id, args.input, {new: true});
@@ -175,9 +175,9 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'deleteDocument';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
       // check if the document belong to the user trying to modify it
       let doc = await Document.findById(args.id);
@@ -218,9 +218,9 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'moveDocument';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -258,6 +258,10 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'deleteDocuments';
     try {
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
+      }
       const docs: DocType[] = await Document.find({_id: {$in: args.ids}});
       // check if there are documents in the search
       if (docs.length === 0) {
@@ -306,9 +310,9 @@ const documentMutations = {
     const qType = 'Mutation';
     const qName = 'moveMultipleDocuments';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const cat: Category =
@@ -337,55 +341,63 @@ const documentMutations = {
  * a list of ids of updated documents and a list of errors found during the execution
  */
 async function moveDocument(cat: Category, docs: DocType[]) {
-  let updatedFiles = {
-    qty: 0,
-    files: [],
-    errors: []
-  }
-  for (let i = 0; i < docs.length; i++) {
-    try {
-      console.log(`Doc ${i}`, docs[i]);
-
-      await Document.findByIdAndUpdate(docs[i]._id,
-        {
-          path: cat.path + '/' + docs[i].fileName,
-          category: cat._id
-        },
-        {new: true, fields: {_id: true}}
-      );
-
-      updatedFiles.qty++;
-      updatedFiles.files.push(docs[i].fileId);
-    } catch (e) {
-      updatedFiles.errors.push(e.toString());
+  try {
+    let updatedFiles = {
+      qty: 0,
+      files: [],
+      errors: []
     }
+    for (let i = 0; i < docs.length; i++) {
+      try {
+        console.log(`Doc ${i}`, docs[i]);
+
+        await Document.findByIdAndUpdate(docs[i]._id,
+          {
+            path: cat.path + '/' + docs[i].fileName,
+            category: cat._id
+          },
+          {new: true, fields: {_id: true}}
+        );
+
+        updatedFiles.qty++;
+        updatedFiles.files.push(docs[i].fileId);
+      } catch (e) {
+        updatedFiles.errors.push(e.toString());
+      }
+    }
+    return updatedFiles;
+  } catch (e) {
+    throw e;
   }
-  return updatedFiles;
 }
 
 async function CreateGFSBucketConnection(): Promise<GridFSBucket> {
-  // Create a mongodb client connection
-  const con = await MongoClient.connect(
-    process.env.DB_PATH,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    }
-  );
-  // Connect to a database using the previous mongo client
-  const db = con.db(process.env.DB_NAME);
-  // GridFS
-  const bucket = new mongodb.GridFSBucket(db, {
-    bucketName: 'archivos',
-  });
-  return bucket;
+  try {
+    // Create a mongodb client connection
+    const con = await MongoClient.connect(
+      process.env.DB_PATH,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }
+    );
+    // Connect to a database using the previous mongo client
+    const db = con.db(process.env.DB_NAME);
+    // GridFS
+    const bucket = new mongodb.GridFSBucket(db, {
+      bucketName: 'archivos',
+    });
+    return bucket;
+  } catch (e) {
+    throw e;
+  }
 }
 
 function logDenyDeleteOfDocuments(context, qT, qN) {
   registerGenericLog(
     context, qT, qN,
     'User can\'t delete documents that are not his own');
-  throw new ApolloError('User can\'t delete documents that are not his own')
+  throw new ForbiddenError('User can\'t delete documents that are not his own')
 }
 
 export { documentQueries, documentMutations };

@@ -1,4 +1,4 @@
-import {ApolloError, AuthenticationError} from "apollo-server";
+import {ApolloError, AuthenticationError, ForbiddenError} from "apollo-server";
 import { User } from "../../models/user.model";
 import { Permission } from "../../models/permission.model";
 import { config } from "../../../config.const";
@@ -36,7 +36,7 @@ export const loginQueries = {
       //search the user in our DB
       /* **********
 
-        change the property "Alumno" for whatever come with workers
+        change the property "Alumno" for whatever comes with workers
 
        ******* */
       let userDB = await User
@@ -52,6 +52,10 @@ export const loginQueries = {
 
         userDB = await userNotFound(userAPI);
         registerGoodLog(context, 'Mutation', 'Usuario creado', userDB._id);
+      }
+
+      if (userDB.status === 'Inactivo') {
+        throw new ForbiddenError('Tu usuario se encuentra desactivado, consulta con un administrador.');
       }
 
       const token = createAuthToken(userDB);

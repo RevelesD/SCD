@@ -56,7 +56,10 @@ exports.queries = `
   
   systemLog(id: ID!): SystemLog!
   systemLogs(input: SearchLogs!): [SystemLog!]!
-  
-  getTree(cat: ID!, user: ID!): Branch!
+  """
+  cat  id, as stored on the db\n
+  user id, as stored on the db\n
+  """
+  getTree(cat: ID!, user: ID!): Branch
 `;
 //# sourceMappingURL=queries.js.map

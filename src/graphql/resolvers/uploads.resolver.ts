@@ -6,7 +6,7 @@ const PromiseAll = require('promises-all');
 import { Document } from "../../models/documents.model";
 import { Category } from "../../models/category.model";
 import { config } from '../../../config.const';
-import { ApolloError } from 'apollo-server';
+import { ApolloError, ForbiddenError } from 'apollo-server';
 import {registerBadLog, registerErrorLog, registerGoodLog} from "../../utils/logAction";
 
 /**
@@ -20,7 +20,7 @@ const processUpload = async (upload, input) => {
     const { createReadStream, filename, mimetype } = await upload;
     const stream = createReadStream();
     if (mimetype !== 'application/pdf') {
-      throw new ApolloError('Tipo de documento no valido');
+      throw new ForbiddenError('Tipo de documento no valido');
     }
 
     const con = await MongoClient.connect(
@@ -96,9 +96,9 @@ const uploadsMutations = {
     const qType = 'Mutation';
     const qName = 'singleUpload';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
       const doc = await processUpload(file, input);
       registerGoodLog(context, qType, qName, doc._id)
@@ -118,9 +118,9 @@ const uploadsMutations = {
     const qType = 'Mutation';
     const qName = 'multipleUpload';
     try {
-      if (!await isAuth(context, [config.permission.docente])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.docente]);
+      if (err !== null){
+        throw err;
       }
 
       const { resolve, reject } = await PromiseAll.all(

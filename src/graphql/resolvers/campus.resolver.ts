@@ -1,4 +1,4 @@
-import {ApolloError} from "apollo-server";
+import {ApolloError, ForbiddenError, AuthenticationError} from "apollo-server";
 import {Campus} from "../../models/campus.model";
 import {getProjection} from "../../utils/merge";
 import {Context, isAuth} from "../../utils/is-auth"
@@ -19,9 +19,9 @@ const campusQueries = {
     const qType = 'Query';
     const qName = 'campus';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin])
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -43,9 +43,9 @@ const campusQueries = {
     const qType = 'Query';
     const qName = 'allCampus';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -72,9 +72,9 @@ const campusMutations = {
     const qType = 'Mutation';
     const qName = 'createCampus';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const campus = new Campus({
@@ -99,9 +99,9 @@ const campusMutations = {
     const qType = 'Mutation';
     const qName = 'updateCampus';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -123,9 +123,9 @@ const campusMutations = {
     const qType = 'Mutation';
     const qName = 'deleteCampus';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const doc = await Campus.findByIdAndDelete(id);

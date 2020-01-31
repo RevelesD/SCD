@@ -18,9 +18,9 @@ const noticeQueries = {
         const qType = 'Query';
         const qName = 'notice';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             let doc = await notice_model_1.Notice.findById(args.id, projections).exec();
@@ -46,9 +46,9 @@ const noticeQueries = {
         const qType = 'Query';
         const qName = 'notices';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             let conditions = {};
@@ -83,14 +83,14 @@ const noticeMutations = {
         const qType = 'Mutation';
         const qName = 'createNotice';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.admin]);
+            if (err !== null) {
+                throw err;
             }
             const path = await imageUploader_1.storeOnS3(file, 'notices');
             if (path === 'FORMAT_ERROR') {
                 logAction_1.registerErrorLog(context, qType, qName, 'File format not supported. Only images are allowed');
-                throw new apollo_server_1.ApolloError(`S5, Message: File format not supported. Only images are allowed`);
+                throw new apollo_server_1.UserInputError(`S5, Message: File format not supported. Only images are allowed`);
             }
             const notice = new notice_model_1.Notice({
                 title: input.title,
@@ -122,9 +122,9 @@ const noticeMutations = {
         const qType = 'Mutation';
         const qName = 'updateNotice';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.admin]);
+            if (err !== null) {
+                throw err;
             }
             if (args.input.file !== undefined) {
                 const doc = await notice_model_1.Notice.findById(args.id, { imgLnk: true });
@@ -157,9 +157,9 @@ const noticeMutations = {
         const qType = 'Mutation';
         const qName = 'deleteNotice';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.admin]);
+            if (err !== null) {
+                throw err;
             }
             const doc = await notice_model_1.Notice.findByIdAndDelete(args.id);
             logAction_1.registerGoodLog(context, qType, qName, doc._id);

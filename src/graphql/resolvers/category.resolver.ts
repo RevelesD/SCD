@@ -1,4 +1,4 @@
-import {ApolloError} from 'apollo-server'
+import {ApolloError, ForbiddenError, UserInputError} from 'apollo-server'
 import {Category} from "../../models/category.model";
 import {config} from "../../../config.const";
 import {getProjection, transformCategory} from "../../utils/merge";
@@ -159,9 +159,9 @@ const categoryMutations = {
     const qType = 'Mutation';
     const qName = 'createRootCategory';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -196,9 +196,9 @@ const categoryMutations = {
     const qType = 'Mutation';
     const qName = 'createLeafCategory';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -210,7 +210,7 @@ const categoryMutations = {
         registerGenericLog(
           context, qType, qName,
           'User can\'t create a leaft category on a category that have RIPAUAQ\'s score');
-        throw new ApolloError('Esta categoria posee puntos RIPAUAQ, no puede contener subcategorias.')
+        throw new UserInputError('Esta categoria posee puntos RIPAUAQ, no puede contener subcategorias.')
       }
       // Begins the declaration of the document for the model
       const doc = {
@@ -248,9 +248,9 @@ const categoryMutations = {
     const qType = 'Mutation';
     const qName = 'updateCategory';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
       // Read the fields requested by the client.
       const projections = getProjection(info);
@@ -267,7 +267,7 @@ const categoryMutations = {
           registerGenericLog(
             context, qType, qName,
             'User can\'t assign RIPAUAQ`s score to a category with children');
-          throw new ApolloError('No se pueden agregar puntos RIPAUAQ a una categoria con hijos');
+          throw new UserInputError('No se pueden agregar puntos RIPAUAQ a una categoria con hijos');
         }
       }
       if (input.clave) {
@@ -303,7 +303,7 @@ const categoryMutations = {
       registerGenericLog(
         context, qType, qName,
         'User can\'t delete a category at this time.');
-      throw new ApolloError('S5, User can\'t delete a category at this time.');
+      throw new UserInputError('S5, User can\'t delete a category at this time.');
     } catch (e) {
       registerErrorLog(context, qType, qName, e);
       throw new ApolloError(e);

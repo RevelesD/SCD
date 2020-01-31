@@ -96,10 +96,10 @@ const documentQueries = {
         const qType = 'Query';
         const qName = 'documents';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
-            }
+            // if (!await isAuth(context, [config.permission.docente])) {
+            //   const error = registerBadLog(context, qType, qName);
+            //   throw new ApolloError(`S5, Message: ${error}`);
+            // }
             const cat = await category_model_1.Category.findOne({ clave: args.category }, { _id: true });
             let conditions = {
                 owner: args.user
@@ -129,16 +129,16 @@ const documentMutations = {
         const qType = 'Mutation';
         const qName = 'updateDocument';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             args.input.updatedAt = Date.now();
             let doc = await documents_model_1.Document.findById(args.id, projections);
             if (doc.owner !== context.user.userId) {
                 logAction_1.registerGenericLog(context, qType, qName, 'User can\'t update documents that are not his own');
-                throw new apollo_server_1.ApolloError('User can\'t update documents that are not his own');
+                throw new apollo_server_1.UserInputError('User can\'t update documents that are not his own');
             }
             doc = await documents_model_1.Document.updateOne(doc._id, args.input, { new: true });
             if (projections.category) {
@@ -164,9 +164,9 @@ const documentMutations = {
         const qType = 'Mutation';
         const qName = 'deleteDocument';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             // check if the document belong to the user trying to modify it
             let doc = await documents_model_1.Document.findById(args.id);
@@ -206,9 +206,9 @@ const documentMutations = {
         const qType = 'Mutation';
         const qName = 'moveDocument';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const cat = await category_model_1.Category.findById(args.cat, { _id: true, path: true });
@@ -239,6 +239,10 @@ const documentMutations = {
         const qType = 'Mutation';
         const qName = 'deleteDocuments';
         try {
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
+            }
             const docs = await documents_model_1.Document.find({ _id: { $in: args.ids } });
             // check if there are documents in the search
             if (docs.length === 0) {
@@ -285,9 +289,9 @@ const documentMutations = {
         const qType = 'Mutation';
         const qName = 'moveMultipleDocuments';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const cat = await category_model_1.Category.findById(args.cat, { _id: true, path: true });
             const docs = await documents_model_1.Document.find({ _id: { $in: args.oids } }, { _id: true, path: true, category: true, fileName: true });
@@ -309,43 +313,53 @@ exports.documentMutations = documentMutations;
  * a list of ids of updated documents and a list of errors found during the execution
  */
 async function moveDocument(cat, docs) {
-    let updatedFiles = {
-        qty: 0,
-        files: [],
-        errors: []
-    };
-    for (let i = 0; i < docs.length; i++) {
-        try {
-            console.log(`Doc ${i}`, docs[i]);
-            await documents_model_1.Document.findByIdAndUpdate(docs[i]._id, {
-                path: cat.path + '/' + docs[i].fileName,
-                category: cat._id
-            }, { new: true, fields: { _id: true } });
-            updatedFiles.qty++;
-            updatedFiles.files.push(docs[i].fileId);
+    try {
+        let updatedFiles = {
+            qty: 0,
+            files: [],
+            errors: []
+        };
+        for (let i = 0; i < docs.length; i++) {
+            try {
+                console.log(`Doc ${i}`, docs[i]);
+                await documents_model_1.Document.findByIdAndUpdate(docs[i]._id, {
+                    path: cat.path + '/' + docs[i].fileName,
+                    category: cat._id
+                }, { new: true, fields: { _id: true } });
+                updatedFiles.qty++;
+                updatedFiles.files.push(docs[i].fileId);
+            }
+            catch (e) {
+                updatedFiles.errors.push(e.toString());
+            }
         }
-        catch (e) {
-            updatedFiles.errors.push(e.toString());
-        }
+        return updatedFiles;
     }
-    return updatedFiles;
+    catch (e) {
+        throw e;
+    }
 }
 async function CreateGFSBucketConnection() {
-    // Create a mongodb client connection
-    const con = await mongodb_1.MongoClient.connect(process.env.DB_PATH, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    // Connect to a database using the previous mongo client
-    const db = con.db(process.env.DB_NAME);
-    // GridFS
-    const bucket = new mongodb.GridFSBucket(db, {
-        bucketName: 'archivos',
-    });
-    return bucket;
+    try {
+        // Create a mongodb client connection
+        const con = await mongodb_1.MongoClient.connect(process.env.DB_PATH, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        // Connect to a database using the previous mongo client
+        const db = con.db(process.env.DB_NAME);
+        // GridFS
+        const bucket = new mongodb.GridFSBucket(db, {
+            bucketName: 'archivos',
+        });
+        return bucket;
+    }
+    catch (e) {
+        throw e;
+    }
 }
 function logDenyDeleteOfDocuments(context, qT, qN) {
     logAction_1.registerGenericLog(context, qT, qN, 'User can\'t delete documents that are not his own');
-    throw new apollo_server_1.ApolloError('User can\'t delete documents that are not his own');
+    throw new apollo_server_1.ForbiddenError('User can\'t delete documents that are not his own');
 }
 //# sourceMappingURL=document.resolver.js.map

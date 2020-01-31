@@ -16,9 +16,9 @@ const campusQueries = {
         const qType = 'Query';
         const qName = 'campus';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const doc = await campus_model_1.Campus.findById(id, projections);
@@ -40,9 +40,9 @@ const campusQueries = {
         const qType = 'Query';
         const qName = 'allCampus';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const docs = await campus_model_1.Campus
@@ -69,9 +69,9 @@ const campusMutations = {
         const qType = 'Mutation';
         const qName = 'createCampus';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const campus = new campus_model_1.Campus({
                 name: input.name,
@@ -96,9 +96,9 @@ const campusMutations = {
         const qType = 'Mutation';
         const qName = 'updateCampus';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const doc = await campus_model_1.Campus
@@ -120,9 +120,9 @@ const campusMutations = {
         const qType = 'Mutation';
         const qName = 'deleteCampus';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const doc = await campus_model_1.Campus.findByIdAndDelete(id);
             logAction_1.registerGoodLog(context, qType, qName, doc._id);

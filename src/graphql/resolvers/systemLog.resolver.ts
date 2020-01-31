@@ -1,4 +1,4 @@
-import {ApolloError} from "apollo-server";
+import {ApolloError, ForbiddenError} from "apollo-server";
 import {getProjection, tranformLog} from "../../utils/merge";
 import {SystemLog} from "../../models/systemLog.model";
 import {isAuth} from "../../utils/is-auth";
@@ -15,9 +15,9 @@ const systemLogQueries = {
     const qType = 'Query';
     const qName = 'systemLog';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -46,9 +46,9 @@ const systemLogQueries = {
     const qType = 'Query';
     const qName = 'systemLogs';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
       const projections = getProjection(info);
       const query = {

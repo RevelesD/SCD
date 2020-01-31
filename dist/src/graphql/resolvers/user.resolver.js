@@ -18,9 +18,9 @@ const userQueries = {
         const qType = 'Query';
         const qName = 'user';
         try {
-            // if (!await isAuth(context, [config.permission.docente])) {
-            //   const error = registerBadLog(context, qType, qName);
-            //   throw new ApolloError(`S5, Message: ${error}`);
+            // const err = await isAuth(context, qType, qName, [config.permission.docente]);
+            // if (err !== null){
+            //   throw err;
             // }
             const projections = merge_1.getProjection(info);
             let doc = await user_model_1.User.findOne({ _id: args.id }, projections).exec();
@@ -46,10 +46,10 @@ const userQueries = {
         const qType = 'Query';
         const qName = 'users';
         try {
-            // if (!await isAuth(context, [config.permission.admin])) {
-            //   const error = registerBadLog(context, qType, qName);
-            //   throw new ApolloError(`S5, Message: ${error}`);
-            // }
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.admin]);
+            if (err !== null) {
+                throw err;
+            }
             const projections = merge_1.getProjection(info);
             let docs = await user_model_1.User.find({}, projections).exec();
             if (projections.adscription) {
@@ -79,9 +79,9 @@ const userMutations = {
         const qType = 'Mutation';
         const qName = 'createUser';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const permission = await permission_model_1.Permission.findOne({ rank: config_const_1.config.permission.docente });
             const user = await user_model_1.User.create({
@@ -114,13 +114,13 @@ const userMutations = {
         const qType = 'Mutation';
         const qName = 'updateUser';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.admin]);
+            if (err !== null) {
+                throw err;
             }
             if (args.status !== 'Activo' && args.status !== 'Inactivo') {
                 const error = logAction_1.registerErrorLog(context, qType, qName, `Status provided: ${args.status}. Status nos allowed`);
-                throw new apollo_server_1.ApolloError(`S5, Message: Status provided: ${args.status}. Status not allowed`);
+                throw new apollo_server_1.UserInputError(`S5, Message: Status provided: ${args.status}. Status not allowed`);
             }
             const projections = merge_1.getProjection(info);
             let doc = await user_model_1.User
@@ -147,9 +147,9 @@ const userMutations = {
         const qType = 'Mutation';
         const qName = 'updateUserRole';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.admin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const permission = await permission_model_1.Permission.findOne({ rank: input.permissionRank });
@@ -196,9 +196,9 @@ const userMutations = {
         const qType = 'Mutation';
         const qName = 'updateProfilePic';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             const path = await imageUploader_1.storeOnS3(photo, 'photo');
@@ -220,9 +220,9 @@ const userMutations = {
         const qType = 'Mutation';
         const qName = 'deleteUser';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             logAction_1.registerGoodLog(context, qType, qName, id);
             return await user_model_1.User.findByIdAndDelete(id).exec();

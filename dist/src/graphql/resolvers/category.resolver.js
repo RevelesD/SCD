@@ -153,9 +153,9 @@ const categoryMutations = {
         const qType = 'Mutation';
         const qName = 'createRootCategory';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             // Create the base doc for model
@@ -190,9 +190,9 @@ const categoryMutations = {
         const qType = 'Mutation';
         const qName = 'createLeafCategory';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             const projections = merge_1.getProjection(info);
             // Retrieve the parent category
@@ -201,7 +201,7 @@ const categoryMutations = {
             // Validate if the parent can have children
             if (pdoc.value) {
                 logAction_1.registerGenericLog(context, qType, qName, 'User can\'t create a leaft category on a category that have RIPAUAQ\'s score');
-                throw new apollo_server_1.ApolloError('Esta categoria posee puntos RIPAUAQ, no puede contener subcategorias.');
+                throw new apollo_server_1.UserInputError('Esta categoria posee puntos RIPAUAQ, no puede contener subcategorias.');
             }
             // Begins the declaration of the document for the model
             const doc = {
@@ -240,9 +240,9 @@ const categoryMutations = {
         const qType = 'Mutation';
         const qName = 'updateCategory';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.superAdmin])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.superAdmin]);
+            if (err !== null) {
+                throw err;
             }
             // Read the fields requested by the client.
             const projections = merge_1.getProjection(info);
@@ -256,7 +256,7 @@ const categoryMutations = {
             if (input.value) {
                 if (doc.children) {
                     logAction_1.registerGenericLog(context, qType, qName, 'User can\'t assign RIPAUAQ`s score to a category with children');
-                    throw new apollo_server_1.ApolloError('No se pueden agregar puntos RIPAUAQ a una categoria con hijos');
+                    throw new apollo_server_1.UserInputError('No se pueden agregar puntos RIPAUAQ a una categoria con hijos');
                 }
             }
             if (input.clave) {
@@ -291,7 +291,7 @@ const categoryMutations = {
         const qName = 'deleteCategory';
         try {
             logAction_1.registerGenericLog(context, qType, qName, 'User can\'t delete a category at this time.');
-            throw new apollo_server_1.ApolloError('S5, User can\'t delete a category at this time.');
+            throw new apollo_server_1.UserInputError('S5, User can\'t delete a category at this time.');
         }
         catch (e) {
             logAction_1.registerErrorLog(context, qType, qName, e);

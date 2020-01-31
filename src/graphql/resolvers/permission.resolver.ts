@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server";
+import { ApolloError, ForbiddenError } from "apollo-server";
 import { Permission } from "../../models/permission.model"
 import { getProjection } from "../../utils/merge";
 import { isAuth } from "../../utils/is-auth";
@@ -15,9 +15,9 @@ const permissionQueries = {
     const qType = 'Query';
     const qName = 'permission';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
       const projections = getProjection(info);
       const doc = await Permission.findById(args.id, projections);
@@ -38,9 +38,9 @@ const permissionQueries = {
     const qType = 'Query';
     const qName = 'permissions';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -67,9 +67,9 @@ const permissionMutations = {
     const qType = 'Mutation';
     const qName = 'createPermission';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const permission = new Permission({
@@ -93,9 +93,9 @@ const permissionMutations = {
     const qType = 'Mutation';
     const qName = 'updatePermission';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
 
       const projections = getProjection(info);
@@ -118,9 +118,9 @@ const permissionMutations = {
     const qType = 'Mutation';
     const qName = 'deletePermission';
     try {
-      if (!await isAuth(context, [config.permission.superAdmin])) {
-        const error = registerBadLog(context, qType, qName);
-        throw new ApolloError(`S5, Message: ${error}`);
+      const err = await isAuth(context, qType, qName, [config.permission.superAdmin]);
+      if (err !== null){
+        throw err;
       }
       const doc =await Permission.findByIdAndDelete(args.id).exec();
       registerGoodLog(context, qType, qName, doc._id)

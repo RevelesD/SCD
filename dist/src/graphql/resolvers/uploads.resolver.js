@@ -20,7 +20,7 @@ const processUpload = async (upload, input) => {
         const { createReadStream, filename, mimetype } = await upload;
         const stream = createReadStream();
         if (mimetype !== 'application/pdf') {
-            throw new apollo_server_1.ApolloError('Tipo de documento no valido');
+            throw new apollo_server_1.ForbiddenError('Tipo de documento no valido');
         }
         const con = await MongoClient.connect(process.env.DB_PATH, {
             useNewUrlParser: true,
@@ -91,9 +91,9 @@ const uploadsMutations = {
         const qType = 'Mutation';
         const qName = 'singleUpload';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const doc = await processUpload(file, input);
             logAction_1.registerGoodLog(context, qType, qName, doc._id);
@@ -114,9 +114,9 @@ const uploadsMutations = {
         const qType = 'Mutation';
         const qName = 'multipleUpload';
         try {
-            if (!await is_auth_1.isAuth(context, [config_const_1.config.permission.docente])) {
-                const error = logAction_1.registerBadLog(context, qType, qName);
-                throw new apollo_server_1.ApolloError(`S5, Message: ${error}`);
+            const err = await is_auth_1.isAuth(context, qType, qName, [config_const_1.config.permission.docente]);
+            if (err !== null) {
+                throw err;
             }
             const { resolve, reject } = await PromiseAll.all(files.map(async (x) => await processUpload(x, input)));
             logAction_1.registerGoodLog(context, qType, qName, 'Multiple documents');
