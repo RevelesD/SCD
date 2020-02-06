@@ -11,7 +11,7 @@ const port = process.env.PORT || 4000;
 import { router } from './routes/downloads.route';
 
 mongoose.connect(
-  process.env.DB_PATH + '/' + process.env.DB_NAME,
+  `${process.env.DB_PATH}/${process.env.DB_NAME}?authSource=${process.env.DB_AUTH_COL}&w=1`,
   {
     useNewUrlParser: true,
     useFindAndModify: false,

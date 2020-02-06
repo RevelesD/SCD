@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = process.env.PORT || 4000;
 const downloads_route_1 = require("./routes/downloads.route");
-mongoose.connect(process.env.DB_PATH + '/' + process.env.DB_NAME, {
+mongoose.connect(`${process.env.DB_PATH}/${process.env.DB_NAME}?authSource=${process.env.DB_AUTH_COL}&w=1`, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true,
