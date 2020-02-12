@@ -201,7 +201,7 @@ const userMutations = {
                 throw err;
             }
             const projections = merge_1.getProjection(info);
-            const path = await imageUploader_1.storeLocally(photo, 'photo');
+            const path = await imageUploader_1.storeOnS3(photo, 'photo');
             const user = await user_model_1.User.findOneAndUpdate({ _id: id }, { photoURL: path }, { new: true, fields: projections });
             logAction_1.registerGoodLog(context, qType, qName, user._id);
             return user;

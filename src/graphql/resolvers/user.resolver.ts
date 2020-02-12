@@ -217,7 +217,7 @@ const userMutations = {
       }
 
       const projections = getProjection(info);
-      const path = await storeLocally(photo, 'photo');
+      const path = await storeOnS3(photo, 'photo');
 
       const user = await User.findOneAndUpdate(
         {_id: id}, {photoURL: path},
