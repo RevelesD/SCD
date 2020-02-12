@@ -18,7 +18,7 @@ export async function storeLocally(upload, folder: string): Promise<string> {
 
     /** Uploads to local file system */
     const fn  = `/public/${folder}/` + fileName;
-    const path = __dirname + '/../../..' + fn;
+    const path = __dirname + '/..' + fn;
     const hddStream = fs.createWriteStream(path);
 
     await new Promise((resolve, reject) => {
@@ -27,7 +27,7 @@ export async function storeLocally(upload, folder: string): Promise<string> {
         .on("error", reject)
         .on("finish", resolve);
     });
-    return path;
+    return fn;
   } catch (e) {
     throw e;
   }

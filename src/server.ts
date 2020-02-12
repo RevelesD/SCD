@@ -48,7 +48,7 @@ const server = new ApolloServer({
 });
 server.applyMiddleware({ app, path: '/graphql' });
 // /public only is used when the images files are stored in
-// app.use('/public', express.static(__dirname + '/public'));
+app.use('/public', express.static(__dirname + '/public'));
 app.use('/downloads', router);
 
 app.listen({port}, () => {

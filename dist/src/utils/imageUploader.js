@@ -18,7 +18,7 @@ async function storeLocally(upload, folder) {
         const fileName = `${folder}_${Date.now()}.${extensionFile[extensionFile.length - 1]}`;
         /** Uploads to local file system */
         const fn = `/public/${folder}/` + fileName;
-        const path = __dirname + '/../../..' + fn;
+        const path = __dirname + '/..' + fn;
         const hddStream = fs.createWriteStream(path);
         await new Promise((resolve, reject) => {
             streamImg
@@ -26,7 +26,7 @@ async function storeLocally(upload, folder) {
                 .on("error", reject)
                 .on("finish", resolve);
         });
-        return path;
+        return fn;
     }
     catch (e) {
         throw e;

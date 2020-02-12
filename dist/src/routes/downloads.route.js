@@ -32,7 +32,7 @@ function getGrid(client) {
 /**
  * Obtain a single file
  * @param {string} id - id of the document
- * @param {string} mode - view or download
+ * @param {string} mode - watch or download
  */
 exports.router.post('/getFile', async (req, res) => {
     // define the variables needed to log the request into the system

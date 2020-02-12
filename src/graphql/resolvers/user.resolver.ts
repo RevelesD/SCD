@@ -1,15 +1,14 @@
-import {ApolloError, ForbiddenError, UserInputError} from "apollo-server";
+import {ApolloError, UserInputError} from "apollo-server";
 import {User} from "../../models/user.model"
 import {Permission} from "../../models/permission.model"
 import {config} from "../../../config.const"
 import {getProjection, transformUser} from "../../utils/merge";
 import {
-  registerBadLog,
   registerGoodLog,
   registerErrorLog
 } from "../../utils/logAction";
 import {isAuth} from "../../utils/is-auth";
-import { storeOnS3 } from "../../utils/imageUploader";
+import { storeOnS3, storeLocally } from "../../utils/imageUploader";
 
 const userQueries = {
   /**
@@ -218,7 +217,7 @@ const userMutations = {
       }
 
       const projections = getProjection(info);
-      const path = await storeOnS3(photo, 'photo');
+      const path = await storeLocally(photo, 'photo');
 
       const user = await User.findOneAndUpdate(
         {_id: id}, {photoURL: path},
